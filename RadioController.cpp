@@ -34,3 +34,12 @@ bool RadioController::set_ptt(bool transmit) {
     ptt_t ptt_state = transmit ? RIG_PTT_ON : RIG_PTT_OFF;
     return rig_set_ptt(rig_, RIG_VFO_CURR, ptt_state) == RIG_OK;
 }
+
+bool RadioController::get_dcd(bool& is_squelch_open) {
+    dcd_t dcd_status;
+    if (rig_get_dcd(rig_, RIG_VFO_CURR, &dcd_status) == RIG_OK) {
+        is_squelch_open = (dcd_status == RIG_DCD_ON);
+        return true;
+    }
+    return false;
+}

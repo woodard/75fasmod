@@ -1,4 +1,7 @@
 #include "ModemDSP.hpp"
+#include <gnuradio/audio/source.h>
+#include <gnuradio/blocks/file_descriptor_sink.h>
+#include <gnuradio/digital/constellation_decoder.h>
 #include <gnuradio/blocks/vector_source_b.h>
 #include <gnuradio/blocks/complex_to_real.h>
 #include <gnuradio/blocks/multiply_const_ff.h>
@@ -8,6 +11,39 @@
 #include <iostream>
 
 ModemDSP::ModemDSP() {}
+
+ModemDSP::~ModemDSP() {
+    stop_rx();
+}
+
+void ModemDSP::start_rx(int output_fd) {
+    rx_tb_ = gr::make_top_block("rx_continuous_flowgraph");
+
+    // 1. Audio Source (ALSA)
+    auto audio_src = gr::audio::source::make(48000, "hw:CARD=THD75,DEV=0");
+
+    // [DSP PLACEHOLDER]: Real->Complex, AGC, Clock Recovery, LMS Equalizer, and Constellation Decoder go here.
+    // To keep it compiling before we write the heavy math, we wire it up as a passthrough placeholder.
+    // In reality, you'd feed the output of your Viterbi decoder / QAM slicer into this file descriptor sink.
+    
+    // 2. File Descriptor Sink (Writes decoded bytes directly to our C++ pipe)
+    auto fd_sink = gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
+
+    // rx_tb_->connect(audio_src, 0, dsp_magic, 0);
+    // rx_tb_->connect(dsp_magic, 0, fd_sink, 0);
+
+    // Start in the background (non-blocking)
+    rx_tb_->start();
+    std::cout << "[DSP] Continuous RX Flowgraph started.\n";
+}
+
+void ModemDSP::stop_rx() {
+    if (rx_tb_) {
+        rx_tb_->stop();
+        rx_tb_->wait();
+        rx_tb_.reset();
+    }
+}
 
 void ModemDSP::transmit_burst(const std::vector<uint8_t>& framed_data) {
     // 1. Create a fresh Top Block for this burst

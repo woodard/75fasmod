@@ -19,6 +19,7 @@ DataSocket::~DataSocket() {
 }
 
 bool DataSocket::start() {
+    // 1. Create the Unix socket (existing code)
     server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
     if (server_fd_ < 0) {
         std::cerr << "Error: Could not create Unix socket.\n";
@@ -44,7 +45,18 @@ bool DataSocket::start() {
         return false;
     }
 
-    // Spawn the C++20 background thread
+    active_client_fd_ = -1;
+
+    // 2. Create the POSIX Pipe for RX data
+    if (pipe(rx_pipe_) < 0) {
+        std::cerr << "Error: Could not create RX pipe.\n";
+        return false;
+    }
+
+    // 3. Start the continuous DSP RX flowgraph, giving it the write-end of the pipe
+    dsp_.start_rx(rx_pipe_[1]);
+
+    // 4. Spawn the C++20 background worker thread    
     worker_thread_ = std::jthread(&DataSocket::accept_loop, this);
     std::cout << "Data socket listening on " << socket_path_ << "\n";
     
@@ -61,6 +73,10 @@ void DataSocket::stop() {
         server_fd_ = -1;
         unlink(socket_path_.c_str());  // Clean up the socket file
     }
+
+    dsp_.stop_rx();
+    if (rx_pipe_[0] >= 0) close(rx_pipe_[0]);
+    if (rx_pipe_[1] >= 0) close(rx_pipe_[1]);
 }
 
 void DataSocket::accept_loop(std::stop_token stoken) {
@@ -85,18 +101,29 @@ void DataSocket::accept_loop(std::stop_token stoken) {
 }
 
 void DataSocket::handle_client(int client_fd, std::stop_token& stoken) {
-    struct pollfd pfd{};
-    pfd.fd = client_fd;
-    pfd.events = POLLIN;
+    active_client_fd_ = client_fd;
     
+    struct pollfd pfds[2];
+    
+    // pfds[0] watches the Unix Socket (Data from app -> transmit over RF)
+    pfds[0].fd = client_fd;
+    pfds[0].events = POLLIN;
+
+    // pfds[1] watches the GNU Radio RX Pipe (Data from RF -> send to app)
+    pfds[1].fd = rx_pipe_[0];
+    pfds[1].events = POLLIN;
+
+    std::vector<uint8_t> tx_buffer(2048);
     std::vector<uint8_t> rx_buffer(2048);
-    uint8_t current_seq = 0;
 
     while (!stoken.stop_requested()) {
-        int ret = poll(&pfd, 1, 100);
-        if (ret > 0 && (pfd.revents & POLLIN)) {
-            ssize_t bytes_read = read(client_fd, rx_buffer.data(), rx_buffer.size());
-            if (bytes_read <= 0) break;
+        int ret = poll(pfds, 2, 100);
+
+        if (ret > 0) {
+            // --- EVENT 1: Data arrived from the App (Needs to be transmitted) ---
+            if (pfds[0].revents & POLLIN) {
+                ssize_t bytes = read(client_fd, tx_buffer.data(), tx_buffer.size());
+                if (bytes <= 0) break; // Client disconnected
             
             // --- 1. TX PIPELINE: Frame the raw data ---
             
@@ -181,5 +208,7 @@ void DataSocket::handle_client(int client_fd, std::stop_token& stoken) {
                 std::cerr << "[RX] CRC-32 Check: FAILED!\n";
             }
         }
+	    
     }
+	
 }

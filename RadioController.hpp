@@ -10,7 +10,8 @@ public:
     bool initialize();
     bool set_frequency(double freq_mhz);
     bool set_ptt(bool transmit);
-
+    bool get_dcd(bool& is_squelch_open);
+  
 private:
     rig_model_t model_;
     std::string port_;

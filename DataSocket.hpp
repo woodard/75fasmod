@@ -25,4 +25,6 @@ private:
     std::jthread worker_thread_;
     RadioController& radio_;
     ModemDSP& dsp_;
+    int rx_pipe_[2]; // rx_pipe_[0] is read (C++), rx_pipe_[1] is write (GNU Radio)
+    int active_client_fd_; // Track connected client to send RF data back to
 };
