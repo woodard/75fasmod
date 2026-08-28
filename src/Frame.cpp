@@ -1,6 +1,6 @@
 #include "Frame.hpp"
 
-Frame::Frame(uint8_t frame_type, uint8_t seq_num, uint16_t payload_len, std::vector<uint8_t> payload)
+Frame::Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len, std::vector<uint8_t> payload)
     : ModemHeader(frame_type, seq_num, payload_len), payload(std::move(payload)) {}
 
 uint32_t Frame::calc_crc() const {
