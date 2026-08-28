@@ -1,13 +1,28 @@
 #include "RadioController.hpp"
 #include <iostream>
 #include <cstring>
+#include <thread>
+#include <chrono>
 
 RadioController::RadioController(rig_model_t model, const std::string& port)
-    : model_(model), port_(port), rig_(nullptr) {}
+    : model_(model), port_(port), rig_(nullptr), 
+      orig_mode_(RIG_MODE_NONE), orig_width_(0), orig_menu_102_(-1) {}
 
 RadioController::~RadioController() {
     if (rig_) {
-        set_ptt(false); // Ensure unkeyed on shutdown
+        std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
+        set_ptt(false); // Ensure unkeyed 
+
+        // 1. Restore specific Kenwood Menu 102
+        if (orig_menu_102_ >= 0) {
+            kenwood_menu_set(102, orig_menu_102_);
+        }
+
+        // 2. Restore standard mode and bandwidth
+        if (orig_mode_ != RIG_MODE_NONE) {
+            rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
+        }
+
         rig_close(rig_);
         rig_cleanup(rig_);
     }
@@ -22,7 +37,72 @@ bool RadioController::initialize() {
         std::cerr << "Error: Could not open radio on " << port_ << "\n";
         return false;
     }
+
+    std::cout << "[RIG] Backing up current radio state...\n";
+
+    // --- 1. BACKUP STATE ---
+    // Backup current operating mode (e.g., FM, Voice, etc)
+    rig_get_mode(rig_, RIG_VFO_CURR, &orig_mode_, &orig_width_);
+    
+    // Backup Menu 102 (USB Out Select). Kenwood TH-D75 uses EX commands for menus.
+    orig_menu_102_ = kenwood_menu_get(102);
+    
+    // --- 2. SET MODEM STATE ---
+    std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
+    
+    // Set standard Hamlib mode to Packet FM with 9600 baud passband
+    rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
+    
+    // Force Menu 102 to '1' (Detect). 
+    // This taps the direct discriminator, bypassing the 6dB/oct de-emphasis filter.
+    kenwood_menu_set(102, 1);
+
     return true;
+}
+
+// ... [Keep set_frequency, set_ptt, get_dcd from previous steps] ...
+
+// --- Private Helpers for Kenwood Specific Features ---
+
+int RadioController::kenwood_menu_get(int menu_num) {
+    char cmd[16];
+    snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
+    
+    // Send command
+    rig_send_raw(rig_, (unsigned char*)cmd, strlen(cmd));
+    
+    // Wait briefly for radio processor to answer
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    // Read response. Expected format: "EX102,0;" or "EX102,1;"
+    char buf[64] = {0};
+    int bytes = rig_read_raw(rig_, (unsigned char*)buf, sizeof(buf)-1);
+    
+    if (bytes > 0) {
+        std::string resp(buf);
+        size_t comma = resp.find(',');
+        size_t semi = resp.find(';');
+        if (comma != std::string::npos && semi != std::string::npos) {
+            try {
+                return std::stoi(resp.substr(comma + 1, semi - comma - 1));
+            } catch (...) {
+                return -1;
+            }
+        }
+    }
+    return -1; // Failed to parse
+}
+
+void RadioController::kenwood_menu_set(int menu_num, int value) {
+    if (value < 0) return; // Skip if invalid value
+    
+    char cmd[32];
+    snprintf(cmd, sizeof(cmd), "EX%03d,%d;", menu_num, value);
+    
+    rig_send_raw(rig_, (unsigned char*)cmd, strlen(cmd));
+    
+    // Give the radio firmware time to apply the setting to its matrix switches
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 bool RadioController::set_frequency(double freq_mhz) {

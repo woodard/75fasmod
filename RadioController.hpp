@@ -13,7 +13,16 @@ public:
     bool get_dcd(bool& is_squelch_open);
   
 private:
-    rig_model_t model_;
-    std::string port_;
-    RIG* rig_;
+  // Raw CAT helpers for proprietary Kenwood Menus
+  int kenwood_menu_get(int menu_num);
+  void kenwood_menu_set(int menu_num, int value);
+
+  rig_model_t model_;
+  std::string port_;
+  RIG* rig_;
+
+  // --- State Storage for Restoration ---
+  rmode_t orig_mode_;
+  pbwidth_t orig_width_;
+  int orig_menu_102_; // USB Out Select state
 };
