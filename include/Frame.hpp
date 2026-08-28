@@ -1,5 +1,7 @@
 #pragma once
+#include <cstddef>
 #include <cstdint>
+#include <vector>
 
 #pragma pack(push, 1)
 struct ModemHeader {
@@ -11,3 +13,16 @@ struct ModemHeader {
 
 // Maximum payload size per frame
 constexpr size_t MAX_PAYLOAD_SIZE = 128;
+
+class Frame {
+public:
+  Frame() = default;
+  Frame(ModemHeader hdr, std::vector<uint8_t> payload);
+  
+  // Calculate CRC-32 for this frame's header + payload
+  uint32_t calc_crc() const;
+  
+  ModemHeader header;
+  std::vector<uint8_t> payload;
+  uint32_t crc = 0;
+};

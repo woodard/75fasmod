@@ -149,21 +149,11 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
           header.seq_num = current_seq++;
           header.payload_len = payload_size;
 
-          std::vector<uint8_t> raw_frame;
-          uint8_t *hdr_ptr = reinterpret_cast<uint8_t *>(&header);
-          raw_frame.insert(raw_frame.end(), hdr_ptr,
-                           hdr_ptr + sizeof(ModemHeader));
-          raw_frame.insert(raw_frame.end(), rx_buffer.begin() + offset,
-                           rx_buffer.begin() + offset + payload_size);
-
-          // Add CRC-32
-          uint32_t crc = calculate_crc32(raw_frame.data(), raw_frame.size());
-          uint8_t *crc_ptr = reinterpret_cast<uint8_t *>(&crc);
-          raw_frame.insert(raw_frame.end(), crc_ptr,
-                           crc_ptr + sizeof(uint32_t));
+          Frame frame(header, std::vector<uint8_t>(rx_buffer.begin() + offset,
+                                                  rx_buffer.begin() + offset + payload_size));
 
           // COBS Encode
-          std::vector<uint8_t> tx_encoded = cobs_encode(raw_frame);
+          std::vector<uint8_t> tx_encoded = cobs_encode(frame);
           tx_encoded.push_back(0x00); // Frame delimiter
 
           if (tx_queue_.empty()) {
@@ -195,41 +185,20 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
             rx_stream_accum.erase(rx_stream_accum.begin(), it + 1);
 
             // Decode and Verify
-            if (!rx_encoded.empty()) {
-              std::vector<uint8_t> decoded_frame = cobs_decode(rx_encoded);
+            Frame decoded_frame = cobs_decode_frame(rx_encoded);
 
-              if (decoded_frame.size() >=
-                  sizeof(ModemHeader) + sizeof(uint32_t)) {
-                ModemHeader rx_header;
-                std::memcpy(&rx_header, decoded_frame.data(),
-                            sizeof(ModemHeader));
+            if (!decoded_frame.payload.empty()) {
+              std::cout << "[RX] Valid Frame -> Type: 0x0"
+                        << (int)decoded_frame.header.frame_type
+                        << " | Seq: " << (int)decoded_frame.header.seq_num
+                        << " | Len: " << decoded_frame.header.payload_len << "\n";
 
-                size_t data_len_without_crc =
-                    decoded_frame.size() - sizeof(uint32_t);
-                uint32_t rx_crc;
-                std::memcpy(&rx_crc,
-                            decoded_frame.data() + data_len_without_crc,
-                            sizeof(uint32_t));
-                uint32_t calc_crc =
-                    calculate_crc32(decoded_frame.data(), data_len_without_crc);
-
-                if (rx_crc == calc_crc) {
-                  std::cout << "[RX] Valid Frame -> Type: 0x0"
-                            << (int)rx_header.frame_type
-                            << " | Seq: " << (int)rx_header.seq_num
-                            << " | Len: " << rx_header.payload_len << "\n";
-
-                  // Send valid payload to the chat app!
-                  write(client_fd, decoded_frame.data() + sizeof(ModemHeader),
-                        rx_header.payload_len);
-                } else {
-                  std::cerr << "[RX] Error: Frame failed CRC check!\n";
-                }
-              }
+              // Send valid payload to the chat app!
+              write(client_fd, decoded_frame.payload.data(),
+                    decoded_frame.header.payload_len);
+            } else {
+              std::cerr << "[RX] Error: Frame failed CRC check!\n";
             }
-            // Check if another frame is already in the accumulator
-            it =
-                std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
           }
         }
       }

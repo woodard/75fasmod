@@ -2,9 +2,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include "Frame.hpp"
 
-// Encodes data and returns a new buffer. (Does NOT append the trailing 0x00).
-std::vector<uint8_t> cobs_encode(const std::vector<uint8_t> &input);
+// Encodes a Frame and returns COBS-encoded bytes (does NOT append trailing 0x00)
+std::vector<uint8_t> cobs_encode(const Frame& frame);
 
-// Decodes data. Assumes the trailing 0x00 has already been removed.
-std::vector<uint8_t> cobs_decode(const std::vector<uint8_t> &input);
+// Decodes COBS data and returns a Frame
+Frame cobs_decode_frame(const std::vector<uint8_t>& input);
