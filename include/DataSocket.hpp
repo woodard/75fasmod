@@ -4,6 +4,11 @@
 #include <thread>
 #include <vector>
 #include <cstdint>
+#include <chrono>
+
+// Forward declarations to fix the compiler errors
+class RadioController;
+class ModemDSP;
 
 class DataSocket {
 public:
@@ -24,14 +29,16 @@ private:
     std::string socket_path_;
     int server_fd_;
     std::jthread worker_thread_;
+
     RadioController& radio_;
     ModemDSP& dsp_;
-    int rx_pipe_[2]; // rx_pipe_[0] is read (C++), rx_pipe_[1] is write (GNU Radio)
-    int active_client_fd_; // Track connected client to send RF data back to
+
     int burst_limit_;
     int flush_timeout_ms_;
+    
+    int rx_pipe_[2];
+    int active_client_fd_;
 
-    // Buffer to hold frames waiting to be transmitted
     std::vector<std::vector<uint8_t>> tx_queue_;
     std::chrono::steady_clock::time_point queue_start_time_;
 };

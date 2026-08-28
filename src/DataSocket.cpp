@@ -1,4 +1,6 @@
 #include "DataSocket.hpp"
+#include "RadioController.hpp"
+#include "ModemDSP.hpp"       
 #include "Frame.hpp"
 #include "cobs.hpp"
 #include "crc32.hpp"
@@ -58,8 +60,10 @@ bool DataSocket::start() {
     // Start the continuous DSP RX flowgraph, giving it the write-end of the pipe
     dsp_.start_rx(rx_pipe_[1]);
 
-    // Spawn the worker thread
-    worker_thread_ = std::jthread(&DataSocket::accept_loop, this);
+    worker_thread_ = std::jthread([this](std::stop_token stoken) {
+        this->accept_loop(stoken);
+    });
+    
     std::cout << "Data socket listening on " << socket_path_ << "\n";
     
     return true;

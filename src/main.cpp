@@ -9,6 +9,7 @@
 #include "RadioController.hpp"
 #include "ModemDSP.hpp"
 
+// Global flag to keep the daemon running
 std::atomic<bool> keep_running{true};
 
 void handle_signal(int /* sig */) {
@@ -16,29 +17,31 @@ void handle_signal(int /* sig */) {
 }
 
 void print_usage(const char* prog_name) {
-  std::cout << "Usage: " << prog_name << " [options]\n"
-            << "Options:\n"
-            << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
-            << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
-            << "  -p, --port <device>   Serial port (default: /dev/ttyUSB0)\n"
-            << "  -m, --model <id>      Hamlib rig model ID (default: 2 for "
-               "generic Kenwood)\n"
-            << "  -s, --sock <path>     Data socket path (default: "
-               "/tmp/75fasmod_data.sock)\n"
-            << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
-            << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: "
-               "200)\n"
-            << "  -h, --help            Show this help message\n";
+    std::cout << "Usage: " << prog_name << " [options]\n"
+              << "Options:\n"
+              << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
+              << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
+              << "  -p, --port <device>   Serial port (default: /dev/ttyUSB0)\n"
+              << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic Kenwood)\n"
+              << "  -s, --sock <path>     Data socket path (default: /tmp/75fasmod_data.sock)\n"
+              << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
+              << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: 200)\n"
+              << "  -h, --help            Show this help message\n";
 }
 
 int main(int argc, char* argv[]) {
+    // Variable Declarations (Correctly scoped for the entire main function)
     double target_freq_mhz = 0.0;
-    std::string power_level = ""; // Empty string means leave power as-is
+    std::string power_level = "";
     std::string serial_port = "/dev/ttyUSB0";
     std::string sock_path = "/tmp/75fasmod_data.sock";
-    rig_model_t rig_model = RIG_MODEL_KENWOOD; 
+    
+    // Default values
+    rig_model_t rig_model = 2; // 2 is the Hamlib ID for Generic Kenwood
+    int burst_limit = 8;
+    int flush_timeout_ms = 200;
 
-    const char* const short_opts = "f:w:p:m:s:h";
+    const char* const short_opts = "f:w:p:m:s:b:t:h";
     const option long_opts[] = {
         {"freq", required_argument, nullptr, 'f'},
         {"power", required_argument, nullptr, 'w'},
@@ -71,9 +74,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // 1. Setup Signal Handler
     std::signal(SIGINT, handle_signal);
     std::signal(SIGTERM, handle_signal);
 
+    // 2. Initialize Hardware & DSP Classes
     RadioController radio(rig_model, serial_port);
     if (!radio.initialize()) {
         std::cerr << "Warning: Radio init failed. Proceeding without rig control.\n";
@@ -81,27 +86,28 @@ int main(int argc, char* argv[]) {
         std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
         radio.set_frequency(target_freq_mhz);
 
-        // Set power if specified by the user
         if (!power_level.empty()) {
             radio.set_power_level(power_level);
         }
     }
 
     ModemDSP dsp;
+
+    // 3. Start the Data Socket Server
     DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
     if (!data_sock.start()) {
         return 1;
     }
 
+    // 4. Main Daemon Loop
     std::cout << "Daemon is running. Press Ctrl+C to stop.\n";
     while (keep_running.load()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
+    // 5. Cleanup
     std::cout << "\nShutting down daemon...\n";
     data_sock.stop();
 
-    // The RadioController destructor will automatically run here
-    // and restore the original power level, mode, and menu settings.
     return 0;
 }

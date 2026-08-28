@@ -1,13 +1,16 @@
 #include "ModemDSP.hpp"
+#include <gnuradio/top_block.h>
 #include <gnuradio/audio/source.h>
 #include <gnuradio/blocks/file_descriptor_sink.h>
-#include <gnuradio/digital/constellation_decoder.h>
-#include <gnuradio/blocks/vector_source_b.h>
+#include <gnuradio/digital/constellation_decoder_cb.h>
+#include <gnuradio/blocks/vector_source.h>
 #include <gnuradio/blocks/complex_to_real.h>
-#include <gnuradio/blocks/multiply_const_ff.h>
-#include <gnuradio/digital/constellation_modulator.h>
+#include <gnuradio/blocks/multiply_const.h>
+#include <gnuradio/digital/constellation_encoder_bc.h>
 #include <gnuradio/digital/constellation.h>
 #include <gnuradio/audio/sink.h>
+#include <gnuradio/filter/interp_fir_filter.h>
+#include <gnuradio/filter/firdes.h>
 #include <iostream>
 
 ModemDSP::ModemDSP() {}
@@ -46,43 +49,64 @@ void ModemDSP::stop_rx() {
 }
 
 void ModemDSP::transmit_burst(const std::vector<uint8_t>& framed_data) {
-    // 1. Create a fresh Top Block for this burst
-    auto tb = gr::make_top_block("tx_burst_flowgraph");
+    // 1. Create the Top Block
+    auto tb = gr::make_top_block("tx_burst");
 
-    // 2. Vector Source: Feeds our COBS encoded bytes. 'false' means don't repeat.
-    // When the vector is empty, it sends a DONE signal, and tb->wait() will return.
-    auto src = gr::blocks::vector_source_b::make(framed_data, false);
+    // 2. Prepend Training Sequence (Preamble)
+    // A robust, alternating sequence (e.g., 0xAA = 10101010) gives the Costas Loop 
+    // and LMS Equalizer a strong, predictable edge to lock onto quickly.
+    std::vector<uint8_t> payload_with_preamble;
+    for (int i = 0; i < 16; ++i) { // 16 bytes of preamble
+        payload_with_preamble.push_back(0xAA); 
+    }
+    // Append the actual MAC frames payload after the preamble
+    payload_with_preamble.insert(payload_with_preamble.end(), framed_data.begin(), framed_data.end());
 
-    // 3. QAM Modulator 
-    // Uses 16-QAM as a base. (TCM requires an FSM passed to gr::trellis::encoder here).
-    auto qam = gr::digital::constellation_16qam::make();
+    // 3. Define the Constellation (16-QAM)
+    // (If you already declare 'qam' as a class member, you can safely remove this line)
+    auto qam = gr::digital::constellation_16qam::make(); 
+
+    // 4. Instantiate the DSP Blocks
+    int sps = 5;           // Samples Per Symbol (9600 baud * 4 sps = 38400 Hz sample rate)
+    float rolloff = 0.35;  // Filter alpha (excess bandwidth)
+
+    // Source: Reads our bytes exactly once (repeat = false) and stops
+    auto src = gr::blocks::vector_source_b::make(payload_with_preamble, false);
     
-    // constellation_modulator parameters: constellation, diff_encode, samples_per_symbol, excess_bw
-    auto mod = gr::digital::constellation_modulator::make(qam->base(), false, 4, 0.35);
+    // Encoder: Maps bytes onto the complex 2D QAM grid
+    auto encoder = gr::digital::constellation_encoder_bc::make(qam);
 
-    // 4. Baseband to Real / IF Conversion
-    // Modulators output Complex (I/Q) baseband signals, but the radio needs real audio.
-    // For a true FM passband, this complex signal should be mixed with an audio IF (e.g., 1500Hz).
-    // For this boilerplate, we'll simply extract the real component to allow audio sink mapping.
-    auto c2r = gr::blocks::complex_to_real::make(1);
-    
-    // 5. Volume Attenuation (Prevent ALSA clipping)
-    auto vol = gr::blocks::multiply_const_ff::make(0.5f);
+    // RRC Filter: Interpolates sudden symbol jumps into smooth, contained waveforms
+    std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
+        sps,         // Gain 
+        sps,         // Sampling freq (normalized to sps)
+        1.0,         // Symbol rate (normalized)
+        rolloff,     // Rolloff factor
+        11 * sps     // Number of taps (11 symbols wide for clean overlap)
+    );
+    auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
 
-    // 6. Audio Sink (48kHz ALSA)
-    auto audio_snk = gr::audio::sink::make(48000, "hw:CARD=THD75,DEV=0");
+    // Converter: Discard the Q channel and pass only the real part to the soundcard
+    auto complex_to_real = gr::blocks::complex_to_real::make(1);
 
-    // 7. Connect the blocks
-    tb->connect(src, 0, mod, 0);
-    tb->connect(mod, 0, c2r, 0);
-    tb->connect(c2r, 0, vol, 0);
-    tb->connect(vol, 0, audio_snk, 0);
+    // Volume/Gain: Scale the float values (-1.0 to 1.0) so ALSA doesn't clip.
+    // 0.5 is a safe starting point. If your transmitted audio is too quiet, raise this.
+    auto gain = gr::blocks::multiply_const_ff::make(0.5);
 
-    // 8. Execute Flowgraph
-    std::cout << "[DSP] Starting GNU Radio flowgraph...\n";
+    // Audio Sink: Send to ALSA. 
+    // An empty string "" tells GNU Radio to use the system default soundcard.
+    auto sink = gr::audio::sink::make(38400, "", true); 
+
+    // 5. Connect the Flowgraph
+    tb->connect(src, 0, encoder, 0);
+    tb->connect(encoder, 0, rrc_filter, 0);
+    tb->connect(rrc_filter, 0, complex_to_real, 0);
+    tb->connect(complex_to_real, 0, gain, 0);
+    tb->connect(gain, 0, sink, 0);
+
+    // 6. Execute the Burst
+    std::cout << "[DSP] Transmitting burst (" << payload_with_preamble.size() << " bytes)...\n";
     tb->start();
-    
-    // Blocks the thread until the vector_source_b finishes streaming the bytes
-    tb->wait(); 
-    std::cout << "[DSP] Flowgraph execution complete.\n";
+    tb->wait(); // Wait blocks the thread until the vector_source runs out of bytes
+    std::cout << "[DSP] Burst complete.\n";
 }
