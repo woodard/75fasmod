@@ -6,19 +6,22 @@
 
 RadioController::RadioController(rig_model_t model, const std::string& port)
     : model_(model), port_(port), rig_(nullptr), 
-      orig_mode_(RIG_MODE_NONE), orig_width_(0), orig_menu_102_(-1) {}
+      orig_mode_(RIG_MODE_NONE), orig_width_(0), orig_menu_102_(-1), orig_power_(-1) {}
 
 RadioController::~RadioController() {
     if (rig_) {
         std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
-        set_ptt(false); // Ensure unkeyed 
+        set_ptt(false); 
 
-        // 1. Restore specific Kenwood Menu 102
         if (orig_menu_102_ >= 0) {
             kenwood_menu_set(102, orig_menu_102_);
         }
 
-        // 2. Restore standard mode and bandwidth
+        // 1. Restore the original power level
+        if (orig_power_ >= 0) {
+            kenwood_power_set(orig_power_);
+        }
+
         if (orig_mode_ != RIG_MODE_NONE) {
             rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
         }
@@ -53,6 +56,9 @@ bool RadioController::initialize() {
     // Set standard Hamlib mode to Packet FM with 9600 baud passband
     rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
     
+    // Backup current transmit power level
+    orig_power_ = kenwood_power_get();
+
     // Force Menu 102 to '1' (Detect). 
     // This taps the direct discriminator, bypassing the 6dB/oct de-emphasis filter.
     kenwood_menu_set(102, 1);
@@ -122,4 +128,62 @@ bool RadioController::get_dcd(bool& is_squelch_open) {
         return true;
     }
     return false;
+}
+
+bool RadioController::set_power_level(const std::string& level) {
+    // Convert input string to uppercase for easy comparison
+    std::string lvl = level;
+    for (auto &c : lvl) c = std::toupper(c);
+
+    int val = -1;
+    if (lvl == "H")       val = 0;
+    else if (lvl == "M")  val = 1;
+    else if (lvl == "L")  val = 2;
+    else if (lvl == "EL") val = 3;
+    else {
+        std::cerr << "Error: Invalid power level '" << level << "'. Use EL, L, M, or H.\n";
+        return false;
+    }
+
+    std::cout << "[RIG] Setting TX power to " << lvl << "...\n";
+    kenwood_power_set(val);
+    return true;
+}
+
+// ... [Keep kenwood_menu_get and kenwood_menu_set] ...
+
+// --- Power Control Implementation ---
+
+int RadioController::kenwood_power_get() {
+    rig_send_raw(rig_, (const unsigned char*)"PC;", 3);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    
+    char buf[32] = {0};
+    int bytes = rig_read_raw(rig_, (unsigned char*)buf, sizeof(buf)-1);
+    
+    if (bytes > 0) {
+        std::string resp(buf);
+        size_t pc_pos = resp.find("PC");
+        size_t semi = resp.find(';');
+        
+        // Expecting "PCx;" where x is 0, 1, 2, or 3
+        if (pc_pos != std::string::npos && semi != std::string::npos && semi > pc_pos + 2) {
+            try {
+                return std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+            } catch (...) {
+                return -1;
+            }
+        }
+    }
+    return -1;
+}
+
+void RadioController::kenwood_power_set(int val) {
+    if (val < 0 || val > 3) return;
+    
+    char cmd[16];
+    snprintf(cmd, sizeof(cmd), "PC%d;", val);
+    
+    rig_send_raw(rig_, (const unsigned char*)cmd, strlen(cmd));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Allow relays to click
 }

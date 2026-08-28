@@ -9,6 +9,7 @@ public:
 
     bool initialize();
     bool set_frequency(double freq_mhz);
+    bool set_power_level(const std::string& level);
     bool set_ptt(bool transmit);
     bool get_dcd(bool& is_squelch_open);
   
@@ -25,4 +26,5 @@ private:
   rmode_t orig_mode_;
   pbwidth_t orig_width_;
   int orig_menu_102_; // USB Out Select state
+  int orig_power_; // Stores the original EL/L/M/H state
 };
