@@ -10,8 +10,9 @@
 #include <cstring>
 #include <iomanip>
 
-DataSocket::DataSocket(const std::string& socket_path) 
-    : socket_path_(socket_path), server_fd_(-1) {}
+DataSocket::DataSocket(const std::string& socket_path, RadioController& radio, ModemDSP& dsp) 
+  : socket_path_(socket_path), server_fd_(-1), radio_(radio), dsp_(dsp) {}
+
 
 DataSocket::~DataSocket() {
     stop();
@@ -120,12 +121,27 @@ void DataSocket::handle_client(int client_fd, std::stop_token& stoken) {
             raw_frame.insert(raw_frame.end(), crc_ptr, crc_ptr + sizeof(uint32_t));
 
             // COBS Encode and append the 0x00 delimiter
-            std::vector<uint8_t> tx_encoded = cobs_encode(raw_frame);
+	    std::vector<uint8_t> tx_encoded = cobs_encode(raw_frame);
             tx_encoded.push_back(0x00);
             
-            std::cout << "\n[TX] Built frame. Raw size: " << raw_frame.size() 
-                      << " | COBS size: " << tx_encoded.size() << " bytes.\n";
+            std::cout << "\n[MAC] Frame prepared. Size: " << tx_encoded.size() << " bytes.\n";
 
+            // --- TRANSMIT STATE MACHINE ---
+            std::cout << "[MAC] Keying PTT ON...\n";
+            radio_.set_ptt(true);
+            
+            // Wait for RF PA and relays to settle (80ms)
+            std::this_thread::sleep_for(std::chrono::milliseconds(80));
+
+            // Run DSP flowgraph
+            dsp_.transmit_burst(tx_encoded);
+
+            // Wait for ALSA hardware buffers to drain out the USB port (approx 50ms)
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+            std::cout << "[MAC] Keying PTT OFF...\n";
+            radio_.set_ptt(false);
+	    
             // --- 2. RX PIPELINE SIMULATION: Decode and verify ---
             
             // Remove the 0x00 delimiter before decoding

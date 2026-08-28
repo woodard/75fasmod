@@ -7,8 +7,8 @@
 
 class DataSocket {
 public:
-    DataSocket(const std::string& socket_path);
-    ~DataSocket();
+    DataSocket(const std::string& socket_path, RadioController& radio, ModemDSP& dsp);
+  ~DataSocket();
 
     // Starts the background thread to listen for IPC connections
     bool start();
@@ -23,4 +23,6 @@ private:
     std::string socket_path_;
     int server_fd_;
     std::jthread worker_thread_;
+    RadioController& radio_;
+    ModemDSP& dsp_;
 };

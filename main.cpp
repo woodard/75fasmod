@@ -6,6 +6,8 @@
 #include <getopt.h>
 #include <hamlib/rig.h>
 #include "DataSocket.hpp"
+#include "RadioController.hpp"
+#include "ModemDSP.hpp"
 
 // Global flag to keep the daemon running
 std::atomic<bool> keep_running{true};
@@ -65,28 +67,20 @@ int main(int argc, char* argv[]) {
     std::signal(SIGINT, handle_signal);
     std::signal(SIGTERM, handle_signal);
 
-    // 2. Initialize Hamlib and set frequency
-    std::cout << "Initializing Hamlib (Model ID: " << rig_model << ")...\n";
-    RIG* my_rig = rig_init(rig_model);
-    if (!my_rig) {
-        std::cerr << "Error: Hamlib initialization failed.\n";
-        return 1;
+    // 2. Initialize Hardware & DSP Classes
+    RadioController radio(rig_model, serial_port);
+    if (!radio.initialize()) {
+        std::cerr << "Warning: Radio init failed. Proceeding without rig control.\n";
+    } else {
+        std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
+        radio.set_frequency(target_freq_mhz);
     }
 
-    strncpy(my_rig->state.rigport.pathname, serial_port.c_str(), FILPATHLEN - 1);
-    
-    if (rig_open(my_rig) == RIG_OK) {
-        std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
-        rig_set_freq(my_rig, RIG_VFO_CURR, target_freq_hz);
-    } else {
-        std::cerr << "Warning: Could not open radio on " << serial_port << ". Continuing for testing...\n";
-    }
+    ModemDSP dsp;
 
     // 3. Start the Data Socket Server
-    DataSocket data_sock(sock_path);
+    DataSocket data_sock(sock_path, radio, dsp);
     if (!data_sock.start()) {
-        rig_close(my_rig);
-        rig_cleanup(my_rig);
         return 1;
     }
 
