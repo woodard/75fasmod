@@ -144,13 +144,8 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
           // Frame up to MAX_PAYLOAD_SIZE bytes at a time
           size_t payload_size = std::min<size_t>(bytes_read - offset, MAX_PAYLOAD_SIZE);
 
-          ModemHeader header;
-          header.frame_type = 0x01; // DATA frame
-          header.seq_num = current_seq++;
-          header.payload_len = payload_size;
-
-          Frame frame(header, std::vector<uint8_t>(rx_buffer.begin() + offset,
-                                                  rx_buffer.begin() + offset + payload_size));
+          Frame frame(0x01, current_seq++, payload_size, std::vector<uint8_t>(rx_buffer.begin() + offset,
+                                                                              rx_buffer.begin() + offset + payload_size));
 
           // COBS Encode
           std::vector<uint8_t> tx_encoded = frame.cobs_encode();

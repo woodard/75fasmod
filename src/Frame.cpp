@@ -1,7 +1,7 @@
 #include "Frame.hpp"
 
-Frame::Frame(ModemHeader hdr, std::vector<uint8_t> payload)
-    : header(hdr), payload(std::move(payload)) {}
+Frame::Frame(uint8_t frame_type, uint8_t seq_num, uint16_t payload_len, std::vector<uint8_t> payload)
+    : ModemHeader(frame_type, seq_num, payload_len), payload(std::move(payload)) {}
 
 uint32_t Frame::calc_crc() const {
   uint32_t crc = 0xFFFFFFFF;
