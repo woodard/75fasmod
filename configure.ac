@@ -1,5 +1,5 @@
 AC_INIT([75fasmod], [0.1.0], [your.email@example.com])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CXX
 
 # Force C++20 for std::jthread and modern features

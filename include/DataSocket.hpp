@@ -7,8 +7,9 @@
 
 class DataSocket {
 public:
-    DataSocket(const std::string& socket_path, RadioController& radio, ModemDSP& dsp);
-  ~DataSocket();
+    DataSocket(const std::string& socket_path, RadioController& radio, ModemDSP& dsp, 
+               int burst_limit, int flush_timeout_ms);
+    ~DataSocket();
 
     // Starts the background thread to listen for IPC connections
     bool start();
@@ -27,4 +28,10 @@ private:
     ModemDSP& dsp_;
     int rx_pipe_[2]; // rx_pipe_[0] is read (C++), rx_pipe_[1] is write (GNU Radio)
     int active_client_fd_; // Track connected client to send RF data back to
+    int burst_limit_;
+    int flush_timeout_ms_;
+
+    // Buffer to hold frames waiting to be transmitted
+    std::vector<std::vector<uint8_t>> tx_queue_;
+    std::chrono::steady_clock::time_point queue_start_time_;
 };

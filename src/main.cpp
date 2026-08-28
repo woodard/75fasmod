@@ -16,14 +16,19 @@ void handle_signal(int /* sig */) {
 }
 
 void print_usage(const char* prog_name) {
-    std::cout << "Usage: " << prog_name << " [options]\n"
-              << "Options:\n"
-              << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
-              << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
-              << "  -p, --port <device>   Serial port (default: /dev/ttyUSB0)\n"
-              << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic Kenwood)\n"
-              << "  -s, --sock <path>     Data socket path (default: /tmp/75fasmod_data.sock)\n"
-              << "  -h, --help            Show this help message\n";
+  std::cout << "Usage: " << prog_name << " [options]\n"
+            << "Options:\n"
+            << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
+            << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
+            << "  -p, --port <device>   Serial port (default: /dev/ttyUSB0)\n"
+            << "  -m, --model <id>      Hamlib rig model ID (default: 2 for "
+               "generic Kenwood)\n"
+            << "  -s, --sock <path>     Data socket path (default: "
+               "/tmp/75fasmod_data.sock)\n"
+            << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
+            << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: "
+               "200)\n"
+            << "  -h, --help            Show this help message\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -40,6 +45,8 @@ int main(int argc, char* argv[]) {
         {"port", required_argument, nullptr, 'p'},
         {"model", required_argument, nullptr, 'm'},
         {"sock", required_argument, nullptr, 's'},
+        {"burst", required_argument, nullptr, 'b'},
+        {"timeout", required_argument, nullptr, 't'},
         {"help", no_argument, nullptr, 'h'},
         {nullptr, 0, nullptr, 0}
     };
@@ -52,6 +59,8 @@ int main(int argc, char* argv[]) {
             case 'p': serial_port = optarg; break;
             case 'm': rig_model = std::stoi(optarg); break;
             case 's': sock_path = optarg; break;
+            case 'b': burst_limit = std::stoi(optarg); break;
+            case 't': flush_timeout_ms = std::stoi(optarg); break;
             case 'h': print_usage(argv[0]); return 0;
             default: print_usage(argv[0]); return 1;
         }
@@ -79,7 +88,7 @@ int main(int argc, char* argv[]) {
     }
 
     ModemDSP dsp;
-    DataSocket data_sock(sock_path, radio, dsp);
+    DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
     if (!data_sock.start()) {
         return 1;
     }
