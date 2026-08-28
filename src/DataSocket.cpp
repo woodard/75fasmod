@@ -153,7 +153,7 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
                                                   rx_buffer.begin() + offset + payload_size));
 
           // COBS Encode
-          std::vector<uint8_t> tx_encoded = cobs_encode(frame);
+          std::vector<uint8_t> tx_encoded = frame.cobs_encode();
           tx_encoded.push_back(0x00); // Frame delimiter
 
           if (tx_queue_.empty()) {

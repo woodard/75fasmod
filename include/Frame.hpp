@@ -22,6 +22,9 @@ public:
   // Calculate CRC-32 for this frame's header + payload
   uint32_t calc_crc() const;
   
+  // COBS encode the frame
+  std::vector<uint8_t> cobs_encode() const;
+  
   ModemHeader header;
   std::vector<uint8_t> payload;
   uint32_t crc = 0;

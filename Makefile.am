@@ -8,7 +8,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
     src/main.cpp \
     src/DataSocket.cpp \
     src/cobs.cpp \
-    src/crc32.cpp \
+    src/Frame.cpp \
     src/RadioController.cpp \
     src/ModemDSP.cpp
 
