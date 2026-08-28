@@ -8,3 +8,6 @@ struct ModemHeader {
   uint16_t payload_len; // Length of the inner data payload
 };
 #pragma pack(pop)
+
+// Maximum payload size per frame
+constexpr size_t MAX_PAYLOAD_SIZE = 128;

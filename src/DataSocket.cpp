@@ -141,8 +141,8 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
 
         size_t offset = 0;
         while (offset < static_cast<size_t>(bytes_read)) {
-          // Frame up to 512 bytes at a time
-          size_t payload_size = std::min<size_t>(bytes_read - offset, 512);
+          // Frame up to MAX_PAYLOAD_SIZE bytes at a time
+          size_t payload_size = std::min<size_t>(bytes_read - offset, MAX_PAYLOAD_SIZE);
 
           ModemHeader header;
           header.frame_type = 0x01; // DATA frame
