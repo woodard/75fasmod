@@ -181,15 +181,15 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
             // Decode and Verify
             Frame decoded_frame = cobs_decode_frame(rx_encoded);
 
-            if (!decoded_frame.payload.empty()) {
+	    if (!decoded_frame.payload.empty()) {
               std::cout << "[RX] Valid Frame -> Type: 0x0"
-                        << (int)decoded_frame.header.frame_type
-                        << " | Seq: " << (int)decoded_frame.header.seq_num
-                        << " | Len: " << decoded_frame.header.payload_len << "\n";
+                        << static_cast<int>(decoded_frame.frame_type)
+                        << " | Seq: " << (int)decoded_frame.seq_num
+                        << " | Len: " << decoded_frame.payload_len << "\n";
 
               // Send valid payload to the chat app!
               write(client_fd, decoded_frame.payload.data(),
-                    decoded_frame.header.payload_len);
+                    decoded_frame.payload_len);
             } else {
               std::cerr << "[RX] Error: Frame failed CRC check!\n";
             }

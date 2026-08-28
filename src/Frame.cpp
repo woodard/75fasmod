@@ -6,8 +6,8 @@ Frame::Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len, std::v
 uint32_t Frame::calc_crc() const {
   uint32_t crc = 0xFFFFFFFF;
   
-  // Hash header
-  const uint8_t* data = reinterpret_cast<const uint8_t*>(&header);
+  // Hash inherited header fields
+  const uint8_t* data = reinterpret_cast<const uint8_t*>(static_cast<const ModemHeader*>(this));
   size_t len = sizeof(ModemHeader);
   for (size_t i = 0; i < len; ++i) {
     crc ^= data[i];
@@ -28,9 +28,8 @@ uint32_t Frame::calc_crc() const {
 }
 
 std::vector<uint8_t> Frame::cobs_encode() const {
-  // Build raw frame data: header + payload + crc
   std::vector<uint8_t> raw_frame;
-  const uint8_t* hdr_ptr = reinterpret_cast<const uint8_t*>(&header);
+  const uint8_t* hdr_ptr = reinterpret_cast<const uint8_t*>(static_cast<const ModemHeader*>(this));
   raw_frame.insert(raw_frame.end(), hdr_ptr, hdr_ptr + sizeof(ModemHeader));
   raw_frame.insert(raw_frame.end(), payload.begin(), payload.end());
   
@@ -38,7 +37,6 @@ std::vector<uint8_t> Frame::cobs_encode() const {
   uint8_t* crc_ptr = reinterpret_cast<uint8_t*>(&crc);
   raw_frame.insert(raw_frame.end(), crc_ptr, crc_ptr + sizeof(uint32_t));
   
-  // COBS encode the raw frame
   std::vector<uint8_t> output;
   output.resize(raw_frame.size() + raw_frame.size() / 254 + 2);
 
