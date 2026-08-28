@@ -3,7 +3,6 @@
 #include "ModemDSP.hpp"
 #include "RadioController.hpp"
 #include "cobs.hpp"
-#include "crc32.hpp"
 #include <algorithm>
 #include <cstring>
 #include <iomanip>
