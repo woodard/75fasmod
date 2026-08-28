@@ -1,0 +1,9 @@
+- name: ollama_chat/laguna-xs-2.1:q4_K_M
+  extra_params:
+    num_ctx: 262144
+
+- name: ollama_chat/gemma4-aider
+  edit_format: architect
+  reasoning_tag: think
+  extra_params:
+    max_tokens: 20000
