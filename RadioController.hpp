@@ -4,6 +4,15 @@
 
 class RadioController {
 public:
+    // Define the specific power levels mapped to Kenwood CAT values
+    enum class PowerLevel {
+        HIGH = 0,
+        MEDIUM = 1,
+        LOW = 2,
+        EXTRA_LOW = 3,
+        UNKNOWN = -1
+    };
+
     RadioController(rig_model_t model, const std::string& port);
     ~RadioController();
 
@@ -12,19 +21,21 @@ public:
     bool set_power_level(const std::string& level);
     bool set_ptt(bool transmit);
     bool get_dcd(bool& is_squelch_open);
-  
+
 private:
-  // Raw CAT helpers for proprietary Kenwood Menus
-  int kenwood_menu_get(int menu_num);
-  void kenwood_menu_set(int menu_num, int value);
+    int kenwood_menu_get(int menu_num);
+    void kenwood_menu_set(int menu_num, int value);
+    
+    // Updated Raw CAT helpers using the enum
+    PowerLevel kenwood_power_get();
+    void kenwood_power_set(PowerLevel val);
 
-  rig_model_t model_;
-  std::string port_;
-  RIG* rig_;
+    rig_model_t model_;
+    std::string port_;
+    RIG* rig_;
 
-  // --- State Storage for Restoration ---
-  rmode_t orig_mode_;
-  pbwidth_t orig_width_;
-  int orig_menu_102_; // USB Out Select state
-  int orig_power_; // Stores the original EL/L/M/H state
+    rmode_t orig_mode_;
+    pbwidth_t orig_width_;
+    int orig_menu_102_;
+    PowerLevel orig_power_; // Stores the original state using the enum
 };

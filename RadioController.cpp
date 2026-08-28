@@ -6,7 +6,8 @@
 
 RadioController::RadioController(rig_model_t model, const std::string& port)
     : model_(model), port_(port), rig_(nullptr), 
-      orig_mode_(RIG_MODE_NONE), orig_width_(0), orig_menu_102_(-1), orig_power_(-1) {}
+      orig_mode_(RIG_MODE_NONE), orig_width_(0), orig_menu_102_(-1), 
+      orig_power_(PowerLevel::UNKNOWN) {} // Initialize with the UNKNOWN state
 
 RadioController::~RadioController() {
     if (rig_) {
@@ -17,8 +18,8 @@ RadioController::~RadioController() {
             kenwood_menu_set(102, orig_menu_102_);
         }
 
-        // 1. Restore the original power level
-        if (orig_power_ >= 0) {
+        // 1. Restore the original power level using the enum
+        if (orig_power_ != PowerLevel::UNKNOWN) {
             kenwood_power_set(orig_power_);
         }
 
@@ -131,15 +132,14 @@ bool RadioController::get_dcd(bool& is_squelch_open) {
 }
 
 bool RadioController::set_power_level(const std::string& level) {
-    // Convert input string to uppercase for easy comparison
     std::string lvl = level;
     for (auto &c : lvl) c = std::toupper(c);
 
-    int val = -1;
-    if (lvl == "H")       val = 0;
-    else if (lvl == "M")  val = 1;
-    else if (lvl == "L")  val = 2;
-    else if (lvl == "EL") val = 3;
+    PowerLevel val = PowerLevel::UNKNOWN;
+    if (lvl == "H")       val = PowerLevel::HIGH;
+    else if (lvl == "M")  val = PowerLevel::MEDIUM;
+    else if (lvl == "L")  val = PowerLevel::LOW;
+    else if (lvl == "EL") val = PowerLevel::EXTRA_LOW;
     else {
         std::cerr << "Error: Invalid power level '" << level << "'. Use EL, L, M, or H.\n";
         return false;
@@ -150,11 +150,9 @@ bool RadioController::set_power_level(const std::string& level) {
     return true;
 }
 
-// ... [Keep kenwood_menu_get and kenwood_menu_set] ...
+// --- Enum-based Power Control Implementation ---
 
-// --- Power Control Implementation ---
-
-int RadioController::kenwood_power_get() {
+RadioController::PowerLevel RadioController::kenwood_power_get() {
     rig_send_raw(rig_, (const unsigned char*)"PC;", 3);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     
@@ -166,23 +164,27 @@ int RadioController::kenwood_power_get() {
         size_t pc_pos = resp.find("PC");
         size_t semi = resp.find(';');
         
-        // Expecting "PCx;" where x is 0, 1, 2, or 3
         if (pc_pos != std::string::npos && semi != std::string::npos && semi > pc_pos + 2) {
             try {
-                return std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+                int pwr_int = std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+                // Validate bounds and cast to enum safely
+                if (pwr_int >= 0 && pwr_int <= 3) {
+                    return static_cast<PowerLevel>(pwr_int);
+                }
             } catch (...) {
-                return -1;
+                return PowerLevel::UNKNOWN;
             }
         }
     }
-    return -1;
+    return PowerLevel::UNKNOWN;
 }
 
-void RadioController::kenwood_power_set(int val) {
-    if (val < 0 || val > 3) return;
+void RadioController::kenwood_power_set(PowerLevel val) {
+    if (val == PowerLevel::UNKNOWN) return;
     
     char cmd[16];
-    snprintf(cmd, sizeof(cmd), "PC%d;", val);
+    // Cast enum back to integer for the Kenwood ASCII command string
+    snprintf(cmd, sizeof(cmd), "PC%d;", static_cast<int>(val));
     
     rig_send_raw(rig_, (const unsigned char*)cmd, strlen(cmd));
     std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Allow relays to click
