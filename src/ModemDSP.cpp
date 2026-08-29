@@ -5,12 +5,13 @@
 #include <gnuradio/blocks/complex_to_real.h>
 #include <gnuradio/blocks/file_descriptor_sink.h>
 #include <gnuradio/blocks/multiply_const.h>
+#include <gnuradio/blocks/repack_bits_bb.h>
 #include <gnuradio/blocks/vector_source.h>
+#include <gnuradio/digital/chunks_to_symbols.h>
 #include <gnuradio/digital/constellation.h>
-#include <gnuradio/digital/constellation_decoder_cb.h>
-#include <gnuradio/digital/constellation_encoder_bc.h>
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/filter/interp_fir_filter.h>
+#include <gnuradio/trellis/encoder.h>
 #include <gnuradio/top_block.h>
 #include <iostream>
 
@@ -22,20 +23,10 @@ void ModemDSP::start_rx(int output_fd) {
   // 1. Audio Source (ALSA)
   auto audio_src = gr::audio::source::make(48000, alsa_device_);
 
-  // [DSP PLACEHOLDER]: Real->Complex, AGC, Clock Recovery, LMS Equalizer, and
-  // Constellation Decoder go here. To keep it compiling before we write the
-  // heavy math, we wire it up as a passthrough placeholder. In reality, you'd
-  // feed the output of your Viterbi decoder / QAM slicer into this file
-  // descriptor sink.
-
-  // 2. File Descriptor Sink (Writes decoded bytes directly to our C++ pipe)
+  // 2. File Descriptor Sink (Writes decoded bytes directly to C++ pipe)
   auto fd_sink =
       gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
 
-  // rx_tb_->connect(audio_src, 0, dsp_magic, 0);
-  // rx_tb_->connect(dsp_magic, 0, fd_sink, 0);
-
-  // Start in the background (non-blocking)
   rx_tb_->start();
   std::cout << "[DSP] Continuous RX Flowgraph started.\n";
 }
@@ -53,61 +44,54 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   auto tb = gr::make_top_block("tx_burst");
 
   // 2. Prepend Training Sequence (Preamble)
-  // A robust, alternating sequence (e.g., 0xAA = 10101010) gives the Costas
-  // Loop and LMS Equalizer a strong, predictable edge to lock onto quickly.
   std::vector<uint8_t> payload_with_preamble;
   for (int i = 0; i < 16; ++i) { // 16 bytes of preamble
     payload_with_preamble.push_back(0xAA);
   }
-  // Append the actual MAC frames payload after the preamble
   payload_with_preamble.insert(payload_with_preamble.end(), framed_data.begin(),
                                framed_data.end());
 
-  // 3. Define the Constellation
-  // Use TcmConfig to build our custom 16-QAM grid
+  // 3. Define the Constellation and Trellis FSM
+  auto fsm = TcmConfig::get_fsm(ModulationScheme::QAM16);
   auto qam = TcmConfig::get_constellation(ModulationScheme::QAM16);
 
   // 4. Instantiate the DSP Blocks
   int sps = 5; // Samples Per Symbol (9600 baud * 5 sps = 48000 Hz sample rate)
   float rolloff = 0.35; // Filter alpha (excess bandwidth)
 
-  // Source: Reads our bytes exactly once (repeat = false) and stops
   auto src = gr::blocks::vector_source_b::make(payload_with_preamble, false);
 
-  // Encoder: Maps bytes onto the complex 2D QAM grid
-  auto encoder = gr::digital::constellation_encoder_bc::make(qam);
+  // Repacker: Slices 8-bit bytes into 3-bit informational chunks (k=3)
+  auto repack = gr::blocks::repack_bits_bb::make(8, 3);
 
-  // RRC Filter: Interpolates sudden symbol jumps into smooth, contained waveforms
+  // Trellis Encoder: Applies convolutional code + set partitioning
+  auto trellis_encoder = gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
+
+  // Symbol Mapper: Maps Trellis indices (0-15) directly to complex QAM coordinates
+  auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(qam->points());
+
+  // RRC Filter
   std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
-      sps,     // Gain (set to sps to maintain amplitude after interpolation)
-      sps,     // Sampling freq (normalized to sps)
-      1.0,     // Symbol rate (normalized)
-      rolloff, // Rolloff factor
-      11 * sps // Number of taps (11 symbols wide for clean overlap)
-  );
+      sps, sps, 1.0, rolloff, 11 * sps);
   auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
 
-  // Converter: Discard the Q channel and pass only the real part to the soundcard
   auto complex_to_real = gr::blocks::complex_to_real::make(1);
-
-  // Volume/Gain: Scale the float values (-1.0 to 1.0) so ALSA doesn't clip.
-  // 0.5 is a safe starting point. If your transmitted audio is too quiet, raise this.
   auto gain = gr::blocks::multiply_const_ff::make(0.5);
-
-  // Audio Sink: Send to ALSA natively at 48,000 Hz.
   auto sink = gr::audio::sink::make(48000, alsa_device_, true);
 
   // 5. Connect the Flowgraph
-  tb->connect(src, 0, encoder, 0);
-  tb->connect(encoder, 0, rrc_filter, 0);
+  tb->connect(src, 0, repack, 0);
+  tb->connect(repack, 0, trellis_encoder, 0);
+  tb->connect(trellis_encoder, 0, mapper, 0);
+  tb->connect(mapper, 0, rrc_filter, 0);
   tb->connect(rrc_filter, 0, complex_to_real, 0);
   tb->connect(complex_to_real, 0, gain, 0);
   tb->connect(gain, 0, sink, 0);
 
   // 6. Execute the Burst
-  std::cout << "[DSP] Transmitting burst (" << payload_with_preamble.size()
+  std::cout << "[DSP] Transmitting TCM burst (" << payload_with_preamble.size()
             << " bytes)...\n";
   tb->start();
-  tb->wait(); // Wait blocks the thread until vector_source runs out of bytes
-  std::cout << "[DSP] Burst complete.\n";
+  tb->wait();
+  std::cout << "[DSP] TCM Burst complete.\n";
 }
