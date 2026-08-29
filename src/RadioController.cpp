@@ -42,14 +42,23 @@ RadioController::~RadioController() {
 }
 
 bool RadioController::initialize() {
+  // Enable Hamlib internal verbose trace logging
+  rig_set_debug_level(RIG_DEBUG_TRACE);
+
+  std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
-  if (!rig_)
+  if (!rig_) {
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_ 
+              << ". The model ID may not exist in this Hamlib build.\n";
     return false;
+  }
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
-  if (rig_open(rig_) != RIG_OK) {
-    std::cerr << "Error: Could not open radio on " << port_ << "\n";
+  int status = rig_open(rig_);
+  if (status != RIG_OK) {
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_ 
+              << " | Code: " << status << " (" << rigerror(status) << ")\n";
     return false;
   }
 
@@ -74,7 +83,7 @@ bool RadioController::initialize() {
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
-  // 3. Verify radio is in an FM mode and not AM, SSB, CW, or D-Star DV
+  // 3. Verify radio is in an FM mode
   rmode_t active_mode = RIG_MODE_NONE;
   pbwidth_t active_width = 0;
   if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {

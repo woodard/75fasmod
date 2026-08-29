@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   std::string sock_path = "/tmp/75fasmod_data.sock";
 
   // Default values
-  rig_model_t rig_model = 2; // 2 is the Hamlib ID for Generic Kenwood
+  rig_model_t rig_model = RadioController::DEFAULT_MODEL;
   int burst_limit = 8;
   int flush_timeout_ms = 200;
 

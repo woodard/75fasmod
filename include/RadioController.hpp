@@ -8,6 +8,9 @@ namespace fs = std::filesystem;
 
 class RadioController {
 public:
+  // Default Hamlib model ID for Kenwood TH-D74 / TH-D75
+  static constexpr rig_model_t DEFAULT_MODEL = 2042;
+
   // Define the specific power levels mapped to Kenwood CAT values
   enum class PowerLevel {
     HIGH = 0,
