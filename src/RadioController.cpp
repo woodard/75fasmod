@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <thread>
+#include <cstdlib>
 
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
@@ -203,8 +204,8 @@ void RadioController::kenwood_power_set(PowerLevel val) {
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-std::vector<std::string> RadioController::find_tty_sysfs(const std::string& target_vid,
-                                                       const std::string& target_pid) {
+std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid,
+                                                       unsigned int target_pid) {
   std::vector<std::string> found_ports;
   fs::path sys_tty = "/sys/class/tty";
   
@@ -220,7 +221,15 @@ std::vector<std::string> RadioController::find_tty_sysfs(const std::string& targ
       fs::path pid_path = dev_path / parent_rel / "idProduct";
 
       if (fs::exists(vid_path) && fs::exists(pid_path)) {
-        if (read_sysfs_attr(vid_path) == target_vid && read_sysfs_attr(pid_path) == target_pid) {
+        unsigned int vid = 0, pid = 0;
+        if (auto vid_str = read_sysfs_attr(vid_path); !vid_str.empty()) {
+          vid = std::stoul(vid_str, nullptr, 16);
+        }
+        if (auto pid_str = read_sysfs_attr(pid_path); !pid_str.empty()) {
+          pid = std::stoul(pid_str, nullptr, 16);
+        }
+        
+        if (vid == target_vid && pid == target_pid) {
           found_ports.push_back("/dev/" + entry.path().filename().string());
           break;
         }

@@ -24,8 +24,8 @@ public:
   bool set_ptt(bool transmit);
   bool get_dcd(bool &is_squelch_open);
 
-  static std::vector<std::string> find_tty_sysfs(const std::string& target_vid,
-                                                 const std::string& target_pid);
+  static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
+                                                 unsigned int target_pid);
 
 private:
   int kenwood_menu_get(int menu_num);
