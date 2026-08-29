@@ -8,6 +8,42 @@
 #include <hamlib/rig.h>
 #include <iostream>
 #include <string>
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
+
+static std::string read_sysfs_attr(const fs::path& filepath) {
+    std::ifstream file(filepath);
+    std::string value;
+    if (file >> value) return value;
+    return "";
+}
+
+static std::vector<std::string> find_tty_sysfs(const std::string& target_vid, const std::string& target_pid) {
+    std::vector<std::string> found_ports;
+    fs::path sys_tty = "/sys/class/tty";
+    
+    if (!fs::exists(sys_tty)) return found_ports;
+
+    for (const auto& entry : fs::directory_iterator(sys_tty)) {
+        fs::path dev_path = entry.path() / "device";
+        if (!fs::exists(dev_path)) continue;
+
+        for (const std::string& parent_rel : {"..", "../..", "../../.."}) {
+            fs::path vid_path = dev_path / parent_rel / "idVendor";
+            fs::path pid_path = dev_path / parent_rel / "idProduct";
+
+            if (fs::exists(vid_path) && fs::exists(pid_path)) {
+                if (read_sysfs_attr(vid_path) == target_vid && read_sysfs_attr(pid_path) == target_pid) {
+                    found_ports.push_back("/dev/" + entry.path().filename().string());
+                    break;
+                }
+            }
+        }
+    }
+    return found_ports;
+}
 
 // Global flag to keep the daemon running
 std::atomic<bool> keep_running{true};
@@ -20,7 +56,7 @@ void print_usage(const char *prog_name) {
       << "Options:\n"
       << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
       << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
-      << "  -p, --port <device>   Serial port (default: /dev/ttyUSB0)\n"
+      << "  -p, --port <device>   Serial port (default: auto-discover Kenwood TH-D75)\n"
       << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic "
          "Kenwood)\n"
       << "  -s, --sock <path>     Data socket path (default: "
@@ -34,7 +70,7 @@ int main(int argc, char *argv[]) {
   // Variable Declarations (Correctly scoped for the entire main function)
   double target_freq_mhz = 0.0;
   std::string power_level = "";
-  std::string serial_port = "/dev/ttyUSB0";
+  std::string serial_port = "";
   std::string sock_path = "/tmp/75fasmod_data.sock";
 
   // Default values
@@ -96,7 +132,35 @@ int main(int argc, char *argv[]) {
   std::signal(SIGINT, handle_signal);
   std::signal(SIGTERM, handle_signal);
 
-  // 2. Initialize Hardware & DSP Classes
+  // 2. Discover Kenwood TH-D75 device if not explicitly specified
+  if (serial_port.empty()) {
+    std::vector<std::string> discovered_ports = find_tty_sysfs("2166", "9023");
+    
+    if (discovered_ports.size() == 1) {
+      serial_port = discovered_ports[0];
+      std::cout << "Auto-discovered Kenwood TH-D75 at " << serial_port << "\n";
+    } else if (discovered_ports.size() > 1) {
+      std::cout << "Multiple Kenwood TH-D75 devices found:\n";
+      for (size_t i = 0; i < discovered_ports.size(); ++i) {
+        std::cout << "  [" << i << "] " << discovered_ports[i] << "\n";
+      }
+      std::cout << "Select device (0-" << (discovered_ports.size() - 1) << "): ";
+      size_t choice;
+      std::cin >> choice;
+      if (choice < discovered_ports.size()) {
+        serial_port = discovered_ports[choice];
+      } else {
+        std::cerr << "Invalid selection\n";
+        return 1;
+      }
+    } else {
+      // Fall back to common default if discovery fails
+      serial_port = "/dev/ttyUSB0";
+      std::cout << "Warning: Could not auto-discover Kenwood TH-D75, using default " << serial_port << "\n";
+    }
+  }
+
+  // 3. Initialize Hardware & DSP Classes
   RadioController radio(rig_model, serial_port);
   if (!radio.initialize()) {
     std::cerr << "Warning: Radio init failed.\n";
@@ -112,19 +176,19 @@ int main(int argc, char *argv[]) {
 
   ModemDSP dsp;
 
-  // 3. Start the Data Socket Server
+  // 4. Start the Data Socket Server
   DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
   if (!data_sock.start()) {
     return 1;
   }
 
-  // 4. Main Daemon Loop
+  // 5. Main Daemon Loop
   std::cout << "Daemon is running. Press Ctrl+C to stop.\n";
   while (keep_running.load()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
-  // 5. Cleanup
+  // 6. Cleanup
   std::cout << "\nShutting down daemon...\n";
   data_sock.stop();
 
