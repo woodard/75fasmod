@@ -100,5 +100,14 @@ gr::digital::constellation_sptr TcmConfig::get_constellation(ModulationScheme sc
     symbol_map[i] = static_cast<int>(i);
   }
 
-  return gr::digital::constellation_rect::make(points, symbol_map, 1, 1, 1, 1);
+  return gr::digital::constellation_rect::make(
+      points,                                       // Constellation points
+      symbol_map,                                   // Symbol map (pre_diff_code)
+      4,                                            // Rotational symmetry (4-fold for QAM)
+      2,                                            // Real sectors
+      2,                                            // Imaginary sectors
+      1.0f,                                         // Width real sectors
+      1.0f,                                         // Width imaginary sectors
+      gr::digital::constellation::NO_NORMALIZATION  // Normalization strategy
+  );
 }
