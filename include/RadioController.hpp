@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 class RadioController {
 public:
   // Define the specific power levels mapped to Kenwood CAT values
