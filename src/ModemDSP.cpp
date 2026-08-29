@@ -14,15 +14,13 @@
 #include <gnuradio/top_block.h>
 #include <iostream>
 
-ModemDSP::ModemDSP() {}
-
 ModemDSP::~ModemDSP() { stop_rx(); }
 
 void ModemDSP::start_rx(int output_fd) {
   rx_tb_ = gr::make_top_block("rx_continuous_flowgraph");
 
   // 1. Audio Source (ALSA)
-  auto audio_src = gr::audio::source::make(48000, "hw:CARD=THD75,DEV=0");
+  auto audio_src = gr::audio::source::make(48000, alsa_device_);
 
   // [DSP PLACEHOLDER]: Real->Complex, AGC, Clock Recovery, LMS Equalizer, and
   // Constellation Decoder go here. To keep it compiling before we write the
@@ -97,8 +95,7 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   auto gain = gr::blocks::multiply_const_ff::make(0.5);
 
   // Audio Sink: Send to ALSA natively at 48,000 Hz.
-  // An empty string "" tells GNU Radio to use the system default soundcard.
-  auto sink = gr::audio::sink::make(48000, "", true);
+  auto sink = gr::audio::sink::make(48000, alsa_device_, true);
 
   // 5. Connect the Flowgraph
   tb->connect(src, 0, encoder, 0);

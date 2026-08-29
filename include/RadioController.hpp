@@ -32,7 +32,10 @@ public:
   static std::vector<std::string> find_tty_sysfs(){
     return find_tty_sysfs(0x2166, 0x9023);
   }
-
+  std::string find_alsa_device(){
+    return find_alsa_device(port_);
+  }
+  
 private:
   PowerLevel kenwood_power_get();
   void kenwood_menu_set(int menu_num, int value);
@@ -50,4 +53,5 @@ private:
 
   static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
 						 unsigned int target_pid);
+  static std::string find_alsa_device(const std::string& serial_port);
 };

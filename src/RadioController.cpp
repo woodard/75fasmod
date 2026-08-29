@@ -309,3 +309,42 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
   return found_ports;
 }
 
+std::string RadioController::find_alsa_device(const std::string& serial_port) {
+  fs::path tty_name = fs::path(serial_port).filename(); // e.g., "ttyACM0"
+  fs::path tty_dev_path = "/sys/class/tty" / tty_name / "device";
+
+  if (!fs::exists(tty_dev_path)) return "";
+
+  fs::path usb_dev_path;
+  try {
+    // The device node is a symlink to the USB interface. Its parent is the physical USB device.
+    usb_dev_path = fs::canonical(tty_dev_path).parent_path();
+  } catch (...) {
+    return "";
+  }
+
+  fs::path sound_class_path = "/sys/class/sound";
+  if (!fs::exists(sound_class_path)) return "";
+
+  // Find the soundcard with the same parent USB device
+  for (const auto& entry : fs::directory_iterator(sound_class_path)) {
+    std::string card_name = entry.path().filename().string();
+    
+    if (card_name.find("card") == 0) {
+      fs::path card_dev_path = entry.path() / "device";
+      if (!fs::exists(card_dev_path)) continue;
+
+      try {
+        fs::path card_usb_path = fs::canonical(card_dev_path).parent_path();
+        if (card_usb_path == usb_dev_path) {
+          // Extract the X from "cardX" to format the ALSA hardware string
+          std::string card_num = card_name.substr(4);
+          return "hw:" + card_num + ",0";
+        }
+      } catch (...) {
+        continue;
+      }
+    }
+  }
+  return "";
+}

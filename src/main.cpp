@@ -142,7 +142,16 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  ModemDSP dsp;
+  // Map the serial port to its matching ALSA soundcard
+  std::string alsa_device = radio.find_alsa_device();
+  if (alsa_device.empty()) {
+    std::cerr << "Warning: Could not map serial port to ALSA device. Defaulting to TH-D75 alias.\n";
+    alsa_device = "hw:CARD=THD75,DEV=0";
+  } else {
+    std::cout << "Mapped serial port " << serial_port << " to ALSA audio device " << alsa_device << "\n";
+  }
+  
+  ModemDSP dsp(alsa_device);
 
   // 4. Start the Data Socket Server
   DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
