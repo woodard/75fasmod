@@ -238,7 +238,3 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
   }
   return found_ports;
 }
-
-std::vector<std::string> RadioController::find_tty_sysfs() {
-  return find_tty_sysfs(0x2166, 0x9023);
-}
