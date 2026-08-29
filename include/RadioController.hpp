@@ -34,6 +34,7 @@ private:
   static std::string read_sysfs_attr(const fs::path& filepath);
 
   PowerLevel kenwood_power_get();
+  void RadioController::kenwood_menu_set(int menu_num, int value);
   void kenwood_power_set(PowerLevel val);
 
   rig_model_t model_;
@@ -45,5 +46,6 @@ private:
   int orig_menu_102_;
   PowerLevel orig_power_; // Stores the original state using the enum
 
-  static std::vector<std::string> find_tty_sysfs(unsigned int target_vid, unsigned int target_pid);
+  static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
+						 unsigned int target_pid);
 };
