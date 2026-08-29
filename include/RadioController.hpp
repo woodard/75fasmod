@@ -31,10 +31,9 @@ public:
   }
 
 private:
-  static std::string read_sysfs_attr(const fs::path& filepath);
-
   PowerLevel kenwood_power_get();
-  void RadioController::kenwood_menu_set(int menu_num, int value);
+  void kenwood_menu_set(int menu_num, int value);
+  int kenwood_menu_get(int menu_num);
   void kenwood_power_set(PowerLevel val);
 
   rig_model_t model_;

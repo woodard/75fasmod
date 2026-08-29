@@ -6,6 +6,13 @@
 #include <cstdlib>
 #include <fstream>
 
+static std::string read_sysfs_attr(const fs::path& filepath) {
+  std::ifstream file(filepath);
+  std::string value;
+  if (file >> value) return value;
+  return "";
+}
+
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
       orig_width_(0), orig_menu_102_(-1), orig_power_(PowerLevel::UNKNOWN) {}
@@ -240,9 +247,3 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
   return found_ports;
 }
 
-static std::string read_sysfs_attr(const fs::path& filepath) {
-  std::ifstream file(filepath);
-  std::string value;
-  if (file >> value) return value;
-  return "";
-}
