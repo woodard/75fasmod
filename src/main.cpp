@@ -20,7 +20,8 @@ static std::string read_sysfs_attr(const fs::path& filepath) {
     return "";
 }
 
-static std::vector<std::string> find_tty_sysfs(const std::string& target_vid, const std::string& target_pid) {
+static std::vector<std::string> find_tty_sysfs(const std::string& target_vid,
+					       const std::string& target_pid) {
     std::vector<std::string> found_ports;
     fs::path sys_tty = "/sys/class/tty";
     
@@ -30,7 +31,8 @@ static std::vector<std::string> find_tty_sysfs(const std::string& target_vid, co
         fs::path dev_path = entry.path() / "device";
         if (!fs::exists(dev_path)) continue;
 
-        for (const std::string& parent_rel : {"..", "../..", "../../.."}) {
+        // Use const char* to avoid allocating temporary std::string objects
+        for (const char* parent_rel : {"..", "../..", "../../.."}) {
             fs::path vid_path = dev_path / parent_rel / "idVendor";
             fs::path pid_path = dev_path / parent_rel / "idProduct";
 

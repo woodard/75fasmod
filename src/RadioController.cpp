@@ -21,7 +21,9 @@ RadioController::~RadioController() {
       kenwood_power_set(orig_power_);
     }
 
+    // Restore original operating mode and bandwidth
     if (orig_mode_ != RIG_MODE_NONE) {
+      std::cout << "[RIG] Restoring original mode (" << rig_strrmode(orig_mode_) << ")...\n";
       rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
     }
 
@@ -35,7 +37,6 @@ bool RadioController::initialize() {
   if (!rig_)
     return false;
 
-  // HAMLIB 4.x FIX: Set the serial port using the configuration API
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
   if (rig_open(rig_) != RIG_OK) {
@@ -45,12 +46,38 @@ bool RadioController::initialize() {
 
   std::cout << "[RIG] Backing up current radio state...\n";
 
-  rig_get_mode(rig_, RIG_VFO_CURR, &orig_mode_, &orig_width_);
+  // 1. Save original operating mode and bandwidth
+  if (rig_get_mode(rig_, RIG_VFO_CURR, &orig_mode_, &orig_width_) == RIG_OK) {
+    std::cout << "[RIG] Saved original mode: " << rig_strrmode(orig_mode_) << "\n";
+  } else {
+    std::cerr << "[RIG] Warning: Could not query starting radio mode.\n";
+  }
+
   orig_menu_102_ = kenwood_menu_get(102);
   orig_power_ = kenwood_power_get();
 
   std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
-  rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
+
+  // 2. Set mode to Packet FM (9600 baud passband)
+  int mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
+  if (mode_ret != RIG_OK) {
+    std::cout << "[RIG] PKTFM mode rejected, falling back to standard FM...\n";
+    mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
+  }
+
+  // 3. Verify radio is in an FM mode and not AM, SSB, CW, or D-Star DV
+  rmode_t active_mode = RIG_MODE_NONE;
+  pbwidth_t active_width = 0;
+  if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
+    if (active_mode != RIG_MODE_PKTFM && active_mode != RIG_MODE_FM) {
+      std::cerr << "[RIG] WARNING: Radio failed to enter FM mode! Current mode: "
+                << rig_strrmode(active_mode) << "\n";
+    } else {
+      std::cout << "[RIG] Verified active mode: " << rig_strrmode(active_mode) << "\n";
+    }
+  }
+
+  // Configure Kenwood 9600 bps data output path (Menu 102)
   kenwood_menu_set(102, 1);
 
   return true;
@@ -100,8 +127,6 @@ bool RadioController::set_power_level(const std::string &level) {
   return true;
 }
 
-// --- Enum-based Power Control Implementation ---
-
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
@@ -109,7 +134,6 @@ int RadioController::kenwood_menu_get(int menu_num) {
   char buf[64] = {0};
   unsigned char term = ';';
 
-  // HAMLIB 4.x FIX: Unified Send & Receive
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -135,7 +159,6 @@ void RadioController::kenwood_menu_set(int menu_num, int value) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "EX%03d,%d;", menu_num, value);
 
-  // Send only, no reply expected
   rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), nullptr, 0,
                nullptr);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
