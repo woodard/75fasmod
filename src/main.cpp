@@ -99,8 +99,8 @@ int main(int argc, char *argv[]) {
   // 2. Initialize Hardware & DSP Classes
   RadioController radio(rig_model, serial_port);
   if (!radio.initialize()) {
-    std::cerr
-        << "Warning: Radio init failed. Proceeding without rig control.\n";
+    std::cerr << "Warning: Radio init failed.\n";
+    exit(1);
   } else {
     std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
     radio.set_frequency(target_freq_mhz);
