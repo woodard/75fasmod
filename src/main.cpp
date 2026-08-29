@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
   // 2. Discover Kenwood TH-D75 device if not explicitly specified
   if (serial_port.empty()) {
-    std::vector<std::string> discovered_ports = RadioController::find_tty_sysfs(0x2166, 0x9023);
+    std::vector<std::string> discovered_ports = RadioController::find_tty_sysfs();
     
     if (discovered_ports.size() == 1) {
       serial_port = discovered_ports[0];

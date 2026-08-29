@@ -24,8 +24,7 @@ public:
   bool set_ptt(bool transmit);
   bool get_dcd(bool &is_squelch_open);
 
-  static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
-                                                 unsigned int target_pid);
+  std::vector<std::string> find_tty_sysfs();
 
 private:
   int kenwood_menu_get(int menu_num);
@@ -43,4 +42,7 @@ private:
   pbwidth_t orig_width_;
   int orig_menu_102_;
   PowerLevel orig_power_; // Stores the original state using the enum
+
+  std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
+                                          unsigned int target_pid);
 };
