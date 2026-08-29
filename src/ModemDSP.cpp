@@ -1,4 +1,5 @@
 #include "ModemDSP.hpp"
+#include "TcmConfig.hpp"
 #include <gnuradio/audio/sink.h>
 #include <gnuradio/audio/source.h>
 #include <gnuradio/blocks/complex_to_real.h>
@@ -64,13 +65,12 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   payload_with_preamble.insert(payload_with_preamble.end(), framed_data.begin(),
                                framed_data.end());
 
-  // 3. Define the Constellation (16-QAM)
-  // (If you already declare 'qam' as a class member, you can safely remove this
-  // line)
-  auto qam = gr::digital::constellation_16qam::make();
+  // 3. Define the Constellation
+  // Use TcmConfig to build our custom 16-QAM grid
+  auto qam = TcmConfig::get_constellation(ModulationScheme::QAM16);
 
   // 4. Instantiate the DSP Blocks
-  int sps = 5; // Samples Per Symbol (9600 baud * 4 sps = 38400 Hz sample rate)
+  int sps = 5; // Samples Per Symbol (9600 baud * 5 sps = 48000 Hz sample rate)
   float rolloff = 0.35; // Filter alpha (excess bandwidth)
 
   // Source: Reads our bytes exactly once (repeat = false) and stops
@@ -79,10 +79,9 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   // Encoder: Maps bytes onto the complex 2D QAM grid
   auto encoder = gr::digital::constellation_encoder_bc::make(qam);
 
-  // RRC Filter: Interpolates sudden symbol jumps into smooth, contained
-  // waveforms
+  // RRC Filter: Interpolates sudden symbol jumps into smooth, contained waveforms
   std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
-      sps,     // Gain
+      sps,     // Gain (set to sps to maintain amplitude after interpolation)
       sps,     // Sampling freq (normalized to sps)
       1.0,     // Symbol rate (normalized)
       rolloff, // Rolloff factor
@@ -90,18 +89,16 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   );
   auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
 
-  // Converter: Discard the Q channel and pass only the real part to the
-  // soundcard
+  // Converter: Discard the Q channel and pass only the real part to the soundcard
   auto complex_to_real = gr::blocks::complex_to_real::make(1);
 
   // Volume/Gain: Scale the float values (-1.0 to 1.0) so ALSA doesn't clip.
-  // 0.5 is a safe starting point. If your transmitted audio is too quiet, raise
-  // this.
+  // 0.5 is a safe starting point. If your transmitted audio is too quiet, raise this.
   auto gain = gr::blocks::multiply_const_ff::make(0.5);
 
-  // Audio Sink: Send to ALSA.
+  // Audio Sink: Send to ALSA natively at 48,000 Hz.
   // An empty string "" tells GNU Radio to use the system default soundcard.
-  auto sink = gr::audio::sink::make(38400, "", true);
+  auto sink = gr::audio::sink::make(48000, "", true);
 
   // 5. Connect the Flowgraph
   tb->connect(src, 0, encoder, 0);
@@ -114,7 +111,6 @@ void ModemDSP::transmit_burst(const std::vector<uint8_t> &framed_data) {
   std::cout << "[DSP] Transmitting burst (" << payload_with_preamble.size()
             << " bytes)...\n";
   tb->start();
-  tb->wait(); // Wait blocks the thread until the vector_source runs out of
-              // bytes
+  tb->wait(); // Wait blocks the thread until vector_source runs out of bytes
   std::cout << "[DSP] Burst complete.\n";
 }

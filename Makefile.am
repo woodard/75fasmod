@@ -10,7 +10,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
     src/cobs.cpp \
     src/Frame.cpp \
     src/RadioController.cpp \
-    src/ModemDSP.cpp
+    src/ModemDSP.cpp \
+    src/TcmConfig.cpp
 
 # Feed compiler and linker flags from pkg-config
 75fasmod_CXXFLAGS = $(HAMLIB_CFLAGS) $(GNURADIO_CFLAGS) -Wall -Wextra -pthread
