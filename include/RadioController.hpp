@@ -29,10 +29,8 @@ public:
   }
 
 private:
-  int kenwood_menu_get(int menu_num);
-  void kenwood_menu_set(int menu_num, int value);
+  static std::string read_sysfs_attr(const fs::path& filepath);
 
-  // Updated Raw CAT helpers using the enum
   PowerLevel kenwood_power_get();
   void kenwood_power_set(PowerLevel val);
 

@@ -13,13 +13,6 @@
 
 namespace fs = std::filesystem;
 
-static std::string read_sysfs_attr(const fs::path& filepath) {
-    std::ifstream file(filepath);
-    std::string value;
-    if (file >> value) return value;
-    return "";
-}
-
 // Global flag to keep the daemon running
 std::atomic<bool> keep_running{true};
 
