@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <stop_token>
 #include <string>
 #include <thread>
 #include <vector>
@@ -43,6 +44,7 @@ private:
   std::vector<std::vector<uint8_t>> tx_queue_;
   std::chrono::steady_clock::time_point queue_start_time_;
 
+  // Non-blocking MAC State Tracking
   bool is_transmitting_ = false;
   std::chrono::steady_clock::time_point ptt_drop_time_;
   std::chrono::steady_clock::time_point tx_resume_time_; // MAC Cooldown
