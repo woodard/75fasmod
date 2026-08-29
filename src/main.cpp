@@ -20,33 +20,6 @@ static std::string read_sysfs_attr(const fs::path& filepath) {
     return "";
 }
 
-static std::vector<std::string> find_tty_sysfs(const std::string& target_vid,
-					       const std::string& target_pid) {
-    std::vector<std::string> found_ports;
-    fs::path sys_tty = "/sys/class/tty";
-    
-    if (!fs::exists(sys_tty)) return found_ports;
-
-    for (const auto& entry : fs::directory_iterator(sys_tty)) {
-        fs::path dev_path = entry.path() / "device";
-        if (!fs::exists(dev_path)) continue;
-
-        // Use const char* to avoid allocating temporary std::string objects
-        for (const char* parent_rel : {"..", "../..", "../../.."}) {
-            fs::path vid_path = dev_path / parent_rel / "idVendor";
-            fs::path pid_path = dev_path / parent_rel / "idProduct";
-
-            if (fs::exists(vid_path) && fs::exists(pid_path)) {
-                if (read_sysfs_attr(vid_path) == target_vid && read_sysfs_attr(pid_path) == target_pid) {
-                    found_ports.push_back("/dev/" + entry.path().filename().string());
-                    break;
-                }
-            }
-        }
-    }
-    return found_ports;
-}
-
 // Global flag to keep the daemon running
 std::atomic<bool> keep_running{true};
 
@@ -136,7 +109,7 @@ int main(int argc, char *argv[]) {
 
   // 2. Discover Kenwood TH-D75 device if not explicitly specified
   if (serial_port.empty()) {
-    std::vector<std::string> discovered_ports = find_tty_sysfs("2166", "9023");
+    std::vector<std::string> discovered_ports = RadioController::find_tty_sysfs("2166", "9023");
     
     if (discovered_ports.size() == 1) {
       serial_port = discovered_ports[0];

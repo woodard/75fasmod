@@ -202,3 +202,30 @@ void RadioController::kenwood_power_set(PowerLevel val) {
                nullptr);
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
+
+std::vector<std::string> RadioController::find_tty_sysfs(const std::string& target_vid,
+                                                       const std::string& target_pid) {
+  std::vector<std::string> found_ports;
+  fs::path sys_tty = "/sys/class/tty";
+  
+  if (!fs::exists(sys_tty)) return found_ports;
+
+  for (const auto& entry : fs::directory_iterator(sys_tty)) {
+    fs::path dev_path = entry.path() / "device";
+    if (!fs::exists(dev_path)) continue;
+
+    // Use const char* to avoid allocating temporary std::string objects
+    for (const char* parent_rel : {"..", "../..", "../../.."}) {
+      fs::path vid_path = dev_path / parent_rel / "idVendor";
+      fs::path pid_path = dev_path / parent_rel / "idProduct";
+
+      if (fs::exists(vid_path) && fs::exists(pid_path)) {
+        if (read_sysfs_attr(vid_path) == target_vid && read_sysfs_attr(pid_path) == target_pid) {
+          found_ports.push_back("/dev/" + entry.path().filename().string());
+          break;
+        }
+      }
+    }
+  }
+  return found_ports;
+}

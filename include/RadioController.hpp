@@ -1,6 +1,8 @@
 #pragma once
 #include <hamlib/rig.h>
 #include <string>
+#include <filesystem>
+#include <vector>
 
 class RadioController {
 public:
@@ -21,6 +23,9 @@ public:
   bool set_power_level(const std::string &level);
   bool set_ptt(bool transmit);
   bool get_dcd(bool &is_squelch_open);
+
+  static std::vector<std::string> find_tty_sysfs(const std::string& target_vid,
+                                                 const std::string& target_pid);
 
 private:
   int kenwood_menu_get(int menu_num);
