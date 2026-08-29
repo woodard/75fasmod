@@ -120,30 +120,6 @@ bool RadioController::get_dcd(bool &is_squelch_open) {
   return false;
 }
 
-bool RadioController::set_power_level(const std::string &level) {
-  std::string lvl = level;
-  for (auto &c : lvl)
-    c = std::toupper(c);
-
-  PowerLevel val = PowerLevel::UNKNOWN;
-  if (lvl == "H")
-    val = PowerLevel::HIGH;
-  else if (lvl == "M")
-    val = PowerLevel::MEDIUM;
-  else if (lvl == "L")
-    val = PowerLevel::LOW;
-  else if (lvl == "EL")
-    val = PowerLevel::EXTRA_LOW;
-  else {
-    std::cerr << "Error: Invalid power level '" << level
-              << "'. Use EL, L, M, or H.\n";
-    return false;
-  }
-
-  std::cout << "[RIG] Setting TX power to " << lvl << "...\n";
-  kenwood_power_set(val);
-  return true;
-}
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
@@ -182,22 +158,86 @@ void RadioController::kenwood_menu_set(int menu_num, int value) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
+bool RadioController::set_power_level(const std::string &level) {
+  std::string lvl = level;
+  for (auto &c : lvl)
+    c = std::toupper(c);
+
+  float pwr_float = 1.0f; // Default High (5W)
+  PowerLevel val = PowerLevel::UNKNOWN;
+
+  if (lvl == "H") {
+    pwr_float = 1.0f;
+    val = PowerLevel::HIGH;
+  } else if (lvl == "M") {
+    pwr_float = 0.4f;   // Mid (~2W)
+    val = PowerLevel::MEDIUM;
+  } else if (lvl == "L") {
+    pwr_float = 0.1f;   // Low (~0.5W)
+    val = PowerLevel::LOW;
+  } else if (lvl == "EL") {
+    pwr_float = 0.01f;  // Extra Low (~0.05W)
+    val = PowerLevel::EXTRA_LOW;
+  } else {
+    std::cerr << "Error: Invalid power level '" << level
+              << "'. Use EL, L, M, or H.\n";
+    return false;
+  }
+
+  // 1. Query the currently active VFO/Band from Hamlib
+  vfo_t active_vfo = RIG_VFO_CURR;
+  if (rig_get_vfo(rig_, &active_vfo) == RIG_OK) {
+    std::cout << "[RIG] Active VFO detected: " << rig_strvfo(active_vfo) << "\n";
+  } else {
+    active_vfo = RIG_VFO_CURR;
+  }
+
+  // 2. Wrap the float in Hamlib's value_t union
+  value_t pwr_val{};
+  pwr_val.f = pwr_float;
+
+  // 3. Attempt Hamlib Native RF Power setting on active VFO
+  std::cout << "[RIG] Setting TX power to " << lvl << " on " << rig_strvfo(active_vfo) << "...\n";
+  int status = rig_set_level(rig_, active_vfo, RIG_LEVEL_RFPOWER, pwr_val);
+
+  if (status != RIG_OK) {
+    std::cerr << "[RIG] Warning: rig_set_level failed (" << status << "). Falling back to raw CAT...\n";
+    kenwood_power_set(val);
+  }
+
+  return true;
+}
+
 RadioController::PowerLevel RadioController::kenwood_power_get() {
-  char buf[32] = {0};
+  // Determine active band (0 = Band A, 1 = Band B) via BC command
+  int active_band = 0;
+  char bc_buf[32] = {0};
   unsigned char term = ';';
 
-  int bytes = rig_send_raw(rig_, (const unsigned char *)"PC;", 3,
+  if (rig_send_raw(rig_, (const unsigned char *)"BC;", 3,
+                           (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // Query power level for active band
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "PC %d;", active_band);
+
+  char buf[32] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes > 0) {
     std::string resp(buf);
-    size_t pc_pos = resp.find("PC");
+    size_t comma = resp.find(',');
     size_t semi = resp.find(';');
 
-    if (pc_pos != std::string::npos && semi != std::string::npos &&
-        semi > pc_pos + 2) {
+    if (comma != std::string::npos && semi != std::string::npos && semi > comma + 1) {
       try {
-        int pwr_int = std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+        int pwr_int = std::stoi(resp.substr(comma + 1, semi - comma - 1));
         if (pwr_int >= 0 && pwr_int <= 3) {
           return static_cast<PowerLevel>(pwr_int);
         }
@@ -213,11 +253,24 @@ void RadioController::kenwood_power_set(PowerLevel val) {
   if (val == PowerLevel::UNKNOWN)
     return;
 
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC%d;", static_cast<int>(val));
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = ';';
 
-  rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), nullptr, 0,
-               nullptr);
+  if (rig_send_raw(rig_, (const unsigned char *)"BC;", 3,
+                           (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // Send formatted power command: PC <band>,<level>;
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "PC %d,%d;", active_band, static_cast<int>(val));
+
+  rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), nullptr, 0, nullptr);
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
