@@ -37,8 +37,14 @@ private:
   int flush_timeout_ms_;
 
   int rx_pipe_[2];
+  int tx_pipe_[2];
   int active_client_fd_;
 
   std::vector<std::vector<uint8_t>> tx_queue_;
   std::chrono::steady_clock::time_point queue_start_time_;
+
+  bool is_transmitting_ = false;
+  std::chrono::steady_clock::time_point ptt_drop_time_;
+  std::chrono::steady_clock::time_point tx_resume_time_; // MAC Cooldown
+  int frames_sent_in_burst_ = 0;
 };
