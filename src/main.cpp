@@ -32,7 +32,8 @@ void print_usage(const char *prog_name) {
       << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
       << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: 200)\n"
       << "  -h, --help            Show this help message\n"
-      << "  -a, --alsa-tx <device>  ALSA transmit device (e.g., hw:5,0)\n";
+      << "  -a, --alsa-tx <device>  ALSA transmit device (e.g., hw:5,0)\n"
+      << "  -d, --hamlib-debug   Enable Hamlib debug logging\n";
 }
 
 int main(int argc, char *argv[]) {
@@ -42,13 +43,14 @@ int main(int argc, char *argv[]) {
   std::string serial_port = "";
   std::string sock_path = "/tmp/75fasmod_data.sock";
   std::string alsa_tx_device = "";
+  bool hamlib_debug = false;
 
   // Default values
   rig_model_t rig_model = RadioController::DEFAULT_MODEL;
   int burst_limit = 8;
   int flush_timeout_ms = 200;
 
-  const char *const short_opts = "f:w:p:m:s:b:t:h:a";
+  const char *const short_opts = "f:w:p:m:s:b:t:h:a:d";
   const option long_opts[] = {{"freq", required_argument, nullptr, 'f'},
                               {"power", required_argument, nullptr, 'w'},
                               {"port", required_argument, nullptr, 'p'},
@@ -58,6 +60,7 @@ int main(int argc, char *argv[]) {
                               {"timeout", required_argument, nullptr, 't'},
                               {"help", no_argument, nullptr, 'h'},
                               {"alsa-tx", required_argument, nullptr, 'a'},
+                              {"hamlib-debug", no_argument, nullptr, 'd'},
                               {nullptr, 0, nullptr, 0}};
 
   int opt;
@@ -90,6 +93,9 @@ int main(int argc, char *argv[]) {
       return 0;
     case 'a':
       alsa_tx_device = optarg;
+      break;
+    case 'd':
+      hamlib_debug = true;
       break;
     default:
       print_usage(argv[0]);
@@ -141,9 +147,9 @@ int main(int argc, char *argv[]) {
 
   // 3. Initialize Hardware & DSP Classes
   RadioController radio(rig_model, serial_port);
-  if (!radio.initialize()) {
-    std::cerr << "Warning: Radio init failed.\n";
-    exit(1);
+  if (!radio.initialize(hamlib_debug)) {
+    std::cerr << "Error: Failed to initialize radio controller.\n";
+    return 1;
   } else {
     std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
     radio.set_frequency(target_freq_mhz);

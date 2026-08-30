@@ -41,9 +41,11 @@ RadioController::~RadioController() {
   }
 }
 
-bool RadioController::initialize() {
-  // Enable Hamlib internal verbose trace logging
-  rig_set_debug_level(RIG_DEBUG_TRACE);
+bool RadioController::initialize(bool hamlib_debug) {
+  // Enable Hamlib internal verbose trace logging only if requested
+  if (hamlib_debug) {
+    rig_set_debug_level(RIG_DEBUG_TRACE);
+  }
 
   std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);

@@ -23,7 +23,7 @@ public:
   RadioController(rig_model_t model, const std::string &port);
   ~RadioController();
 
-  bool initialize();
+  bool initialize(bool hamlib_debug = false);
   bool set_frequency(double freq_mhz);
   bool set_power_level(const std::string &level);
   bool set_ptt(bool transmit);
