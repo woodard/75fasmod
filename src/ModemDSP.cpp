@@ -14,6 +14,7 @@
 #include <gnuradio/top_block.h>
 #include <unistd.h>
 #include <iostream>
+#include <stdexcept> // Ensure this is included at the top for std::exception
 
 ModemDSP::ModemDSP(const std::string& alsa_device) : alsa_device_(alsa_device) {}
 
@@ -25,17 +26,22 @@ ModemDSP::~ModemDSP() {
 void ModemDSP::start_rx(int output_fd) {
   rx_tb_ = gr::make_top_block("rx_continuous_flowgraph");
 
-  // 1. Audio Source (ALSA)
-  auto audio_src = gr::audio::source::make(48000, alsa_device_);
+  try {
+    // 1. Audio Source (ALSA)
+    auto audio_src = gr::audio::source::make(48000, alsa_device_);
 
-  // 2. File Descriptor Sink (Writes decoded bytes directly to C++ pipe)
-  auto fd_sink =
-      gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
+    // 2. File Descriptor Sink (Writes decoded bytes directly to C++ pipe)
+    auto fd_sink =
+        gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
 
-  // [Placeholder for future RX DSP blocks]
-  
-  rx_tb_->start();
-  std::cout << "[DSP] Continuous RX Flowgraph started.\n";
+    // [Placeholder for future RX DSP blocks]
+    
+    rx_tb_->start();
+    std::cout << "[DSP] Continuous RX Flowgraph started.\n";
+  } catch (const std::exception& e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_rx initializing ALSA device '" 
+              << alsa_device_ << "':\n -> " << e.what() << "\n\n";
+  }
 }
 
 void ModemDSP::stop_rx() {
@@ -56,36 +62,43 @@ void ModemDSP::start_tx(int input_fd) {
   int sps = 5;
   float rolloff = 0.35;
 
-  // 1. Persistent Source: Reads bytes continuously from the C++ TX Pipe
-  auto src = gr::blocks::file_descriptor_source::make(sizeof(uint8_t), input_fd, false);
-  
-  // Repacker: Slices 8-bit bytes into 3-bit informational chunks (k=3)
-  auto repack = gr::blocks::repack_bits_bb::make(8, 3);
-  
-  // Trellis Encoder: Applies convolutional code + set partitioning
-  auto trellis_encoder = gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
-  
-  // Symbol Mapper: Maps Trellis indices (0-15) directly to complex QAM coordinates
-  auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(qam->points());
+  try {
+    // 1. Persistent Source: Reads bytes continuously from the C++ TX Pipe
+    auto src = gr::blocks::file_descriptor_source::make(sizeof(uint8_t), input_fd, false);
+    
+    // Repacker: Slices 8-bit bytes into 3-bit informational chunks (k=3)
+    auto repack = gr::blocks::repack_bits_bb::make(8, 3);
+    
+    // Trellis Encoder: Applies convolutional code + set partitioning
+    auto trellis_encoder = gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
+    
+    // Symbol Mapper: Maps Trellis indices (0-15) directly to complex QAM coordinates
+    auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(qam->points());
 
-  std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
-      sps, sps, 1.0, rolloff, 11 * sps);
-  auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
+    std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
+        sps, sps, 1.0, rolloff, 11 * sps);
+    auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
 
-  auto complex_to_real = gr::blocks::complex_to_real::make(1);
-  auto gain = gr::blocks::multiply_const_ff::make(0.5);
-  auto sink = gr::audio::sink::make(48000, alsa_device_, true);
+    auto complex_to_real = gr::blocks::complex_to_real::make(1);
+    auto gain = gr::blocks::multiply_const_ff::make(0.5);
+    
+    // ALSA Audio Sink
+    auto sink = gr::audio::sink::make(48000, alsa_device_, true);
 
-  tx_tb_->connect(src, 0, repack, 0);
-  tx_tb_->connect(repack, 0, trellis_encoder, 0);
-  tx_tb_->connect(trellis_encoder, 0, mapper, 0);
-  tx_tb_->connect(mapper, 0, rrc_filter, 0);
-  tx_tb_->connect(rrc_filter, 0, complex_to_real, 0);
-  tx_tb_->connect(complex_to_real, 0, gain, 0);
-  tx_tb_->connect(gain, 0, sink, 0);
+    tx_tb_->connect(src, 0, repack, 0);
+    tx_tb_->connect(repack, 0, trellis_encoder, 0);
+    tx_tb_->connect(trellis_encoder, 0, mapper, 0);
+    tx_tb_->connect(mapper, 0, rrc_filter, 0);
+    tx_tb_->connect(rrc_filter, 0, complex_to_real, 0);
+    tx_tb_->connect(complex_to_real, 0, gain, 0);
+    tx_tb_->connect(gain, 0, sink, 0);
 
-  tx_tb_->start();
-  std::cout << "[DSP] Continuous TX Flowgraph started.\n";
+    tx_tb_->start();
+    std::cout << "[DSP] Continuous TX Flowgraph started.\n";
+  } catch (const std::exception& e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_tx initializing ALSA device '" 
+              << alsa_device_ << "':\n -> " << e.what() << "\n\n";
+  }
 }
 
 void ModemDSP::stop_tx() {
