@@ -1,5 +1,71 @@
 # Radio Notes
 
+## Frustrations about the radio
+Overall frustrations:
+* Only supports legacy Bluetooth. Not modern Bluetooth Low Energy.
+  * Only supports the Bluetooth HSP. This is a legacy Bluetooth
+    profile and isn't supported on the iPhone or newer headsets. It
+    would be nicer if it supported the more modern HFP. Even though it
+    is only mono.
+  * Only Supports Bluetooth SPP. This is also a legacy Bluetooth
+    profile and only supports connected mode. There are newer profiles
+    which take less energy.
+* Only does USB Audio out. It would be better if the sound card did
+  both Audio in and out.
+* Even though it has a IF tap that can capture a whole 15  
+
+
+### USB Audio
+The USB Audio feature on the TH-D75A/E supports audio output only.
+* The supported output format is 48 kHz, 16-bit, and monaural audio.
+* USB Audio outputs the same audio sound as the speaker output.
+* The output level of USB Audio can be adjusted in Menu No. 91A.
+* Audio sound is output from the USB even when a speaker microphone or earphone is connected.
+* When a Bluetooth headset is connected, USB Audio becomes a port used exclusively for the input and output of the Bluetooth headset.
+[Operating Tips 5.13.2]
+
+It would be so much nicer if they did full USB in and out. Since it is
+a dual band radio, Even though the signal is mono, provide
+
+### Bluetooth
+[Operating Tips 5.12.1] The TH-D75A/E does not support Bluetooth Low
+Energy (BLE). Therefore, it is not compatible with applications or
+devices that require BLE. It only supports communication via the HSP
+and SPP profiles.
+
+This includes the iPhone.
+
+#### HSP (Headset Profile)
+By connecting the TH-D75A/E to a Bluetooth-compatible headset device,
+the microphone and earphone of the headset can be used for making
+voice calls.
+
+PTT on the transceiver unit or speaker microphone is used to start
+transmission. (Transmission cannot be made directly from the Bluetooth
+headset, except for VOX operation, as PTT is not available via the
+Bluetooth headset.)
+
+To adjust the volume level when a Bluetooth device is connected, do so
+using the volume control of the headset. The sensitivity of the
+microphone can be adjusted in Menu No. 112.  
+
+Note: Audio sound cannot be output from the USB or SP port when a
+Bluetooth headset is connected. HFP (Hands-Free Profile) is not
+supported.
+
+#### SPP (Serial Port Profile)
+By pairing the TH-D75A/E with a PC and assigning a virtual serial
+port, it is possible to carry out serial communication with the PC
+wirelessly. Doing so enables wireless operation of APRS applications
+such as UI-View32 and MCP-D75. Also, serial communication with a PC is
+possible while a Bluetooth headset is being connected.  During virtual
+serial communication via Bluetooth, configuration of the baud rate is
+not necessary to ensure communication at the optimal speed. If it is
+necessary to configure the baud rate in the PC application program in
+use, select any of the available options.  Bluetooth ON (Bluetooth
+icon appears) Bluetooth (connected) icon lights up Bluetooth devices
+that are currently connected will appear in Menu No. 933.  Note:
+
 ## AF vs IF mode
 When using a radio like the Kenwood TH-D75 for digital modes like FT8,
 the difference between **AF (Audio Frequency) mode** and **IF
