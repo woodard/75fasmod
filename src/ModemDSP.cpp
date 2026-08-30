@@ -16,7 +16,8 @@
 #include <iostream>
 #include <stdexcept> // Ensure this is included at the top for std::exception
 
-ModemDSP::ModemDSP(const std::string& alsa_device) : alsa_device_(alsa_device) {}
+ModemDSP::ModemDSP(const std::string& alsa_tx_device, const std::string& alsa_rx_device) 
+    : alsa_tx_device_(alsa_tx_device), alsa_rx_device_(alsa_rx_device) {}
 
 ModemDSP::~ModemDSP() {
   stop_rx();
@@ -27,7 +28,7 @@ bool ModemDSP::start_rx(int output_fd) {
   rx_tb_ = gr::make_top_block("rx_continuous_flowgraph");
 
   try {
-    auto audio_src = gr::audio::source::make(48000, alsa_device_);
+    auto audio_src = gr::audio::source::make(48000, alsa_rx_device_);
     auto fd_sink = gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
     
     rx_tb_->start();
@@ -35,7 +36,7 @@ bool ModemDSP::start_rx(int output_fd) {
     return true;
   } catch (const std::exception& e) {
     std::cerr << "\n[DSP] CRITICAL ERROR in start_rx initializing ALSA device '" 
-              << alsa_device_ << "':\n -> " << e.what() << "\n\n";
+              << alsa_rx_device_ << "':\n -> " << e.what() << "\n\n";
     return false;
   }
 }
@@ -69,7 +70,7 @@ bool ModemDSP::start_tx(int input_fd) {
 
     auto complex_to_real = gr::blocks::complex_to_real::make(1);
     auto gain = gr::blocks::multiply_const_ff::make(0.5);
-    auto sink = gr::audio::sink::make(48000, alsa_device_, true);
+    auto sink = gr::audio::sink::make(48000, alsa_tx_device_, true);
 
     tx_tb_->connect(src, 0, repack, 0);
     tx_tb_->connect(repack, 0, trellis_encoder, 0);
@@ -84,7 +85,7 @@ bool ModemDSP::start_tx(int input_fd) {
     return true;
   } catch (const std::exception& e) {
     std::cerr << "\n[DSP] CRITICAL ERROR in start_tx initializing ALSA device '" 
-              << alsa_device_ << "':\n -> " << e.what() << "\n\n";
+              << alsa_tx_device_ << "':\n -> " << e.what() << "\n\n";
     return false;
   }
 }

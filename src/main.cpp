@@ -31,7 +31,8 @@ void print_usage(const char *prog_name) {
          "/tmp/75fasmod_data.sock)\n"
       << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
       << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: 200)\n"
-      << "  -h, --help            Show this help message\n";
+      << "  -h, --help            Show this help message\n"
+      << "  -a, --alsa-tx <device>  ALSA transmit device (e.g., hw:5,0)\n";
 }
 
 int main(int argc, char *argv[]) {
@@ -40,13 +41,14 @@ int main(int argc, char *argv[]) {
   std::string power_level = "";
   std::string serial_port = "";
   std::string sock_path = "/tmp/75fasmod_data.sock";
+  std::string alsa_tx_device = "";
 
   // Default values
   rig_model_t rig_model = RadioController::DEFAULT_MODEL;
   int burst_limit = 8;
   int flush_timeout_ms = 200;
 
-  const char *const short_opts = "f:w:p:m:s:b:t:h";
+  const char *const short_opts = "f:w:p:m:s:b:t:h:a";
   const option long_opts[] = {{"freq", required_argument, nullptr, 'f'},
                               {"power", required_argument, nullptr, 'w'},
                               {"port", required_argument, nullptr, 'p'},
@@ -55,6 +57,7 @@ int main(int argc, char *argv[]) {
                               {"burst", required_argument, nullptr, 'b'},
                               {"timeout", required_argument, nullptr, 't'},
                               {"help", no_argument, nullptr, 'h'},
+                              {"alsa-tx", required_argument, nullptr, 'a'},
                               {nullptr, 0, nullptr, 0}};
 
   int opt;
@@ -85,6 +88,9 @@ int main(int argc, char *argv[]) {
     case 'h':
       print_usage(argv[0]);
       return 0;
+    case 'a':
+      alsa_tx_device = optarg;
+      break;
     default:
       print_usage(argv[0]);
       return 1;
@@ -93,6 +99,11 @@ int main(int argc, char *argv[]) {
 
   if (target_freq_mhz == 0.0) {
     std::cerr << "Error: You must specify a target frequency in MHz.\n";
+    return 1;
+  }
+
+  if (alsa_tx_device.empty()) {
+    std::cerr << "Error: You must specify an ALSA transmit device.\n";
     return 1;
   }
 
@@ -151,7 +162,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Mapped serial port " << serial_port << " to ALSA audio device " << alsa_device << "\n";
   }
   
-  ModemDSP dsp(alsa_device);
+  ModemDSP dsp(alsa_tx_device, alsa_device);
 
   // 4. Start the Data Socket Server
   DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
