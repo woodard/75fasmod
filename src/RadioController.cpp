@@ -83,7 +83,7 @@ bool RadioController::initialize() {
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
-  // 3. Verify radio is in an FM mode
+// 3. Verify radio is in an FM mode
   rmode_t active_mode = RIG_MODE_NONE;
   pbwidth_t active_width = 0;
   if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
@@ -95,8 +95,35 @@ bool RadioController::initialize() {
     }
   }
 
-  // Configure Kenwood 9600 bps data output path (Menu 102)
-  kenwood_menu_set(102, 1);
+  // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
+  if (orig_menu_102_ != 1) {
+    std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a USB reset...\n";
+    kenwood_menu_set(102, 1);
+    
+    // The radio is currently rebooting its USB interface. 
+    // Close our stale handles before the OS gets upset.
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
+
+    std::cout << "[RIG] Waiting 4 seconds for USB re-enumeration...\n";
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+
+    // Re-initialize Hamlib now that the radio has returned
+    std::cout << "[RIG] Reconnecting to Hamlib after USB reset...\n";
+    rig_ = rig_init(model_);
+    rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+    
+    int re_status = rig_open(rig_);
+    if (re_status != RIG_OK) {
+      std::cerr << "[RIG] Error: Failed to reconnect after USB reset. Code: " 
+                << re_status << "\n";
+      return false;
+    }
+    std::cout << "[RIG] Successfully reconnected to radio.\n";
+  } else {
+    std::cout << "[RIG] Menu 102 already set to IF Output. Skipping USB reset.\n";
+  }
 
   return true;
 }
