@@ -37,8 +37,8 @@ bool DataSocket::start() {
   if (pipe(rx_pipe_) < 0) return false;
   if (pipe(tx_pipe_) < 0) return false; // Create TX Pipe
 
-  dsp_.start_rx(rx_pipe_[1]);
-  dsp_.start_tx(tx_pipe_[0]); // Start persistent TX flowgraph
+  if (!dsp_.start_rx(rx_pipe_[1])) return false;
+  if (!dsp_.start_tx(tx_pipe_[0])) return false;
 
   worker_thread_ = std::jthread([this](std::stop_token stoken) { this->accept_loop(stoken); });
   std::cout << "Data socket listening on " << socket_path_ << "\n";

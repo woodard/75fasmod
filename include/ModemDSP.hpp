@@ -10,10 +10,10 @@ public:
   ModemDSP(const std::string& alsa_device);
   ~ModemDSP();
 
-  void start_rx(int output_fd);
+  bool start_rx(int output_fd);
   void stop_rx();
 
-  void start_tx(int input_fd);
+  bool start_tx(int input_fd);
   void stop_tx();
 
 private:
