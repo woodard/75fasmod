@@ -182,8 +182,15 @@ bool RadioController::set_frequency(double freq_mhz) {
 }
 
 bool RadioController::set_ptt(bool transmit) {
-  ptt_t ptt_state = transmit ? RIG_PTT_ON : RIG_PTT_OFF;
-  return rig_set_ptt(rig_, RIG_VFO_CURR, ptt_state) == RIG_OK;
+  // Bypass Hamlib's rig_set_ptt because it fails to consume the ACK response,
+  // causing the serial buffer to desynchronize for all subsequent commands.
+  const char* cmd = transmit ? "TX\r" : "RX\r";
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  
+  rig_send_raw(rig_, (const unsigned char*)cmd, strlen(cmd), 
+                     (unsigned char*)buf, sizeof(buf) - 1, &term);
+  return true;
 }
 
 bool RadioController::get_dcd(bool &is_squelch_open) {
@@ -221,7 +228,7 @@ bool RadioController::set_power_level(const std::string &level) {
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX %03d\r", menu_num); // Space is required!
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -260,7 +267,7 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX %03d,%d\r", menu_num, value); // Space is required!
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -298,14 +305,14 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
   if (rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
                            (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
     std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos) {
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
       active_band = 1;
     }
   }
 
   // Fetch power for the active band
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); // PC requires space and band
+  snprintf(cmd, sizeof(cmd), "PC%d\r", active_band);
 
   char buf[64] = {0};
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
@@ -354,13 +361,13 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   if (rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
                            (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
     std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos) {
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
       active_band = 1;
     }
   }
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); // PC requires space and band
+  snprintf(cmd, sizeof(cmd), "PC%d,%d\r", active_band, static_cast<int>(val)); 
 
   char buf[64] = {0};
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
@@ -389,7 +396,7 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 }
 
 int RadioController::kenwood_tnc_get() {
-  char cmd[] = "TN\r"; // TNC status uses the TN command
+  char cmd[] = "TN\r"; 
   char buf[64] = {0};
   unsigned char term = '\r';
   
@@ -408,10 +415,14 @@ int RadioController::kenwood_tnc_get() {
 
   if (bytes > 0) {
     std::string resp(buf);
-    // Response format: "TN x" where x is mode (0=OFF, 1=APRS, 2=KISS1200, 3=KISS9600)
-    if (resp.substr(0, 3) == "TN ") {
+    size_t space_pos = resp.find(' ');
+    size_t comma = resp.find(',');
+    
+    // Response formats varies: "TN 1,0\r", "TN1,0\r", "TN 1\r"
+    if (comma != std::string::npos) {
+      size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
       try {
-        return std::stoi(resp.substr(3, 1));
+        return std::stoi(resp.substr(start, comma - start));
       } catch (...) {
         return -1;
       }
@@ -422,7 +433,7 @@ int RadioController::kenwood_tnc_get() {
 
 bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TN %d\r", mode); // TNC state is set using TN command
+  snprintf(cmd, sizeof(cmd), "TN%d,0\r", mode); // Command formatted without spaces
   
   char buf[64] = {0};
   unsigned char term = '\r';
