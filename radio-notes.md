@@ -480,3 +480,47 @@ void get_tnc_band(RIG *my_rig) {
     printf("Failed to query TNC band status: %s\n", response);
 }
 
+In Hamlib, both **`rig_send_raw()`** and **`rig_send_raw_cmd()`** allow low-level pass-through access to the rig's communication port, but they serve fundamentally different network/hardware purposes and handle communication framing differently.
+
+---
+
+### **1. `rig_send_raw_cmd()` (Text/CAT Pass-Through)**
+
+Use **`rig_send_raw_cmd()`** when sending high-level ASCII CAT commands to radios that use text-based command interfaces (like Kenwood, Elecraft, or Ten-Tec).
+
+```c
+int rig_send_raw_cmd(RIG *rig, const char *in_buf, int in_len,
+                     char *out_buf, int out_len, const char *term);
+
+```
+
+* **Purpose:** It writes a text command to the transceiver and automatically reads back the response, stopping when it sees a specific termination character (like `\r` or `;`) or reaches a timeout.
+* **Termination Handling:** It uses the `term` string parameter to detect the end of the radio's response (e.g., `";"` for Kenwood or Yaesu CAT commands).
+* **Expected Usage:** Sending text string queries (such as `"BC;"` or `"TN;"`) where you expect an ASCII formatted string returned in `out_buf`.
+
+---
+
+### **2. `rig_send_raw()` (Raw Binary Byte I/O)**
+
+Use **`rig_send_raw()`** when sending raw binary packets or working with byte-oriented protocols (like Icom CI-V, Yaesu binary CAT protocols, or raw serial streams).
+
+```c
+int rig_send_raw(RIG *rig, const unsigned char *in_buf, int in_len,
+                 unsigned char *out_buf, int out_len);
+
+```
+
+* **Purpose:** It performs a direct write/read on the serial or network port buffer without searching for ASCII line terminators or string boundaries.
+* **Termination Handling:** It relies strictly on reading a predetermined byte length (`out_len`) or stopping when the underlying port read buffer clears out / times out.
+* **Expected Usage:** Sending raw byte arrays, binary hex frames, or custom hardware control commands that contain non-printable characters or `0x00` (NUL) bytes.
+
+---
+
+### **Summary**
+
+| Feature | `rig_send_raw_cmd()` | `rig_send_raw()` |
+| --- | --- | --- |
+| **Data Format** | Null-terminated or text ASCII strings | Raw binary byte arrays (`unsigned char*`) |
+| **Response Terminator** | Looks for explicit terminator string (e.g., `"\r"` or `";"`) | Reads fixed number of bytes or until timeout |
+| **Typical Target Radios** | Kenwood (`BC;`), Elecraft (`FA;`) | Icom CI-V hex frames (`0xFE 0xFE...`), Yaesu binary |
+| **Best Choice For TH-D75** | **Yes** (For standard text commands) | Only if interfacing with custom binary streams |

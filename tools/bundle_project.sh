@@ -16,13 +16,14 @@ echo "" >> "$OUTPUT"
 
 # Use 'tree' if available for better readability, otherwise fallback to 'find'
 if command -v tree >/dev/null 2>&1; then
-    tree -a -I '.git|.libs|.deps|autom4te.cache|build|*.o|*.lo|*.la|*.so' >> "$OUTPUT"
+    tree -a -I '.git|.libs|.deps|autom4te.cache|build|*.o|*.lo|*.la|*.so|.aider*' >> "$OUTPUT"
 else
     find . -type f \
         -not -path '*/\.git/*' \
         -not -path '*/\.libs/*' \
         -not -path '*/\.deps/*' \
-        -not -path '*/autom4te.cache/*' | sort >> "$OUTPUT"
+        -not -path '*/autom4te.cache/*' \
+        -not -name '.aider*' | sort >> "$OUTPUT"
 fi
 echo -e "\n\n" >> "$OUTPUT"
 
@@ -36,7 +37,8 @@ find . -type f \
     -not -path '*/\.git/*' \
     -not -path '*/\.libs/*' \
     -not -path '*/\.deps/*' \
-    -not -path '*/autom4te.cache/*' | sort | while read -r FILE; do
+    -not -path '*/autom4te.cache/*' \
+    -not -name '.aider*' | sort | while read -r FILE; do
 
     # Strip the leading './' from the find output for cleaner paths
     CLEAN_NAME="${FILE#./}"

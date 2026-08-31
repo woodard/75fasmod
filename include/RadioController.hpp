@@ -45,16 +45,17 @@ public:
   }
   
   int kenwood_tnc_get();
-  void kenwood_tnc_set(int mode);
+  bool kenwood_tnc_set(int mode);
   
   UsbOutSelect kenwood_usb_out_select_get();
-  void kenwood_usb_out_select_set(UsbOutSelect value);
+  bool kenwood_usb_out_select_set(UsbOutSelect value);
   
 private:
   PowerLevel kenwood_power_get();
-  void kenwood_menu_set(int menu_num, int value);
+  bool kenwood_power_set(PowerLevel val);
+  
   int kenwood_menu_get(int menu_num);
-  void kenwood_power_set(PowerLevel val);
+  bool kenwood_menu_set(int menu_num, int value);
 
   rig_model_t model_;
   std::string port_;
@@ -70,4 +71,5 @@ private:
   static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
 						 unsigned int target_pid);
   static std::string find_alsa_device(const std::string& serial_port);
+  static std::string read_sysfs_attr(const fs::path& filepath);
 };
