@@ -1,6 +1,6 @@
-#include "DataSocket.hpp"
-#include "ModemDSP.hpp"
 #include "RadioController.hpp"
+#include "ModemDSP.hpp"
+#include "DataSocket.hpp"
 #include <atomic>
 #include <csignal>
 #include <cstdlib>

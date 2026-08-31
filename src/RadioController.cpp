@@ -354,6 +354,20 @@ void RadioController::kenwood_tnc_set(int mode) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
+RadioController::UsbOutSelect RadioController::kenwood_usb_out_select_get() {
+  int value = kenwood_menu_get(102);
+  switch (value) {
+    case 0: return UsbOutSelect::AF;
+    case 1: return UsbOutSelect::IF;
+    case 2: return UsbOutSelect::Detect;
+    default: return UsbOutSelect::AF;
+  }
+}
+
+void RadioController::kenwood_usb_out_select_set(UsbOutSelect value) {
+  kenwood_menu_set(102, static_cast<int>(value));
+}
+
 std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid,
                                                        unsigned int target_pid) {
   std::vector<std::string> found_ports;

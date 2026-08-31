@@ -20,6 +20,13 @@ public:
     UNKNOWN = -1
   };
 
+  // USB Out Select menu item 102 values
+  enum class UsbOutSelect {
+    AF = 0,
+    IF = 1,
+    Detect = 2
+  };
+
   RadioController(rig_model_t model, const std::string &port);
   ~RadioController();
 
@@ -38,6 +45,9 @@ public:
   
   int kenwood_tnc_get();
   void kenwood_tnc_set(int mode);
+  
+  UsbOutSelect kenwood_usb_out_select_get();
+  void kenwood_usb_out_select_set(UsbOutSelect value);
   
 private:
   PowerLevel kenwood_power_get();
