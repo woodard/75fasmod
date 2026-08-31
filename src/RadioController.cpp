@@ -23,6 +23,9 @@ RadioController::~RadioController() {
     std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
     set_ptt(false);
 
+    // Restore original menu 102
+    kenwood_usb_out_select_set(orig_menu_102_);
+
     // Restore original VFO
     if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
       std::cout << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << "\n";
@@ -77,7 +80,7 @@ bool RadioController::initialize(bool hamlib_debug) {
     std::cerr << "[RIG] Warning: Could not query starting radio mode.\n";
   }
 
-  orig_menu_102_ = kenwood_menu_get(102);
+  orig_menu_102_ = kenwood_usb_out_select_get();
   orig_power_ = kenwood_power_get();
 
   // Save TNC state before any modifications
@@ -123,7 +126,7 @@ bool RadioController::initialize(bool hamlib_debug) {
   // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
   if (orig_menu_102_ != 1) {
     std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a USB reset...\n";
-    kenwood_menu_set(102, 1);
+    kenwood_usb_out_select_set(UsbOutSelect::AF)
     
     // The radio is currently rebooting its USB interface. 
     // Close our stale handles before the OS gets upset.
@@ -360,7 +363,7 @@ RadioController::UsbOutSelect RadioController::kenwood_usb_out_select_get() {
     case 0: return UsbOutSelect::AF;
     case 1: return UsbOutSelect::IF;
     case 2: return UsbOutSelect::Detect;
-    default: return UsbOutSelect::AF;
+    default: return UsbOutSelect::unknown;
   }
 }
 

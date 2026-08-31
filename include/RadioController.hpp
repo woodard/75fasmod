@@ -24,7 +24,8 @@ public:
   enum class UsbOutSelect {
     AF = 0,
     IF = 1,
-    Detect = 2
+    Detect = 2,
+    unknown
   };
 
   RadioController(rig_model_t model, const std::string &port);
@@ -61,7 +62,7 @@ private:
 
   rmode_t orig_mode_;
   pbwidth_t orig_width_;
-  int orig_menu_102_;
+  UsbOutSelect orig_menu_102_;
   PowerLevel orig_power_; // Stores the original state using the enum
   int orig_tnc_state_; // Store the original TNC state
   vfo_t orig_vfo_; // Store the original VFO state
