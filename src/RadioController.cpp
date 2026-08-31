@@ -149,7 +149,6 @@ bool RadioController::get_dcd(bool &is_squelch_open) {
   return false;
 }
 
-
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
@@ -301,6 +300,35 @@ void RadioController::kenwood_power_set(PowerLevel val) {
 
   rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), nullptr, 0, nullptr);
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
+}
+
+int RadioController::kenwood_tnc_get() {
+  char cmd[] = "TNC;";
+  char buf[32] = {0};
+  unsigned char term = ';';
+
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    // Response format: "TNC x,y" where x is mode, y is band
+    if (resp.substr(0, 4) == "TNC ") {
+      try {
+        return std::stoi(resp.substr(4, 1));
+      } catch (...) {
+        return -1;
+      }
+    }
+  }
+  return -1;
+}
+
+void RadioController::kenwood_tnc_set(int mode) {
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "TNC %d;", mode);
+  rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), nullptr, 0, nullptr);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid,

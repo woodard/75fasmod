@@ -36,6 +36,9 @@ public:
     return find_alsa_device(port_);
   }
   
+  int kenwood_tnc_get();
+  void kenwood_tnc_set(int mode);
+  
 private:
   PowerLevel kenwood_power_get();
   void kenwood_menu_set(int menu_num, int value);
