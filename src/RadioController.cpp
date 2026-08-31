@@ -185,12 +185,15 @@ bool RadioController::set_ptt(bool transmit) {
   // Bypass Hamlib's rig_set_ptt because it fails to consume the ACK response,
   // causing the serial buffer to desynchronize for all subsequent commands.
   const char* cmd = transmit ? "TX\r" : "RX\r";
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) return false;
-
   char buf[64] = {0};
-  // Read back the response to clear the buffer
-  rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = '\r';
+  
+  int bytes = rig_send_raw(rig_, (const unsigned char*)cmd, strlen(cmd), 
+                           (unsigned char*)buf, sizeof(buf) - 1, &term);
+  
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    return false;
+  }
   return true;
 }
 
@@ -231,17 +234,13 @@ int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "MU %03d\r", menu_num); // Kenwood Menu Command
 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(status) << ")\n";
-    return -1;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
 
-  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " response (" << rigerror(bytes) << ")\n";
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
@@ -275,17 +274,13 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "MU %03d,%d\r", menu_num, value); // Kenwood Menu Command
 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
-  
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
     return false;
   }
 
@@ -310,15 +305,16 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
 RadioController::PowerLevel RadioController::kenwood_power_get() {
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
-  
-  int status = rig_send_raw(rig_, "BC\r", 3);
-  if (status == RIG_OK) {
-    char bc_buf[32] = {0};
-    if (rig_recv_raw(rig_, bc_buf, sizeof(bc_buf) - 1) > 0) {
-      std::string bc_resp(bc_buf);
-      if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
-        active_band = 1;
-      }
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+                              
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
     }
   }
 
@@ -326,16 +322,12 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); // PC requires space and band
 
-  status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying power level (" << rigerror(status) << ")\n";
-    return PowerLevel::UNKNOWN;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
-  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving power level response (" << rigerror(bytes) << ")\n";
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying power level (" << rigerror(bytes) << ")\n";
     return PowerLevel::UNKNOWN;
   }
 
@@ -371,30 +363,28 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
-  int status = rig_send_raw(rig_, "BC\r", 3);
-  if (status == RIG_OK) {
-    char bc_buf[32] = {0};
-    if (rig_recv_raw(rig_, bc_buf, sizeof(bc_buf) - 1) > 0) {
-      std::string bc_resp(bc_buf);
-      if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
-        active_band = 1;
-      }
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+                              
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
     }
   }
 
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); // Space required
 
-  status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error setting power level (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving power set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting power level (" << rigerror(bytes) << ")\n";
     return false;
   }
 
@@ -417,16 +407,14 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 
 int RadioController::kenwood_tnc_get() {
   char cmd[] = "TN\r"; 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(status) << ")\n";
-    return -1;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
-  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving TNC state response (" << rigerror(bytes) << ")\n";
+  unsigned char term = '\r';
+  
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
@@ -440,7 +428,7 @@ int RadioController::kenwood_tnc_get() {
     size_t space_pos = resp.find(' ');
     size_t comma = resp.find(',');
     
-    // Response formats vary: "TN 1,0\r", "TN1,0\r"
+    // Response formats varies: "TN 1,0\r", "TN1,0\r", "TN 1\r"
     if (comma != std::string::npos) {
       size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
       try {
@@ -457,16 +445,13 @@ bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode); // Command formatted with space and band target
   
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving TNC set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(bytes) << ")\n";
     return false;
   }
 
