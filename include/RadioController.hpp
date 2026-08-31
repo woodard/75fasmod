@@ -53,6 +53,8 @@ private:
   pbwidth_t orig_width_;
   int orig_menu_102_;
   PowerLevel orig_power_; // Stores the original state using the enum
+  int orig_tnc_state_; // Store the original TNC state
+  vfo_t orig_vfo_; // Store the original VFO state
 
   static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
 						 unsigned int target_pid);

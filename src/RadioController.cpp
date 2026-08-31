@@ -15,19 +15,23 @@ static std::string read_sysfs_attr(const fs::path& filepath) {
 
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_width_(0), orig_menu_102_(-1), orig_power_(PowerLevel::UNKNOWN) {}
+      orig_width_(0), orig_menu_102_(-1), orig_power_(PowerLevel::UNKNOWN),
+      orig_tnc_state_(-1), orig_vfo_(RIG_VFO_NONE) {}
 
 RadioController::~RadioController() {
   if (rig_) {
     std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
     set_ptt(false);
 
-    if (orig_menu_102_ >= 0) {
-      kenwood_menu_set(102, orig_menu_102_);
+    // Restore original VFO
+    if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
+      std::cout << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << "\n";
     }
 
-    if (orig_power_ != PowerLevel::UNKNOWN) {
-      kenwood_power_set(orig_power_);
+    // Restore original TNC state
+    if (orig_tnc_state_ != -1) {
+      std::cout << "[RIG] Restoring TNC state to " << orig_tnc_state_ << "...\n";
+      kenwood_tnc_set(orig_tnc_state_);
     }
 
     // Restore original operating mode and bandwidth
@@ -76,6 +80,25 @@ bool RadioController::initialize(bool hamlib_debug) {
   orig_menu_102_ = kenwood_menu_get(102);
   orig_power_ = kenwood_power_get();
 
+  // Save TNC state before any modifications
+  orig_tnc_state_ = kenwood_tnc_get();
+  std::cout << "[RIG] Saved TNC state: " << orig_tnc_state_ << "\n";
+
+  // Turn off TNC if it's on to allow dual mode changes
+  if (orig_tnc_state_ != 0) {
+    std::cout << "[RIG] Turning off TNC to allow dual mode changes...\n";
+    kenwood_tnc_set(0);
+  }
+
+  // Save current VFO state
+  if (rig_get_vfo(rig_, &orig_vfo_) == RIG_OK) {
+    std::cout << "[RIG] Saved VFO state: " << rig_strvfo(orig_vfo_) << "\n";
+  }
+
+  // Set to VFO B to allow menu 102 changes when in dual mode
+  std::cout << "[RIG] Setting radio to VFO B for menu 102 access...\n";
+  rig_set_vfo(rig_, RIG_VFO_B);
+
   std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
 
   // 2. Set mode to Packet FM (9600 baud passband)
@@ -85,7 +108,7 @@ bool RadioController::initialize(bool hamlib_debug) {
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
-// 3. Verify radio is in an FM mode
+  // 3. Verify radio is in an FM mode
   rmode_t active_mode = RIG_MODE_NONE;
   pbwidth_t active_width = 0;
   if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
