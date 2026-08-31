@@ -94,10 +94,12 @@ bool RadioController::initialize(bool hamlib_debug) {
     std::cerr << "[RIG] Warning: Could not query starting radio mode.\n";
   }
 
-  orig_menu_102_ = kenwood_usb_out_select_get();
-  orig_power_ = kenwood_power_get();
+  // 2. Save current VFO state
+  if (rig_get_vfo(rig_, &orig_vfo_) == RIG_OK) {
+    std::cout << "[RIG] Saved VFO state: " << rig_strvfo(orig_vfo_) << "\n";
+  }
 
-  // Save TNC state before any modifications
+  // 3. Save TNC state before any modifications
   orig_tnc_state_ = kenwood_tnc_get();
   std::cout << "[RIG] Saved TNC state: " << orig_tnc_state_ << "\n";
 
@@ -106,29 +108,38 @@ bool RadioController::initialize(bool hamlib_debug) {
     std::cout << "[RIG] Turning off TNC to allow dual mode changes...\n";
     if (!kenwood_tnc_set(0)) {
       std::cerr << "[RIG] CRITICAL ERROR: Could not turn off TNC.\n";
-      return false;
+      return false; // Fail fast[cite: 8]
     }
   }
 
-  // Save current VFO state
-  if (rig_get_vfo(rig_, &orig_vfo_) == RIG_OK) {
-    std::cout << "[RIG] Saved VFO state: " << rig_strvfo(orig_vfo_) << "\n";
-  }
+  // 4. Force Single Band Mode on VFO B to unlock Menu 102
+  std::cout << "[RIG] Disabling Dual Watch to unlock menus...\n";
+  char bc_buf[64] = {0};
+  unsigned char term = '\r';
+  rig_send_raw(rig_, (const unsigned char*)"BC 1,0\r", 7, (unsigned char*)bc_buf, sizeof(bc_buf)-1, &term);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  // Set to VFO B to allow menu 102 changes when in dual mode
-  std::cout << "[RIG] Setting radio to VFO B for menu 102 access...\n";
   rig_set_vfo(rig_, RIG_VFO_B);
+
+  // 5. Query power and Menu 102 state
+  orig_power_ = kenwood_power_get();
+  orig_menu_102_ = kenwood_usb_out_select_get();
+  
+  if (orig_menu_102_ == UsbOutSelect::unknown) {
+    std::cerr << "[RIG] CRITICAL ERROR: Could not query Menu 102. Ensure radio is not locked.\n";
+    return false; // Fail fast if we cannot communicate with the menu[cite: 8]
+  }
 
   std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
 
-  // 2. Set mode to Packet FM (9600 baud passband)
+  // 6. Set mode to Packet FM (9600 baud passband)
   int mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
   if (mode_ret != RIG_OK) {
     std::cout << "[RIG] PKTFM mode rejected, falling back to standard FM...\n";
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
-  // 3. Verify radio is in an FM mode
+  // Verify radio is in an FM mode
   rmode_t active_mode = RIG_MODE_NONE;
   pbwidth_t active_width = 0;
   if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
@@ -140,12 +151,12 @@ bool RadioController::initialize(bool hamlib_debug) {
     }
   }
 
-  // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
+  // 7. Configure Kenwood 9600 bps data output path (Menu 102) safely
   if (orig_menu_102_ != UsbOutSelect::IF) {
     std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a USB reset...\n";
     if (!kenwood_usb_out_select_set(UsbOutSelect::IF)) {
       std::cerr << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF output.\n";
-      return false;
+      return false; // Fail fast[cite: 8]
     }
     
     // The radio is currently rebooting its USB interface. 
@@ -182,8 +193,6 @@ bool RadioController::set_frequency(double freq_mhz) {
 }
 
 bool RadioController::set_ptt(bool transmit) {
-  // Bypass Hamlib's rig_set_ptt because it fails to consume the ACK response,
-  // causing the serial buffer to desynchronize for all subsequent commands.
   const char* cmd = transmit ? "TX\r" : "RX\r";
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -232,7 +241,7 @@ bool RadioController::set_power_level(const std::string &level) {
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "MU %03d\r", menu_num); // Kenwood Menu Command
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num); // NO SPACE for EX command[cite: 8]
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -244,7 +253,6 @@ int RadioController::kenwood_menu_get(int menu_num) {
     return -1;
   }
 
-  // Check for Kenwood firmware errors (usually "?", "?;", or "E;")[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying Menu " << menu_num << ": " << buf << "\n";
     return -1;
@@ -272,7 +280,7 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "MU %03d,%d\r", menu_num, value); // Kenwood Menu Command
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value); // NO SPACE for EX command[cite: 8]
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -284,7 +292,6 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting Menu " << menu_num << ": " << buf << "\n";
     return false;
@@ -292,7 +299,7 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  // Belt and Suspenders Verification 
+  // Belt and Suspenders Verification[cite: 8]
   int actual = kenwood_menu_get(menu_num);
   if (actual != value) {
     std::cerr << "[RIG] Verification failed for Menu " << menu_num << ". Expected " << value << " but got " << actual << ".\n";
@@ -320,7 +327,7 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
 
   // Fetch power for the active band
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); // PC requires space and band
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); // PC requires space and band[cite: 8]
 
   char buf[64] = {0};
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
@@ -377,7 +384,7 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   }
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); // Space required
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); 
 
   char buf[64] = {0};
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
@@ -395,7 +402,7 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  // Belt and Suspenders Verification
+  // Belt and Suspenders Verification[cite: 8]
   PowerLevel actual = kenwood_power_get();
   if (actual != val) {
     std::cerr << "[RIG] Verification failed for Power Level. Expected " << static_cast<int>(val) << " but got " << static_cast<int>(actual) << ".\n";
@@ -428,7 +435,6 @@ int RadioController::kenwood_tnc_get() {
     size_t space_pos = resp.find(' ');
     size_t comma = resp.find(',');
     
-    // Response formats varies: "TN 1,0\r", "TN1,0\r", "TN 1\r"
     if (comma != std::string::npos) {
       size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
       try {
@@ -443,7 +449,7 @@ int RadioController::kenwood_tnc_get() {
 
 bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode); // Command formatted with space and band target
+  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode); // TN requires space and band target[cite: 8]
   
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -462,7 +468,7 @@ bool RadioController::kenwood_tnc_set(int mode) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  // Belt and Suspenders Verification
+  // Belt and Suspenders Verification[cite: 8]
   int actual = kenwood_tnc_get();
   if (actual != mode) {
     std::cerr << "[RIG] Verification failed for TNC Mode. Expected " << mode << " but got " << actual << ".\n";
