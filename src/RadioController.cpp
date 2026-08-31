@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <fstream>
 
-static std::string read_sysfs_attr(const fs::path& filepath) {
+std::string RadioController::read_sysfs_attr(const fs::path& filepath) {
   std::ifstream file(filepath);
   std::string value;
   if (file >> value) return value;
