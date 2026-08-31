@@ -221,7 +221,7 @@ bool RadioController::set_power_level(const std::string &level) {
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num); // Use \r for raw Kenwood
+  snprintf(cmd, sizeof(cmd), "EX %03d\r", menu_num); // Space is required!
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -242,7 +242,7 @@ int RadioController::kenwood_menu_get(int menu_num) {
     std::string resp(buf);
     size_t comma = resp.find(',');
     size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos) term_pos = resp.find(';'); // Safety fallback
+    if (term_pos == std::string::npos) term_pos = resp.find(';'); 
 
     if (comma != std::string::npos && term_pos != std::string::npos) {
       try {
@@ -260,7 +260,7 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
+  snprintf(cmd, sizeof(cmd), "EX %03d,%d\r", menu_num, value); // Space is required!
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -290,9 +290,25 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
 }
 
 RadioController::PowerLevel RadioController::kenwood_power_get() {
-  char buf[64] = {0};
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)"PC\r", 3, 
+
+  if (rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                           (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // Fetch power for the active band
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); // PC requires space and band
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0) {
@@ -307,14 +323,14 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
 
   if (bytes > 0) {
     std::string resp(buf);
-    size_t pc_pos = resp.find("PC");
+    size_t comma = resp.find(',');
     size_t term_pos = resp.find('\r');
     if (term_pos == std::string::npos) term_pos = resp.find(';');
 
-    if (pc_pos != std::string::npos && term_pos != std::string::npos &&
-        term_pos > pc_pos + 2) {
+    // PC response looks like "PC 0,3\r" (Band, Power)
+    if (comma != std::string::npos && term_pos != std::string::npos && term_pos > comma + 1) {
       try {
-        int pwr_int = std::stoi(resp.substr(pc_pos + 2, term_pos - pc_pos - 2));
+        int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
         if (pwr_int >= 0 && pwr_int <= 3) {
           return static_cast<PowerLevel>(pwr_int);
         }
@@ -330,11 +346,23 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   if (val == PowerLevel::UNKNOWN)
     return false;
 
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC%d\r", static_cast<int>(val));
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  if (rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                           (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term) > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); // PC requires space and band
 
   char buf[64] = {0};
-  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -361,7 +389,7 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 }
 
 int RadioController::kenwood_tnc_get() {
-  char cmd[] = "TNC\r";
+  char cmd[] = "TN\r"; // TNC status uses the TN command
   char buf[64] = {0};
   unsigned char term = '\r';
   
@@ -380,10 +408,10 @@ int RadioController::kenwood_tnc_get() {
 
   if (bytes > 0) {
     std::string resp(buf);
-    // Response format: "TNC x,y" where x is mode, y is band
-    if (resp.substr(0, 4) == "TNC ") {
+    // Response format: "TN x" where x is mode (0=OFF, 1=APRS, 2=KISS1200, 3=KISS9600)
+    if (resp.substr(0, 3) == "TN ") {
       try {
-        return std::stoi(resp.substr(4, 1));
+        return std::stoi(resp.substr(3, 1));
       } catch (...) {
         return -1;
       }
@@ -394,7 +422,7 @@ int RadioController::kenwood_tnc_get() {
 
 bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TNC %d\r", mode);
+  snprintf(cmd, sizeof(cmd), "TN %d\r", mode); // TNC state is set using TN command
   
   char buf[64] = {0};
   unsigned char term = '\r';
