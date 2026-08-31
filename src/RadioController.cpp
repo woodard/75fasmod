@@ -221,10 +221,10 @@ bool RadioController::set_power_level(const std::string &level) {
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num); // Use \r for raw Kenwood
 
   char buf[64] = {0};
-  unsigned char term = ';';
+  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -233,7 +233,7 @@ int RadioController::kenwood_menu_get(int menu_num) {
     return -1;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying Menu " << menu_num << ": " << buf << "\n";
     return -1;
   }
@@ -241,10 +241,12 @@ int RadioController::kenwood_menu_get(int menu_num) {
   if (bytes > 0) {
     std::string resp(buf);
     size_t comma = resp.find(',');
-    size_t semi = resp.find(';');
-    if (comma != std::string::npos && semi != std::string::npos) {
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos) term_pos = resp.find(';'); // Safety fallback
+
+    if (comma != std::string::npos && term_pos != std::string::npos) {
       try {
-        return std::stoi(resp.substr(comma + 1, semi - comma - 1));
+        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
       } catch (...) {
         return -1;
       }
@@ -258,10 +260,10 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d;", menu_num, value);
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
   char buf[64] = {0};
-  unsigned char term = ';';
+  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -270,19 +272,27 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting Menu " << menu_num << ": " << buf << "\n";
     return false;
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Belt and Suspenders Verification 
+  int actual = kenwood_menu_get(menu_num);
+  if (actual != value) {
+    std::cerr << "[RIG] Verification failed for Menu " << menu_num << ". Expected " << value << " but got " << actual << ".\n";
+    return false;
+  }
+
   return true;
 }
 
 RadioController::PowerLevel RadioController::kenwood_power_get() {
   char buf[64] = {0};
-  unsigned char term = ';';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)"PC;", 3, 
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)"PC\r", 3, 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0) {
@@ -290,7 +300,7 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
     return PowerLevel::UNKNOWN;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying power: " << buf << "\n";
     return PowerLevel::UNKNOWN;
   }
@@ -298,12 +308,13 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
   if (bytes > 0) {
     std::string resp(buf);
     size_t pc_pos = resp.find("PC");
-    size_t semi = resp.find(';');
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos) term_pos = resp.find(';');
 
-    if (pc_pos != std::string::npos && semi != std::string::npos &&
-        semi > pc_pos + 2) {
+    if (pc_pos != std::string::npos && term_pos != std::string::npos &&
+        term_pos > pc_pos + 2) {
       try {
-        int pwr_int = std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+        int pwr_int = std::stoi(resp.substr(pc_pos + 2, term_pos - pc_pos - 2));
         if (pwr_int >= 0 && pwr_int <= 3) {
           return static_cast<PowerLevel>(pwr_int);
         }
@@ -320,10 +331,10 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
     return false;
 
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC%d;", static_cast<int>(val));
+  snprintf(cmd, sizeof(cmd), "PC%d\r", static_cast<int>(val));
 
   char buf[64] = {0};
-  unsigned char term = ';';
+  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -332,19 +343,27 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting power: " << buf << "\n";
     return false;
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+  // Belt and Suspenders Verification
+  PowerLevel actual = kenwood_power_get();
+  if (actual != val) {
+    std::cerr << "[RIG] Verification failed for Power Level. Expected " << static_cast<int>(val) << " but got " << static_cast<int>(actual) << ".\n";
+    return false;
+  }
+
   return true;
 }
 
 int RadioController::kenwood_tnc_get() {
-  char cmd[] = "TNC;";
+  char cmd[] = "TNC\r";
   char buf[64] = {0};
-  unsigned char term = ';';
+  unsigned char term = '\r';
   
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
@@ -354,7 +373,7 @@ int RadioController::kenwood_tnc_get() {
     return -1;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying TNC state: " << buf << "\n";
     return -1;
   }
@@ -375,10 +394,10 @@ int RadioController::kenwood_tnc_get() {
 
 bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TNC %d;", mode);
+  snprintf(cmd, sizeof(cmd), "TNC %d\r", mode);
   
   char buf[64] = {0};
-  unsigned char term = ';';
+  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
@@ -387,12 +406,20 @@ bool RadioController::kenwood_tnc_set(int mode) {
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting TNC state: " << buf << "\n";
     return false;
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Belt and Suspenders Verification
+  int actual = kenwood_tnc_get();
+  if (actual != mode) {
+    std::cerr << "[RIG] Verification failed for TNC Mode. Expected " << mode << " but got " << actual << ".\n";
+    return false;
+  }
+
   return true;
 }
 
@@ -421,7 +448,6 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
     fs::path dev_path = entry.path() / "device";
     if (!fs::exists(dev_path)) continue;
 
-    // Use const char* to avoid allocating temporary std::string objects
     for (const char* parent_rel : {"..", "../..", "../../.."}) {
       fs::path vid_path = dev_path / parent_rel / "idVendor";
       fs::path pid_path = dev_path / parent_rel / "idProduct";
@@ -446,14 +472,13 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
 }
 
 std::string RadioController::find_alsa_device(const std::string& serial_port) {
-  fs::path tty_name = fs::path(serial_port).filename(); // e.g., "ttyACM0"
+  fs::path tty_name = fs::path(serial_port).filename(); 
   fs::path tty_dev_path = "/sys/class/tty" / tty_name / "device";
 
   if (!fs::exists(tty_dev_path)) return "";
 
   fs::path usb_dev_path;
   try {
-    // The device node is a symlink to the USB interface. Its parent is the physical USB device.
     usb_dev_path = fs::canonical(tty_dev_path).parent_path();
   } catch (...) {
     return "";
@@ -462,7 +487,6 @@ std::string RadioController::find_alsa_device(const std::string& serial_port) {
   fs::path sound_class_path = "/sys/class/sound";
   if (!fs::exists(sound_class_path)) return "";
 
-  // Find the soundcard with the same parent USB device
   for (const auto& entry : fs::directory_iterator(sound_class_path)) {
     std::string card_name = entry.path().filename().string();
     
@@ -473,7 +497,6 @@ std::string RadioController::find_alsa_device(const std::string& serial_port) {
       try {
         fs::path card_usb_path = fs::canonical(card_dev_path).parent_path();
         if (card_usb_path == usb_dev_path) {
-          // Extract the X from "cardX" to format the ALSA hardware string
           std::string card_num = card_name.substr(4);
           return "hw:" + card_num + ",0";
         }
