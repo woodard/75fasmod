@@ -31,8 +31,10 @@ RadioController::~RadioController() {
     }
 
     // Restore original VFO
-    if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
-      std::cout << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << "\n";
+    if (orig_vfo_ != RIG_VFO_NONE) {
+      if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
+        std::cout << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << "\n";
+      }
     }
 
     // Restore original TNC state
@@ -100,7 +102,7 @@ bool RadioController::initialize(bool hamlib_debug) {
   std::cout << "[RIG] Saved TNC state: " << orig_tnc_state_ << "\n";
 
   // Turn off TNC if it's on to allow dual mode changes
-  if (orig_tnc_state_ != 0) {
+  if (orig_tnc_state_ != 0 && orig_tnc_state_ != -1) {
     std::cout << "[RIG] Turning off TNC to allow dual mode changes...\n";
     if (!kenwood_tnc_set(0)) {
       std::cerr << "[RIG] CRITICAL ERROR: Could not turn off TNC.\n";
@@ -221,28 +223,35 @@ int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
 
-  char out_buf[64] = {0};
-  int status = rig_send_raw_cmd(rig_, cmd, out_buf);
-
+  int status = rig_send_raw(rig_, cmd, strlen(cmd));
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(status) << ")\n";
     return -1;
   }
 
-  // Check for Kenwood firmware errors (usually "?", "?;", or "E;")[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error querying Menu " << menu_num << ": " << out_buf << "\n";
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " response (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
-  std::string resp(out_buf);
-  size_t comma = resp.find(',');
-  size_t semi = resp.find(';');
-  if (comma != std::string::npos && semi != std::string::npos) {
-    try {
-      return std::stoi(resp.substr(comma + 1, semi - comma - 1));
-    } catch (...) {
-      return -1;
+  // Check for Kenwood firmware errors (usually "?", "?;", or "E;")[cite: 8]
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error querying Menu " << menu_num << ": " << buf << "\n";
+    return -1;
+  }
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+    size_t semi = resp.find(';');
+    if (comma != std::string::npos && semi != std::string::npos) {
+      try {
+        return std::stoi(resp.substr(comma + 1, semi - comma - 1));
+      } catch (...) {
+        return -1;
+      }
     }
   }
   return -1;
@@ -255,17 +264,24 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "EX%03d,%d;", menu_num, value);
 
-  char out_buf[64] = {0};
-  int status = rig_send_raw_cmd(rig_, cmd, out_buf);
-
+  int status = rig_send_raw(rig_, cmd, strlen(cmd));
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(status) << ")\n";
     return false;
   }
 
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  
+  // Setters might timeout returning -RIG_ETIMEOUT. If it does, we allow it to pass.
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " set response (" << rigerror(bytes) << ")\n";
+    return false;
+  }
+
   // Check for Kenwood firmware errors[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error setting Menu " << menu_num << ": " << out_buf << "\n";
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error setting Menu " << menu_num << ": " << buf << "\n";
     return false;
   }
 
@@ -274,33 +290,40 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
 }
 
 RadioController::PowerLevel RadioController::kenwood_power_get() {
-  char out_buf[32] = {0};
-  int status = rig_send_raw_cmd(rig_, "PC;", out_buf);
-
+  int status = rig_send_raw(rig_, "PC;", 3);
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error querying power level (" << rigerror(status) << ")\n";
     return PowerLevel::UNKNOWN;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error querying power: " << out_buf << "\n";
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error receiving power level response (" << rigerror(bytes) << ")\n";
     return PowerLevel::UNKNOWN;
   }
 
-  std::string resp(out_buf);
-  size_t pc_pos = resp.find("PC");
-  size_t semi = resp.find(';');
+  // Check for Kenwood firmware errors[cite: 8]
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error querying power: " << buf << "\n";
+    return PowerLevel::UNKNOWN;
+  }
 
-  if (pc_pos != std::string::npos && semi != std::string::npos &&
-      semi > pc_pos + 2) {
-    try {
-      int pwr_int = std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
-      if (pwr_int >= 0 && pwr_int <= 3) {
-        return static_cast<PowerLevel>(pwr_int);
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t pc_pos = resp.find("PC");
+    size_t semi = resp.find(';');
+
+    if (pc_pos != std::string::npos && semi != std::string::npos &&
+        semi > pc_pos + 2) {
+      try {
+        int pwr_int = std::stoi(resp.substr(pc_pos + 2, semi - pc_pos - 2));
+        if (pwr_int >= 0 && pwr_int <= 3) {
+          return static_cast<PowerLevel>(pwr_int);
+        }
+      } catch (...) {
+        return PowerLevel::UNKNOWN;
       }
-    } catch (...) {
-      return PowerLevel::UNKNOWN;
     }
   }
   return PowerLevel::UNKNOWN;
@@ -313,17 +336,22 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "PC%d;", static_cast<int>(val));
 
-  char out_buf[64] = {0};
-  int status = rig_send_raw_cmd(rig_, cmd, out_buf);
-
+  int status = rig_send_raw(rig_, cmd, strlen(cmd));
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error setting power level (" << rigerror(status) << ")\n";
     return false;
   }
 
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error receiving power set response (" << rigerror(bytes) << ")\n";
+    return false;
+  }
+
   // Check for Kenwood firmware errors[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error setting power: " << out_buf << "\n";
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error setting power: " << buf << "\n";
     return false;
   }
 
@@ -332,27 +360,35 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 }
 
 int RadioController::kenwood_tnc_get() {
-  char out_buf[64] = {0};
-  int status = rig_send_raw_cmd(rig_, "TNC;", out_buf);
-
+  char cmd[] = "TNC;";
+  int status = rig_send_raw(rig_, cmd, strlen(cmd));
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(status) << ")\n";
     return -1;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error querying TNC state: " << out_buf << "\n";
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error receiving TNC state response (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
-  std::string resp(out_buf);
-  // Response format: "TNC x,y" where x is mode, y is band
-  if (resp.substr(0, 4) == "TNC ") {
-    try {
-      return std::stoi(resp.substr(4, 1));
-    } catch (...) {
-      return -1;
+  // Check for Kenwood firmware errors[cite: 8]
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error querying TNC state: " << buf << "\n";
+    return -1;
+  }
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    // Response format: "TNC x,y" where x is mode, y is band
+    if (resp.substr(0, 4) == "TNC ") {
+      try {
+        return std::stoi(resp.substr(4, 1));
+      } catch (...) {
+        return -1;
+      }
     }
   }
   return -1;
@@ -362,17 +398,22 @@ bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "TNC %d;", mode);
   
-  char out_buf[64] = {0};
-  int status = rig_send_raw_cmd(rig_, cmd, out_buf);
-
+  int status = rig_send_raw(rig_, cmd, strlen(cmd));
   if (status != RIG_OK) {
     std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(status) << ")\n";
     return false;
   }
 
+  char buf[64] = {0};
+  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error receiving TNC set response (" << rigerror(bytes) << ")\n";
+    return false;
+  }
+
   // Check for Kenwood firmware errors[cite: 8]
-  if (out_buf[0] == '?' || (out_buf[0] == 'E' && (out_buf[1] == ';' || out_buf[1] == '\r' || out_buf[1] == '\0'))) {
-    std::cerr << "[RIG] Firmware error setting TNC state: " << out_buf << "\n";
+  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error setting TNC state: " << buf << "\n";
     return false;
   }
 
@@ -466,12 +507,5 @@ std::string RadioController::find_alsa_device(const std::string& serial_port) {
       }
     }
   }
-  return "";
-}
-
-std::string RadioController::read_sysfs_attr(const fs::path& filepath) {
-  std::ifstream file(filepath);
-  std::string value;
-  if (file >> value) return value;
   return "";
 }

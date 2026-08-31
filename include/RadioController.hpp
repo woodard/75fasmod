@@ -53,7 +53,7 @@ public:
 private:
   PowerLevel kenwood_power_get();
   bool kenwood_power_set(PowerLevel val);
-  
+
   int kenwood_menu_get(int menu_num);
   bool kenwood_menu_set(int menu_num, int value);
 
