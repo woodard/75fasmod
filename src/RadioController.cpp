@@ -15,7 +15,7 @@ static std::string read_sysfs_attr(const fs::path& filepath) {
 
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_width_(0), orig_menu_102_(-1), orig_power_(PowerLevel::UNKNOWN),
+      orig_width_(0), orig_menu_102_(UsbOutSelect::unknown), orig_power_(PowerLevel::UNKNOWN),
       orig_tnc_state_(-1), orig_vfo_(RIG_VFO_NONE) {}
 
 RadioController::~RadioController() {
@@ -124,9 +124,9 @@ bool RadioController::initialize(bool hamlib_debug) {
   }
 
   // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
-  if (orig_menu_102_ != 1) {
+  if (orig_menu_102_ != UsbOutSelect::IF) {
     std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a USB reset...\n";
-    kenwood_usb_out_select_set(UsbOutSelect::AF)
+    kenwood_usb_out_select_set(UsbOutSelect::IF);
     
     // The radio is currently rebooting its USB interface. 
     // Close our stale handles before the OS gets upset.
