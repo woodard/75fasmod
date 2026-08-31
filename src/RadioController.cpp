@@ -223,20 +223,16 @@ int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "EX%03d;", menu_num);
 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(status) << ")\n";
-    return -1;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = ';';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
-  // Check for Kenwood firmware errors (usually "?", "?;", or "E;")[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying Menu " << menu_num << ": " << buf << "\n";
     return -1;
@@ -264,22 +260,16 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "EX%03d,%d;", menu_num, value);
 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
-  
-  // Setters might timeout returning -RIG_ETIMEOUT. If it does, we allow it to pass.
+  unsigned char term = ';';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving Menu " << menu_num << " set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
     return false;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting Menu " << menu_num << ": " << buf << "\n";
     return false;
@@ -290,20 +280,16 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
 }
 
 RadioController::PowerLevel RadioController::kenwood_power_get() {
-  int status = rig_send_raw(rig_, "PC;", 3);
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying power level (" << rigerror(status) << ")\n";
-    return PowerLevel::UNKNOWN;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = ';';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)"PC;", 3, 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error receiving power level response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying power level (" << rigerror(bytes) << ")\n";
     return PowerLevel::UNKNOWN;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying power: " << buf << "\n";
     return PowerLevel::UNKNOWN;
@@ -336,20 +322,16 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "PC%d;", static_cast<int>(val));
 
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error setting power level (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = ';';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving power set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting power level (" << rigerror(bytes) << ")\n";
     return false;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting power: " << buf << "\n";
     return false;
@@ -361,20 +343,17 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 
 int RadioController::kenwood_tnc_get() {
   char cmd[] = "TNC;";
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(status) << ")\n";
-    return -1;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = ';';
+  
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error receiving TNC state response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(bytes) << ")\n";
     return -1;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying TNC state: " << buf << "\n";
     return -1;
@@ -398,20 +377,16 @@ bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "TNC %d;", mode);
   
-  int status = rig_send_raw(rig_, cmd, strlen(cmd));
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(status) << ")\n";
-    return false;
-  }
-
   char buf[64] = {0};
-  int bytes = rig_recv_raw(rig_, buf, sizeof(buf) - 1);
+  unsigned char term = ';';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error receiving TNC set response (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(bytes) << ")\n";
     return false;
   }
 
-  // Check for Kenwood firmware errors[cite: 8]
   if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == ';' || buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting TNC state: " << buf << "\n";
     return false;
