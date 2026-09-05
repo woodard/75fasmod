@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
                               {nullptr, 0, nullptr, 0}};
 
   int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) != -1) {
+  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
+         -1) {
     switch (opt) {
     case 's':
       set_flag = true;
@@ -57,7 +58,8 @@ int main(int argc, char *argv[]) {
 
   RadioController radio(RadioController::DEFAULT_MODEL, ports[0]);
   if (!radio.initialize()) {
-    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0] << "\n";
+    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0]
+              << "\n";
     return 1;
   }
 
@@ -72,7 +74,8 @@ int main(int argc, char *argv[]) {
                                    ? explicit_level
                                    : get_different_power_level(current_level);
     if (!radio.set_power_level(target_level)) {
-      std::cerr << "[ERROR] Failed to set power level to " << target_level << "\n";
+      std::cerr << "[ERROR] Failed to set power level to " << target_level
+                << "\n";
       return 1;
     }
     std::cout << target_level << "\n";
