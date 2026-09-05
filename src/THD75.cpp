@@ -333,3 +333,27 @@ THD75::UsbOutSelect THD75::kenwood_usb_out_select_get() {
 bool THD75::kenwood_usb_out_select_set(UsbOutSelect value) {
   return kenwood_menu_set(102, static_cast<int>(value));
 }
+// VFO control functions
+THD75::VFO THD75::get_current_vfo() {
+  vfo_t vfo;
+  if (rig_get_vfo(rig_, &vfo) == RIG_OK) {
+    if (vfo == RIG_VFO_A) {
+      return VFO::A;
+    } else if (vfo == RIG_VFO_B) {
+      return VFO::B;
+    }
+  }
+  return VFO::A; // Default fallback
+}
+
+bool THD75::set_current_vfo(VFO vfo) {
+  vfo_t hamlib_vfo;
+  if (vfo == VFO::A) {
+    hamlib_vfo = RIG_VFO_A;
+  } else if (vfo == VFO::B) {
+    hamlib_vfo = RIG_VFO_B;
+  } else {
+    return false;
+  }
+  return rig_set_vfo(rig_, hamlib_vfo) == RIG_OK;
+}

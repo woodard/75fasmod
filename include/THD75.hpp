@@ -22,6 +22,17 @@ public:
   static constexpr rig_model_t DEFAULT_MODEL = 2042;
 
   /**
+   * @brief VFO selection enum for TH-D75
+   *
+   * Values match RIG_VFO_A and RIG_VFO_B from hamlib.
+   * RIG_VFO_A = 1 (1<<0), RIG_VFO_B = 2 (1<<1)
+   */
+  enum class VFO : int8_t {
+    A = RIG_VFO_A, // = 1
+    B = RIG_VFO_B  // = 2
+  };
+
+  /**
    * @brief Construct a new TH D75 object
    *
    * @param port Serial port device path (e.g., "/dev/ttyUSB0")
@@ -39,19 +50,34 @@ public:
    *
    * @return true if initialization successful, false otherwise
    */
-  virtual bool initialize();
+  bool initialize() override;
 
   /**
    * @brief Shutdown the THD75 radio controller
    *
    * Restores the radio to its original state after modifications.
    */
-  virtual void shutdown();
+  void shutdown() override;
 
   // THD75-specific implementations
-  virtual bool set_ptt(bool transmit);
-  virtual bool set_power_level(const std::string &level);
-  virtual bool get_power_level(std::string &level);
+  bool set_ptt(bool transmit) override;
+  bool set_power_level(const std::string &level) override;
+  bool get_power_level(std::string &level) override;
+
+  /**
+   * @brief Get the current VFO that will transmit when PTT is set
+   *
+   * @return VFO::A if VFO A will transmit, VFO::B if VFO B will transmit
+   */
+  VFO get_current_vfo();
+
+  /**
+   * @brief Set the VFO that will transmit when PTT is set
+   *
+   * @param vfo The VFO to set (VFO::A or VFO::B)
+   * @return true if successful, false otherwise
+   */
+  bool set_current_vfo(VFO vfo);
 
 private:
   // Kenwood-specific helper methods
