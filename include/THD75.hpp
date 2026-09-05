@@ -3,8 +3,8 @@
  * @brief Kenwood TH-D75 specific radio controller implementation
  *
  * This class implements the TH-D75 specific functionality for the
- * RadioController base class. It provides implementations for all
- * virtual methods using Hamlib's Kenwood TH-D75 backend.
+ * RadioController base class. It provides implementations using
+ * Hamlib's Kenwood TH-D75 backend where needed.
  */
 
 #ifndef THD75_HPP
@@ -21,27 +21,14 @@ public:
    * @param port Serial port device path (e.g., "/dev/ttyUSB0")
    * @param hamlib_debug Enable Hamlib debug output (default: false)
    */
-  THD75(rig_model_t model, const std::string &port,
-        bool hamlib_debug = false);
+  THD75(rig_model_t model, const std::string &port, bool hamlib_debug = false);
 
-  // Implement virtual methods
-  bool set_frequency(double freq_mhz) override;
-  bool get_frequency(double &freq_mhz) override;
-  bool set_power_level(const std::string &level) override;
-  bool get_power_level(std::string &level) override;
+  // THD75-specific implementations
+  // Note: set_frequency, get_frequency, set_power_level, get_power_level,
+  // and get_dcd are inherited from RadioController as the base class
+  // implementations are sufficient for THD75.
+
   bool set_ptt(bool transmit) override;
-  bool get_dcd(bool &is_squelch_open) override;
-
-protected:
-  // Kenwood-specific implementations
-  int kenwood_tnc_get();
-  bool kenwood_tnc_set(int mode);
-  UsbOutSelect kenwood_usb_out_select_get();
-  bool kenwood_usb_out_select_set(UsbOutSelect value);
-  PowerLevel kenwood_power_get();
-  bool kenwood_power_set(PowerLevel val);
-  int kenwood_menu_get(int menu_num);
-  bool kenwood_menu_set(int menu_num, int value);
 };
 
 #endif // THD75_HPP

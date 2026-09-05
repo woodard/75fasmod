@@ -3,7 +3,7 @@ bin_PROGRAMS = 75fasmod
 # Test programs
 check_PROGRAMS = test_frequency test_power
 
-test_frequency_SOURCES = test/test_frequency.cpp src/RadioController.cpp src/THD75.cpp src/THD75.cpp
+test_frequency_SOURCES = test/test_frequency.cpp src/RadioController.cpp src/THD75.cpp
 test_frequency_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
 test_frequency_LDADD = $(HAMLIB_LIBS)
 
