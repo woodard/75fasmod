@@ -39,21 +39,21 @@ public:
    *
    * @return true if initialization successful, false otherwise
    */
-  bool initialize() override;
+  virtual bool initialize();
 
   /**
    * @brief Shutdown the THD75 radio controller
    *
    * Restores the radio to its original state after modifications.
    */
-  void shutdown() override;
+  virtual void shutdown();
 
   // THD75-specific implementations
-  bool set_ptt(bool transmit) override;
-  bool set_power_level(const std::string &level) override;
-  bool get_power_level(std::string &level) override;
+  virtual bool set_ptt(bool transmit);
+  virtual bool set_power_level(const std::string &level);
+  virtual bool get_power_level(std::string &level);
 
-protected:
+private:
   // Kenwood-specific helper methods
 
   /**
@@ -96,7 +96,6 @@ protected:
    */
   bool kenwood_menu_set(int menu_num, int value);
 
-private:
   // THD75-specific state backup variables
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
   int orig_tnc_state_;         ///< Saved original TNC state
