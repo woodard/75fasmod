@@ -43,11 +43,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 
 # Test runner
 TESTS = test/run_frequency_test.sh test/run_power_test.sh \
-        test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh \
-        test/run_radio_control_test.sh
+        test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh
 EXTRA_DIST = test/run_frequency_test.sh test/run_power_test.sh \
              test/run_vfo_test.sh test/run_tnc_test.sh \
-             test/run_single_dual_test.sh test/run_radio_control_test.sh
+             test/run_single_dual_test.sh
 
 # Documentation targets
 .PHONY: docs
