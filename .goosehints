@@ -2,36 +2,57 @@
 
 1. **Git Branch Verification**:
    - Check the current branch using `git branch --show-current`.
-   - If the current branch is `main` or `master`, immediately create and switch to a feature branch (e.g., `git checkout -b feature/agent-work`).
+   - If the current branch is `main` or `master`, immediately create
+     and switch to a feature branch (e.g., `git checkout -b
+     feature/agent-work`).
 
 2. **Graph Ingestion & Code Indexing**:
-   - Run `python3 ~/.local/bin/ingest-code-graph.py` via shell to parse the current workspace directory and refresh the Neo4j graph database.
+   - Run `python3 ~/.local/bin/ingest-code-graph.py` via shell to
+     parse the current workspace directory and refresh the Neo4j graph
+     database.
 
 3. **Graph & Web Research**:
-   - Query the newly updated Neo4j database using the Neo4j MCP tools (`read-cypher`) to inspect structural relationships, file nodes, and dependencies.
-   - Use SearXNG and Firecrawl MCP tools to search for and scrape documentation when external reference is needed.
+   - Query the newly updated Neo4j database using the Neo4j MCP tools
+     (`read-cypher`) to inspect structural relationships, file nodes,
+     and dependencies.
+   - Use SearXNG and Firecrawl MCP tools to search for and scrape
+     documentation when external reference is needed.
 
 4. **Build & Test Loop**:
-   - Compile changes using `bear` to generate/update the compilation database:
-     `bear -- make -j$(nproc) -C build`
+   - Compile changes using `bear` to generate/update the compilation
+     database: `bear -- make -j$(nproc) -C build`
    - Run unit tests using: `ctest --test-dir build`
-   - If compilation or tests fail, inspect `stderr`, modify the source files, and re-run.
+   - If compilation or tests fail, inspect `stderr`, modify the source
+     files, and re-run.
 
 5. **Linting Loop**:
    - Execute the project linter: `./scripts/run-linter.sh`
    - If `scripts/run-linter.sh` exits with a non-zero code:
-     - For formatting errors, run `clang-format -i <file>` on the flagged files.
-     - For `clang-tidy` errors, modify source files or run `clang-tidy -p build -fix <file>` to automatically resolve standard issues.
+     - For formatting errors, run `clang-format -i <file>` on the
+       flagged files.     
+     - For `clang-tidy` errors, modify source files or run `clang-tidy
+       -p build -fix <file>` to automatically resolve standard issues.
      - Re-run `./scripts/run-linter.sh` until it exits with code 0.
      
 6. **Commit**:
-   - Generate a concise commit message detailing the changes and commit via `git commit -m`.
+   - Generate a concise commit message detailing the changes and
+     commit via `git commit -m`.   
+   - Always include the following footer on a new line in every commit
+     message:
+       `Co-authored-by: Goose <goose@block.xyz>`
+   - Pass multiple `-m` flags to git so the footer is separated
+     automatically: `git commit -m "<concise message>" -m
+     "Co-authored-by: Goose <goose@block.xyz>"`
 
 # Tool Usage & Editing Guidelines
 
 1. **No-Op Edit Prevention**:
-   - Do not attempt an `edit` tool call where the `before` and `after` blocks are identical.
-   - If an `edit` produces no functional change, inspect the target file before trying again.
+   - Do not attempt an `edit` tool call where the `before` and `after`
+     blocks are identical.
+   - If an `edit` produces no functional change, inspect the target
+     file before trying again.
 
 2. **Failed Search Recovery**:
-   - If a shell search command (e.g., `grep`) exits with code 1, read the target file contents directly to locate the actual line context instead of guessing edits.
+   - If a shell search command (e.g., `grep`) exits with code 1, read
+     the target file contents directly to locate the actual line
+     context instead of guessing edits.
