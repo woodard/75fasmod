@@ -26,17 +26,16 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 
 # Test runner
 TESTS = test/run_frequency_test.sh
+EXTRA_DIST = test/run_frequency_test.sh
 
 # Documentation targets
 .PHONY: docs
 docs: Doxyfile
 	doxygen Doxyfile
 
-# Clean documentation
 .PHONY: clean-docs
 clean-docs:
 	rm -rf docs/html docs/latex
 
-# Install documentation
 .PHONY: install-docs
 install-docs: docs

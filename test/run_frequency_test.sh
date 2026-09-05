@@ -1,66 +1,32 @@
 #!/bin/bash
-# Script runner for test_frequency
-# This script runs the frequency test twice and compares the results
-
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-TEST_BIN="${PROJECT_DIR}/test_frequency"
-
-# Check if the test binary exists
+# Resolve binary path across standard and Automake out-of-tree builds
+TEST_BIN="./test_frequency"
 if [ ! -x "$TEST_BIN" ]; then
-    echo "[ERROR] Test binary not found at $TEST_BIN"
-    echo "[INFO] Run 'make check' from the project directory first"
+    TEST_BIN="./test/test_frequency"
+fi
+
+if [ ! -x "$TEST_BIN" ]; then
+    echo "[ERROR] Test binary 'test_frequency' not found or not executable."
     exit 1
 fi
 
-# Set a test frequency (within the 2m ham band: 144-148 MHz)
-SET_FREQ="145.500"
+echo "=== Step 1: Setting Frequency (-s) ==="
+SET_FREQ=$( "$TEST_BIN" -s )
+echo "Radio set to: ${SET_FREQ} MHz"
 
-echo "========================================"
-echo "Frequency Test - Setting Frequency"
-echo "========================================"
+echo "=== Step 2: Querying Frequency (no flags) ==="
+GET_FREQ=$( "$TEST_BIN" )
+echo "Radio read as: ${GET_FREQ} MHz"
 
-# First invocation: Set the frequency
-echo "[RUNNING] First invocation with -s $SET_FREQ..."
-FIRST_OUTPUT=$( "$TEST_BIN" -s "$SET_FREQ" 2>&1 )
-echo "$FIRST_OUTPUT"
+# Floating-point equivalence check with tolerance
+MATCH=$( awk -v a="$SET_FREQ" -v b="$GET_FREQ" 'BEGIN { print (abs(a - b) < 0.001) ? "1" : "0" } function abs(x) { return x < 0 ? -x : x }' )
 
-# Extract the frequency that was set (from [OUTPUT] line)
-FIRST_FREQ=$( echo "$FIRST_OUTPUT" | grep "^\[OUTPUT\]" | awk '{print $2}' | tr -d ' ' )
-
-echo ""
-echo "========================================"
-echo "Frequency Test - Getting Frequency"
-echo "========================================"
-
-# Second invocation: Get the frequency
-echo "[RUNNING] Second invocation without -s..."
-SECOND_OUTPUT=$( "$TEST_BIN" 2>&1 )
-echo "$SECOND_OUTPUT"
-
-# Extract the frequency that was read (from [OUTPUT] line)
-SECOND_FREQ=$( echo "$SECOND_OUTPUT" | grep "^\[OUTPUT\]" | awk '{print $2}' | tr -d ' ' )
-
-echo ""
-echo "========================================"
-echo "Comparison"
-echo "========================================"
-
-echo "First frequency (set):  $FIRST_FREQ MHz"
-echo "Second frequency (get): $SECOND_FREQ MHz"
-
-# Compare the two frequencies (with some tolerance for floating point)
-FIRST_INT=$( echo "$FIRST_FREQ" | awk '{printf "%.0f", $1 * 1000}' )
-SECOND_INT=$( echo "$SECOND_FREQ" | awk '{printf "%.0f", $1 * 1000}' )
-
-if [ "$FIRST_INT" = "$SECOND_INT" ]; then
-    echo "[SUCCESS] Frequencies match!"
+if [ "$MATCH" -eq 1 ]; then
+    echo "[PASS] Frequency set (${SET_FREQ} MHz) matches frequency read (${GET_FREQ} MHz)."
     exit 0
 else
-    echo "[FAIL] Frequencies do not match!"
-    echo "  Expected: $FIRST_FREQ MHz"
-    echo "  Got:      $SECOND_FREQ MHz"
+    echo "[FAIL] Frequency mismatch! Set: ${SET_FREQ} MHz | Read: ${GET_FREQ} MHz"
     exit 1
 fi
