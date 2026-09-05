@@ -3,7 +3,7 @@
  * @brief Test program for RadioController frequency get/set functionality
  */
 
-#include "RadioController.hpp"
+#include "THD75.hpp"
 #include <getopt.h>
 #include <iostream>
 #include <string>
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  RadioController radio(RadioController::DEFAULT_MODEL, ports[0]);
+  THD75 radio(RadioController::DEFAULT_MODEL, ports[0]);
   if (!radio.initialize()) {
     std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0] << "\n";
     return 1;

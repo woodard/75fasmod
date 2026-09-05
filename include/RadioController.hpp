@@ -126,7 +126,7 @@ public:
    * @param freq_mhz Frequency in megahertz
    * @return true if set successfully, false otherwise
    */
-  bool set_frequency(double freq_mhz);
+  virtual bool set_frequency(double freq_mhz);
 
   /**
    * @brief Get the current VFO frequency
@@ -136,7 +136,7 @@ public:
    * @param freq_mhz Reference to store the frequency in megahertz
    * @return true if query successful, false on error
    */
-  bool get_frequency(double &freq_mhz);
+  virtual bool get_frequency(double &freq_mhz);
 
   /**
    * @brief Set the TX power level
@@ -146,7 +146,7 @@ public:
    * @param level Power level string ("EL", "L", "M", or "H")
    * @return true if set successfully, false otherwise
    */
-  bool set_power_level(const std::string &level);
+  virtual bool set_power_level(const std::string &level);
 
   /**
    * @brief Get the current TX power level
@@ -157,7 +157,7 @@ public:
    * "H")
    * @return true if query successful, false on error
    */
-  bool get_power_level(std::string &level);
+  virtual bool get_power_level(std::string &level);
 
   /**
    * @brief Set PTT (Push-to-Talk) state
@@ -167,7 +167,7 @@ public:
    * @param transmit true for transmit, false for receive
    * @return true if command successful, false otherwise
    */
-  bool set_ptt(bool transmit);
+  virtual bool set_ptt(bool transmit);
 
   /**
    * @brief Get the DCD (Digital Carrier Detect) status
@@ -177,7 +177,7 @@ public:
    * @param is_squelch_open Reference to store the DCD status
    * @return true if query successful, false on error
    */
-  bool get_dcd(bool &is_squelch_open);
+  virtual bool get_dcd(bool &is_squelch_open);
 
   /**
    * @brief Find available serial tty devices in sysfs
@@ -309,8 +309,11 @@ private:
 
   rig_model_t model_; ///< Hamlib rig model
   std::string port_;  ///< Serial port path
+
+protected:
   RIG *rig_;          ///< Hamlib rig handle
 
+private:
   rmode_t orig_mode_;    ///< Saved original radio mode
   bool orig_mode_saved_; ///< Flag indicating if mode was saved
 

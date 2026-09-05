@@ -1,6 +1,7 @@
 #include "DataSocket.hpp"
 #include "ModemDSP.hpp"
 #include "RadioController.hpp"
+#include "THD75.hpp"
 #include <atomic>
 #include <csignal>
 #include <cstdlib>
@@ -151,7 +152,7 @@ int main(int argc, char *argv[]) {
   }
 
   // 3. Initialize Hardware & DSP Classes
-  RadioController radio(rig_model, serial_port, hamlib_debug);
+  THD75 radio(rig_model, serial_port, hamlib_debug);
   if (!radio.initialize()) {
     std::cerr << "Error: Failed to initialize radio controller.\n";
     return 1;
