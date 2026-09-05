@@ -183,7 +183,7 @@ public:
 
   std::string find_alsa_device() { return find_alsa_device(port_); }
 
-protected:
+private:
   /**
    * @brief Get the Kenwood TNC mode
    *
