@@ -11,7 +11,7 @@
 // Constructor
 THD75::THD75(const std::string &port, rig_model_t model, bool hamlib_debug)
     : RadioController(model, port, hamlib_debug),
-      orig_menu_102_(UsbOutSelect::unknown), orig_tnc_state_(-1) {}
+      orig_menu_102_(UsbOutSelect::unknown) {}
 
 // THD75-specific implementations
 auto THD75::set_ptt(bool transmit) -> bool {
@@ -193,11 +193,6 @@ auto THD75::set_tnc(int mode) -> bool {
 
   return bytes > 0;
 }
-
-// Internal TNC helpers (used by set_single)
-int THD75::kenwood_tnc_get() { return get_tnc(); }
-
-bool THD75::kenwood_tnc_set(int mode) { return set_tnc(mode); }
 
 // Kenwood helper method implementations
 int THD75::kenwood_menu_get(int menu_num) {

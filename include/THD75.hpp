@@ -114,11 +114,14 @@ public:
   // TNC control methods (public for external access)
   /**
    * @brief Get the Kenwood TNC mode
+   * @return TNC mode status
    */
   auto get_tnc() -> int;
 
   /**
    * @brief Set the Kenwood TNC mode
+   * @param mode The TNC mode to set
+   * @return true if successful, false otherwise
    */
   auto set_tnc(int mode) -> bool;
 
@@ -154,13 +157,8 @@ private:
    */
   auto kenwood_menu_set(int menu_num, int value) -> bool;
 
-  // Internal TNC helper (used by set_single)
-  auto kenwood_tnc_get() -> int;
-  auto kenwood_tnc_set(int mode) -> bool;
-
   // THD75-specific state backup variables
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
-  int orig_tnc_state_;         ///< Saved original TNC state
 };
 
 #endif // THD75_HPP
