@@ -27,10 +27,7 @@ public:
    * Values match RIG_VFO_A and RIG_VFO_B from hamlib.
    * RIG_VFO_A = 1 (1<<0), RIG_VFO_B = 2 (1<<1)
    */
-  enum class VFO : int8_t {
-    A = RIG_VFO_A, // = 1
-    B = RIG_VFO_B  // = 2
-  };
+  enum class VFO : int8_t { A = RIG_VFO_A, B = RIG_VFO_B };
 
   /**
    * @brief Construct a new TH D75 object
@@ -69,7 +66,7 @@ public:
    *
    * @return VFO::A if VFO A will transmit, VFO::B if VFO B will transmit
    */
-  VFO get_current_vfo();
+  auto get_current_vfo() -> VFO;
 
   /**
    * @brief Set the VFO that will transmit when PTT is set
@@ -77,7 +74,42 @@ public:
    * @param vfo The VFO to set (VFO::A or VFO::B)
    * @return true if successful, false otherwise
    */
-  bool set_current_vfo(VFO vfo);
+  auto set_current_vfo(VFO vfo) -> bool;
+
+  /**
+   * @brief Check if the radio is in Single Band mode
+   *
+   * Uses RIG_FUNC_DUAL_WATCH to determine dual watch status.
+   *
+   * @return true if in Single Band mode, false if in Dual Band mode
+   */
+  auto get_single() -> bool;
+
+  /**
+   * @brief Set the radio to Single Band mode
+   *
+   * First sets the current VFO, then disables DUAL_WATCH function.
+   *
+   * @param vfo The VFO to use (VFO::A or VFO::B)
+   * @return true if successful, false otherwise
+   */
+  auto set_single(VFO vfo) -> bool;
+
+  /**
+   * @brief Check if the radio is in Dual Band mode
+   *
+   * @return true if in Dual Band mode, false if in Single Band mode
+   */
+  auto get_dual() -> bool;
+
+  /**
+   * @brief Set the radio to Dual Band mode
+   *
+   * Enables the DUAL_WATCH function for dual band reception.
+   *
+   * @return true if successful, false otherwise
+   */
+  auto set_dual() -> bool;
 
 private:
   // Kenwood-specific helper methods
@@ -85,42 +117,42 @@ private:
   /**
    * @brief Get the Kenwood TNC mode
    */
-  int kenwood_tnc_get();
+  auto kenwood_tnc_get() -> int;
 
   /**
    * @brief Set the Kenwood TNC mode
    */
-  bool kenwood_tnc_set(int mode);
+  auto kenwood_tnc_set(int mode) -> bool;
 
   /**
    * @brief Get the USB Out Select setting
    */
-  UsbOutSelect kenwood_usb_out_select_get();
+  auto kenwood_usb_out_select_get() -> UsbOutSelect;
 
   /**
    * @brief Set the USB Out Select setting
    */
-  bool kenwood_usb_out_select_set(UsbOutSelect value);
+  auto kenwood_usb_out_select_set(UsbOutSelect value) -> bool;
 
   /**
    * @brief Get the current power level
    */
-  PowerLevel kenwood_power_get();
+  auto kenwood_power_get() -> PowerLevel;
 
   /**
    * @brief Set the power level
    */
-  bool kenwood_power_set(PowerLevel val);
+  auto kenwood_power_set(PowerLevel val) -> bool;
 
   /**
    * @brief Get a Kenwood menu item
    */
-  int kenwood_menu_get(int menu_num);
+  auto kenwood_menu_get(int menu_num) -> int;
 
   /**
    * @brief Set a Kenwood menu item
    */
-  bool kenwood_menu_set(int menu_num, int value);
+  auto kenwood_menu_set(int menu_num, int value) -> bool;
 
   // THD75-specific state backup variables
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting

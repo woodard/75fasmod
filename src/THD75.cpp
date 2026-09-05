@@ -14,26 +14,26 @@ THD75::THD75(const std::string &port, rig_model_t model, bool hamlib_debug)
       orig_menu_102_(UsbOutSelect::unknown), orig_tnc_state_(-1) {}
 
 // THD75-specific implementations
-bool THD75::set_ptt(bool transmit) {
+auto THD75::set_ptt(bool transmit) -> bool {
   return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF) ==
          RIG_OK;
 }
 
-bool THD75::set_power_level(const std::string &level) {
+auto THD75::set_power_level(const std::string &level) -> bool {
   std::string lvl = level;
-  for (auto &c : lvl)
-    c = std::toupper(c);
+  for (auto &chr : lvl)
+    chr = std::toupper(chr);
 
   PowerLevel val = PowerLevel::UNKNOWN;
-  if (lvl == "H")
+  if (lvl == "H") {
     val = PowerLevel::HIGH;
-  else if (lvl == "M")
+  } else if (lvl == "M") {
     val = PowerLevel::MEDIUM;
-  else if (lvl == "L")
+  } else if (lvl == "L") {
     val = PowerLevel::LOW;
-  else if (lvl == "EL")
+  } else if (lvl == "EL") {
     val = PowerLevel::EXTRA_LOW;
-  else {
+  } else {
     std::cerr << "Error: Invalid power level '" << level
               << "'. Use EL, L, M, or H.\n";
     return false;
@@ -43,7 +43,7 @@ bool THD75::set_power_level(const std::string &level) {
   return kenwood_power_set(val);
 }
 
-bool THD75::get_power_level(std::string &level) {
+auto THD75::get_power_level(std::string &level) -> bool {
   PowerLevel pwr = kenwood_power_get();
   switch (pwr) {
   case PowerLevel::HIGH:
@@ -157,128 +157,6 @@ void THD75::shutdown() {
 }
 
 // Kenwood helper method implementations
-
-int THD75::kenwood_menu_get(int menu_num) {
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
-
-  char buf[64] = {0};
-  unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  if (bytes > 0) {
-    std::string resp(buf);
-    size_t comma = resp.find(',');
-    size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos)
-      term_pos = resp.find(';');
-
-    if (comma != std::string::npos && term_pos != std::string::npos) {
-      try {
-        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
-      } catch (...) {
-        return -1;
-      }
-    }
-  }
-  return -1;
-}
-
-bool THD75::kenwood_menu_set(int menu_num, int value) {
-  if (value < 0)
-    return false;
-
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
-
-  char buf[64] = {0};
-  unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  return bytes > 0;
-}
-
-THD75::PowerLevel THD75::kenwood_power_get() {
-  // Query active band (0 = Band A, 1 = Band B)
-  int active_band = 0;
-  char bc_buf[32] = {0};
-  unsigned char term = '\r';
-
-  int bc_bytes =
-      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
-
-  if (bc_bytes > 0) {
-    std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos ||
-        bc_resp.find("BC1") != std::string::npos) {
-      active_band = 1;
-    }
-  }
-
-  // Fetch power for the active band
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
-
-  char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  if (bytes > 0) {
-    std::string resp(buf);
-    size_t comma = resp.find(',');
-    size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos)
-      term_pos = resp.find(';');
-
-    if (comma != std::string::npos && term_pos != std::string::npos &&
-        term_pos > comma + 1) {
-      try {
-        int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
-        if (pwr_int >= 0 && pwr_int <= 3) {
-          return static_cast<PowerLevel>(pwr_int);
-        }
-      } catch (...) {
-        return PowerLevel::UNKNOWN;
-      }
-    }
-  }
-  return PowerLevel::UNKNOWN;
-}
-
-bool THD75::kenwood_power_set(PowerLevel val) {
-  if (val == PowerLevel::UNKNOWN)
-    return false;
-
-  // Query active band
-  int active_band = 0;
-  char bc_buf[32] = {0};
-  unsigned char term = '\r';
-
-  int bc_bytes =
-      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
-
-  if (bc_bytes > 0) {
-    std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos ||
-        bc_resp.find("BC1") != std::string::npos) {
-      active_band = 1;
-    }
-  }
-
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
-
-  char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  return bytes > 0;
-}
-
 int THD75::kenwood_tnc_get() {
   char cmd[] = "TN\r";
   char buf[64] = {0};
@@ -333,8 +211,132 @@ THD75::UsbOutSelect THD75::kenwood_usb_out_select_get() {
 bool THD75::kenwood_usb_out_select_set(UsbOutSelect value) {
   return kenwood_menu_set(102, static_cast<int>(value));
 }
+
+THD75::PowerLevel THD75::kenwood_power_get() {
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // Fetch power for the active band
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
+
+    if (comma != std::string::npos && term_pos != std::string::npos &&
+        term_pos > comma + 1) {
+      try {
+        int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+        if (pwr_int >= 0 && pwr_int <= 3) {
+          return static_cast<PowerLevel>(pwr_int);
+        }
+      } catch (...) {
+        return PowerLevel::UNKNOWN;
+      }
+    }
+  }
+  return PowerLevel::UNKNOWN;
+}
+
+bool THD75::kenwood_power_set(PowerLevel val) {
+  if (val == PowerLevel::UNKNOWN)
+    return false;
+
+  // Query active band
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  return bytes > 0;
+}
+
+int THD75::kenwood_menu_get(int menu_num) {
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
+
+    if (comma != std::string::npos && term_pos != std::string::npos) {
+      try {
+        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+      } catch (...) {
+        return -1;
+      }
+    }
+  }
+  return -1;
+}
+
+bool THD75::kenwood_menu_set(int menu_num, int value) {
+  if (value < 0)
+    return false;
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  return bytes > 0;
+}
+
 // VFO control functions
-THD75::VFO THD75::get_current_vfo() {
+auto THD75::get_current_vfo() -> VFO {
   vfo_t vfo;
   if (rig_get_vfo(rig_, &vfo) == RIG_OK) {
     if (vfo == RIG_VFO_A) {
@@ -346,7 +348,7 @@ THD75::VFO THD75::get_current_vfo() {
   return VFO::A; // Default fallback
 }
 
-bool THD75::set_current_vfo(VFO vfo) {
+auto THD75::set_current_vfo(VFO vfo) -> bool {
   vfo_t hamlib_vfo;
   if (vfo == VFO::A) {
     hamlib_vfo = RIG_VFO_A;
@@ -356,4 +358,34 @@ bool THD75::set_current_vfo(VFO vfo) {
     return false;
   }
   return rig_set_vfo(rig_, hamlib_vfo) == RIG_OK;
+}
+
+// Single/Dual Band control functions
+auto THD75::get_single() -> bool {
+  int status = 0;
+  if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
+      RIG_OK) {
+    return status == 0; // If DUAL_WATCH is disabled (0), we're in Single mode
+  }
+  return true; // Default to single on error
+}
+
+auto THD75::set_single(VFO vfo) -> bool {
+  if (!set_current_vfo(vfo)) {
+    return false;
+  }
+  return rig_set_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, 0) == RIG_OK;
+}
+
+auto THD75::get_dual() -> bool {
+  int status = 0;
+  if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
+      RIG_OK) {
+    return status != 0; // If DUAL_WATCH is enabled, we're in Dual mode
+  }
+  return false; // Default to dual off on error
+}
+
+auto THD75::set_dual() -> bool {
+  return rig_set_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, 1) == RIG_OK;
 }
