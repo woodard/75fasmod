@@ -1,7 +1,7 @@
 bin_PROGRAMS = 75fasmod
 
 # Test programs
-check_PROGRAMS = test_frequency test_power test_radio_control
+check_PROGRAMS = test_frequency test_power test_vfo test_tnc test_single_dual
 
 test_frequency_SOURCES = test/test_frequency.cpp src/RadioController.cpp src/THD75.cpp
 test_frequency_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
@@ -11,9 +11,17 @@ test_power_SOURCES = test/test_power.cpp src/RadioController.cpp src/THD75.cpp
 test_power_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
 test_power_LDADD = $(HAMLIB_LIBS)
 
-test_radio_control_SOURCES = test/test_radio_control.cpp src/RadioController.cpp src/THD75.cpp
-test_radio_control_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
-test_radio_control_LDADD = $(HAMLIB_LIBS)
+test_vfo_SOURCES = test/test_vfo.cpp src/RadioController.cpp src/THD75.cpp
+test_vfo_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_vfo_LDADD = $(HAMLIB_LIBS)
+
+test_tnc_SOURCES = test/test_tnc.cpp src/RadioController.cpp src/THD75.cpp
+test_tnc_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_tnc_LDADD = $(HAMLIB_LIBS)
+
+test_single_dual_SOURCES = test/test_single_dual.cpp src/RadioController.cpp src/THD75.cpp
+test_single_dual_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_single_dual_LDADD = $(HAMLIB_LIBS)
 
 # Tell the C++ preprocessor where to find the header files
 AM_CPPFLAGS = -I$(top_srcdir)/include
@@ -34,8 +42,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 75fasmod_LDADD = $(HAMLIB_LIBS) $(GNURADIO_LIBS) $(FMT_LIBS) $(VOLK_LIBS) -lpthread
 
 # Test runner
-TESTS = test/run_frequency_test.sh test/run_power_test.sh test/run_radio_control_test.sh
-EXTRA_DIST = test/run_frequency_test.sh test/run_power_test.sh test/run_radio_control_test.sh
+TESTS = test/run_frequency_test.sh test/run_power_test.sh \
+        test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh \
+        test/run_radio_control_test.sh
+EXTRA_DIST = test/run_frequency_test.sh test/run_power_test.sh \
+             test/run_vfo_test.sh test/run_tnc_test.sh \
+             test/run_single_dual_test.sh test/run_radio_control_test.sh
 
 # Documentation targets
 .PHONY: docs

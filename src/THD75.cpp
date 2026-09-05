@@ -390,3 +390,14 @@ auto THD75::get_dual() -> bool {
 auto THD75::set_dual() -> bool {
   return rig_set_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, 1) == RIG_OK;
 }
+
+// Toggle single/dual mode
+auto THD75::flip_single_dual(VFO vfo) -> bool {
+  if (get_single()) {
+    // Currently in single mode, switch to dual
+    return set_dual();
+  } else {
+    // Currently in dual mode, switch to single
+    return set_single(vfo);
+  }
+}

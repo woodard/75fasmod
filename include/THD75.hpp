@@ -111,6 +111,17 @@ public:
    */
   auto set_dual() -> bool;
 
+  /**
+   * @brief Set single or dual mode based on current state
+   *
+   * If currently in single mode, switches to dual. If in dual mode,
+   * switches to single (sets VFO to specified value first).
+   *
+   * @param vfo The VFO to set if switching to single mode
+   * @return true if successful, false otherwise
+   */
+  auto flip_single_dual(VFO vfo) -> bool;
+
   // TNC control methods (public for external access)
   /**
    * @brief Get the Kenwood TNC mode
