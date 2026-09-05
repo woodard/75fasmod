@@ -48,8 +48,6 @@ RadioController::RadioController(rig_model_t model, const std::string &port,
 void RadioController::shutdown() {
   if (rig_) {
     std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
-    set_ptt(false);
-
     // Restore original menu 102 (only if we successfully queried it)
     if (orig_menu_102_ != UsbOutSelect::unknown) {
       if (!kenwood_usb_out_select_set(orig_menu_102_)) {
@@ -92,6 +90,7 @@ void RadioController::shutdown() {
 RadioController::~RadioController() {
   shutdown();
   if (rig_) {
+    set_ptt(false);
     rig_close(rig_);
     rig_cleanup(rig_);
   }
