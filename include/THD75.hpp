@@ -31,12 +31,75 @@ public:
   THD75(const std::string &port, rig_model_t model = DEFAULT_MODEL,
         bool hamlib_debug = false);
 
-  // THD75-specific implementations
-  // Note: set_frequency, get_frequency, set_power_level, get_power_level,
-  // and get_dcd are inherited from RadioController as the base class
-  // implementations are sufficient for THD75.
+  /**
+   * @brief Initialize the THD75 radio controller
+   *
+   * Saves current radio settings and configures the radio for
+   * high-speed modem operation by setting USB Out Select to IF.
+   *
+   * @return true if initialization successful, false otherwise
+   */
+  bool initialize() override;
 
+  /**
+   * @brief Shutdown the THD75 radio controller
+   *
+   * Restores the radio to its original state after modifications.
+   */
+  void shutdown() override;
+
+  // THD75-specific implementations
   bool set_ptt(bool transmit) override;
+  bool set_power_level(const std::string &level) override;
+  bool get_power_level(std::string &level) override;
+
+protected:
+  // Kenwood-specific helper methods
+
+  /**
+   * @brief Get the Kenwood TNC mode
+   */
+  int kenwood_tnc_get();
+
+  /**
+   * @brief Set the Kenwood TNC mode
+   */
+  bool kenwood_tnc_set(int mode);
+
+  /**
+   * @brief Get the USB Out Select setting
+   */
+  UsbOutSelect kenwood_usb_out_select_get();
+
+  /**
+   * @brief Set the USB Out Select setting
+   */
+  bool kenwood_usb_out_select_set(UsbOutSelect value);
+
+  /**
+   * @brief Get the current power level
+   */
+  PowerLevel kenwood_power_get();
+
+  /**
+   * @brief Set the power level
+   */
+  bool kenwood_power_set(PowerLevel val);
+
+  /**
+   * @brief Get a Kenwood menu item
+   */
+  int kenwood_menu_get(int menu_num);
+
+  /**
+   * @brief Set a Kenwood menu item
+   */
+  bool kenwood_menu_set(int menu_num, int value);
+
+private:
+  // THD75-specific state backup variables
+  UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
+  int orig_tnc_state_;         ///< Saved original TNC state
 };
 
 #endif // THD75_HPP

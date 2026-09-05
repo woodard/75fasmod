@@ -86,8 +86,8 @@ public:
   /**
    * @brief Shutdown the radio controller
    *
-   * Restores the radio to its original state after modifications.
-   * Call this method when done with the radio to clean up resources.
+   * Closes the radio connection and performs cleanup.
+   * Derived classes should override to add specific cleanup logic.
    */
   virtual void shutdown();
 
@@ -96,18 +96,15 @@ public:
    *
    * Closes the Hamlib rig connection if open.
    */
-  ~RadioController();
+  virtual ~RadioController();
 
   /**
    * @brief Initialize the radio controller
    *
-   * Backs up current radio settings and configures the radio for
-   * high-speed modem operation by setting USB Out Select to IF.
+   * Base initialization. Derived classes should override to add
+   * THD75-specific initialization logic.
    *
    * @return true if initialization successful, false otherwise
-   *
-   * @note This method modifies radio settings. Use save/restore methods if
-   *       you need to restore settings later.
    */
   virtual bool initialize();
 
@@ -146,7 +143,7 @@ public:
    *
    * Queries the radio for the current TX power level.
    *
-   * @param level Reference to store the power level string ("EL", "L", "M", or
+   * @param level Reference to store the power level string ("EL", "L", "M",
    * "H")
    * @return true if query successful, false on error
    */
@@ -185,86 +182,7 @@ public:
 
   std::string find_alsa_device() { return find_alsa_device(port_); }
 
-private:
-  /**
-   * @brief Get the Kenwood TNC mode
-   *
-   * Queries the TNC (Telegraph Noiseless Code) operating mode.
-   *
-   * @return TNC mode value, or -1 on error
-   */
-  int kenwood_tnc_get();
-
-  /**
-   * @brief Set the Kenwood TNC mode
-   *
-   * Sets the TNC operating mode.
-   *
-   * @param mode TNC mode value
-   * @return true if successful, false otherwise
-   */
-  bool kenwood_tnc_set(int mode);
-
-  /**
-   * @brief Get the USB Out Select setting
-   *
-   * Queries Menu Item 102 to determine the current USB data output path.
-   *
-   * @return UsbOutSelect enum value
-   */
-  UsbOutSelect kenwood_usb_out_select_get();
-
-  /**
-   * @brief Set the USB Out Select setting
-   *
-   * Sets Menu Item 102 to control USB data output path.
-   * Set to IF for digital modem operation.
-   *
-   * @param value UsbOutSelect enum value
-   * @return true if successful, false otherwise
-   */
-  bool kenwood_usb_out_select_set(UsbOutSelect value);
-
-  /**
-   * @brief Get the current power level
-   *
-   * Internal method to query the radio's power level.
-   *
-   * @return PowerLevel enum value
-   */
-  PowerLevel kenwood_power_get();
-
-  /**
-   * @brief Set the power level
-   *
-   * Internal method to set the radio's power level.
-   *
-   * @param val PowerLevel enum value
-   * @return true if successful, false otherwise
-   */
-  bool kenwood_power_set(PowerLevel val);
-
-  /**
-   * @brief Get a Kenwood menu item
-   *
-   * Queries a Kenwood CAT menu item by number.
-   *
-   * @param menu_num Menu item number
-   * @return Menu value, or -1 on error
-   */
-  int kenwood_menu_get(int menu_num);
-
-  /**
-   * @brief Set a Kenwood menu item
-   *
-   * Sets a Kenwood CAT menu item by number and value.
-   *
-   * @param menu_num Menu item number
-   * @param value Menu value to set
-   * @return true if successful, false otherwise
-   */
-  bool kenwood_menu_set(int menu_num, int value);
-
+protected:
   /**
    * @brief Find tty sysfs devices for a specific USB device
    *
@@ -289,7 +207,6 @@ private:
    */
   static std::string find_alsa_device(const std::string &port);
 
-private:
   /**
    * @brief Helper function to read sysfs attributes
    *
@@ -306,15 +223,13 @@ private:
 protected:
   RIG *rig_; ///< Hamlib rig handle
 
-private:
+  // Backup variables for restoring radio state
   rmode_t orig_mode_;    ///< Saved original radio mode
   bool orig_mode_saved_; ///< Flag indicating if mode was saved
 
-  vfo_t orig_vfo_;             ///< Saved original VFO state
-  pbwidth_t orig_width_;       ///< Saved original bandwidth
-  PowerLevel orig_power_;      ///< Saved original power level
-  UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
-  int orig_tnc_state_;         ///< Saved original TNC state
+  vfo_t orig_vfo_;        ///< Saved original VFO state
+  pbwidth_t orig_width_;  ///< Saved original bandwidth
+  PowerLevel orig_power_; ///< Saved original power level
 };
 
 #endif // RADIOCONTROLLER_HPP
