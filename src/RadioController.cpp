@@ -45,7 +45,7 @@ RadioController::RadioController(rig_model_t model, const std::string &port,
     return;
   }
 }
-RadioController::~RadioController() {
+void RadioController::shutdown() {
   if (rig_) {
     std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
     set_ptt(false);
@@ -86,7 +86,12 @@ RadioController::~RadioController() {
                 << ")...\n";
       rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
     }
+  }
+}
 
+RadioController::~RadioController() {
+  shutdown();
+  if (rig_) {
     rig_close(rig_);
     rig_cleanup(rig_);
   }

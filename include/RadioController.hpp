@@ -91,6 +91,14 @@ public:
                   bool hamlib_debug = false);
 
   /**
+   * @brief Shutdown the radio controller
+   *
+   * Restores the radio to its original state after modifications.
+   * Call this method when done with the radio to clean up resources.
+   */
+  void shutdown();
+
+  /**
    * @brief Destroy the Radio Controller object
    *
    * Closes the Hamlib rig connection if open.
