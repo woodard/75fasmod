@@ -203,6 +203,15 @@ bool RadioController::set_frequency(double freq_mhz) {
   return rig_set_freq(rig_, RIG_VFO_CURR, freq_hz) == RIG_OK;
 }
 
+bool RadioController::get_frequency(double &freq_mhz) {
+  freq_t freq_hz;
+  if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) != RIG_OK) {
+    return false;
+  }
+  freq_mhz = static_cast<double>(freq_hz) / 1000000.0;
+  return true;
+}
+
 bool RadioController::set_ptt(bool transmit) {
   const char *cmd = transmit ? "TX\r" : "RX\r";
   char buf[64] = {0};
@@ -248,6 +257,26 @@ bool RadioController::set_power_level(const std::string &level) {
 
   std::cout << "[RIG] Setting TX power to " << lvl << "...\n";
   return kenwood_power_set(val);
+}
+
+bool RadioController::get_power_level(std::string &level) {
+  PowerLevel pwr = kenwood_power_get();
+  switch (pwr) {
+  case PowerLevel::HIGH:
+    level = "H";
+    return true;
+  case PowerLevel::MEDIUM:
+    level = "M";
+    return true;
+  case PowerLevel::LOW:
+    level = "L";
+    return true;
+  case PowerLevel::EXTRA_LOW:
+    level = "EL";
+    return true;
+  default:
+    return false;
+  }
 }
 
 int RadioController::kenwood_menu_get(int menu_num) {
