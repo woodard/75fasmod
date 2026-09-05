@@ -16,9 +16,9 @@ std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
 
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_width_(0), orig_menu_102_(UsbOutSelect::unknown),
-      orig_power_(PowerLevel::UNKNOWN), orig_tnc_state_(-1),
-      orig_vfo_(RIG_VFO_NONE) {}
+      orig_mode_saved_(false), orig_vfo_(RIG_VFO_NONE), orig_width_(0),
+      orig_power_(PowerLevel::UNKNOWN), orig_menu_102_(UsbOutSelect::unknown),
+      orig_tnc_state_(-1) {}
 
 RadioController::~RadioController() {
   if (rig_) {
