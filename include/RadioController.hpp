@@ -85,8 +85,10 @@ public:
    *
    * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
    * @param port Serial port device path (e.g., "/dev/ttyUSB0")
+   * @param hamlib_debug Enable Hamlib debug output (default: false)
    */
-  RadioController(rig_model_t model, const std::string &port);
+  RadioController(rig_model_t model, const std::string &port,
+                  bool hamlib_debug = false);
 
   /**
    * @brief Destroy the Radio Controller object
@@ -98,16 +100,15 @@ public:
   /**
    * @brief Initialize the radio controller
    *
-   * Opens the connection to the radio, saves current settings, and configures
-   * the radio for high-speed modem operation by setting USB Out Select to IF.
+   * Backs up current radio settings and configures the radio for
+   * high-speed modem operation by setting USB Out Select to IF.
    *
-   * @param hamlib_debug Enable Hamlib debug output (default: false)
    * @return true if initialization successful, false otherwise
    *
    * @note This method modifies radio settings. Use save/restore methods if
    *       you need to restore settings later.
    */
-  bool initialize(bool hamlib_debug = false);
+  bool initialize();
 
   /**
    * @brief Set the radio frequency

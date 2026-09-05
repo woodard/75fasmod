@@ -14,12 +14,37 @@ std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
   return "";
 }
 
-RadioController::RadioController(rig_model_t model, const std::string &port)
+RadioController::RadioController(rig_model_t model, const std::string &port,
+                                 bool hamlib_debug)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
       orig_mode_saved_(false), orig_vfo_(RIG_VFO_NONE), orig_width_(0),
       orig_power_(PowerLevel::UNKNOWN), orig_menu_102_(UsbOutSelect::unknown),
-      orig_tnc_state_(-1) {}
+      orig_tnc_state_(-1) {
+  // Enable Hamlib internal verbose trace logging only if requested
+  if (hamlib_debug) {
+    rig_set_debug_level(RIG_DEBUG_TRACE);
+  }
 
+  std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
+  rig_ = rig_init(model_);
+  if (!rig_) {
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
+              << ". The model ID may not exist in this Hamlib build.\n";
+    return;
+  }
+
+  rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+
+  int status = rig_open(rig_);
+  if (status != RIG_OK) {
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_
+              << " | Code: " << status << " (" << rigerror(status) << ")\n";
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
+    return;
+  }
+}
 RadioController::~RadioController() {
   if (rig_) {
     std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
@@ -67,29 +92,7 @@ RadioController::~RadioController() {
   }
 }
 
-bool RadioController::initialize(bool hamlib_debug) {
-  // Enable Hamlib internal verbose trace logging only if requested
-  if (hamlib_debug) {
-    rig_set_debug_level(RIG_DEBUG_TRACE);
-  }
-
-  std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
-  rig_ = rig_init(model_);
-  if (!rig_) {
-    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
-              << ". The model ID may not exist in this Hamlib build.\n";
-    return false;
-  }
-
-  rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
-
-  int status = rig_open(rig_);
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Error: rig_open() failed on " << port_
-              << " | Code: " << status << " (" << rigerror(status) << ")\n";
-    return false;
-  }
-
+bool RadioController::initialize() {
   std::cout << "[RIG] Backing up current radio state...\n";
 
   // 1. Save original operating mode and bandwidth

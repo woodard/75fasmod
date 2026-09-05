@@ -151,8 +151,8 @@ int main(int argc, char *argv[]) {
   }
 
   // 3. Initialize Hardware & DSP Classes
-  RadioController radio(rig_model, serial_port);
-  if (!radio.initialize(hamlib_debug)) {
+  RadioController radio(rig_model, serial_port, hamlib_debug);
+  if (!radio.initialize()) {
     std::cerr << "Error: Failed to initialize radio controller.\n";
     return 1;
   } else {
