@@ -302,10 +302,10 @@ private:
   std::string port_;  ///< Serial port path
   RIG *rig_;          ///< Hamlib rig handle
 
-  rmode_t orig_mode_;           ///< Saved original radio mode
-  bool orig_mode_saved_;       ///< Flag indicating if mode was saved
+  rmode_t orig_mode_;    ///< Saved original radio mode
+  bool orig_mode_saved_; ///< Flag indicating if mode was saved
 
-  vfo_t orig_vfo_;               ///< Saved original VFO state
+  vfo_t orig_vfo_;             ///< Saved original VFO state
   pbwidth_t orig_width_;       ///< Saved original bandwidth
   PowerLevel orig_power_;      ///< Saved original power level
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
