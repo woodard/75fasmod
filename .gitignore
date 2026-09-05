@@ -1,0 +1,22 @@
+# Build artifacts
+build/
+*.o
+*.Po
+*.dirstamp
+
+# Generated documentation
+docs/html/
+docs/latex/
+docs/*.tag
+
+# Backup files
+*~
+*.bak
+*.orig
+
+# IDE files
+.vscode/
+.idea/
+
+# Aider files
+.aider*
