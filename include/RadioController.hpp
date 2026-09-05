@@ -74,6 +74,13 @@ public:
   };
 
   /**
+   * @brief Default Hamlib model for Kenwood TH-D75
+   *
+   * This is the Hamlib model ID for the Kenwood TH-D75 transceiver.
+   */
+  static constexpr rig_model_t DEFAULT_MODEL = 2042;
+
+  /**
    * @brief Construct a new Radio Controller object
    *
    * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
@@ -289,16 +296,17 @@ private:
    * @param filepath Path to the sysfs file
    * @return String value read from file, or empty string on error
    */
-  std::string read_sysfs_attr(const fs::path &filepath);
+  static std::string read_sysfs_attr(const fs::path &filepath);
 
   rig_model_t model_; ///< Hamlib rig model
   std::string port_;  ///< Serial port path
-  rig *rig_;          ///< Hamlib rig handle
+  RIG *rig_;          ///< Hamlib rig handle
 
-  int orig_mode_;        ///< Saved original radio mode
-  bool orig_mode_saved_; ///< Flag indicating if mode was saved
+  rmode_t orig_mode_;           ///< Saved original radio mode
+  bool orig_mode_saved_;       ///< Flag indicating if mode was saved
 
-  int orig_vfo_;               ///< Saved original VFO state
+  vfo_t orig_vfo_;               ///< Saved original VFO state
+  pbwidth_t orig_width_;       ///< Saved original bandwidth
   PowerLevel orig_power_;      ///< Saved original power level
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
   int orig_tnc_state_;         ///< Saved original TNC state
