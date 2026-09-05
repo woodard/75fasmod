@@ -111,19 +111,19 @@ public:
    */
   auto set_dual() -> bool;
 
-private:
-  // Kenwood-specific helper methods
-
+  // TNC control methods (public for external access)
   /**
    * @brief Get the Kenwood TNC mode
    */
-  auto kenwood_tnc_get() -> int;
+  auto get_tnc() -> int;
 
   /**
    * @brief Set the Kenwood TNC mode
    */
-  auto kenwood_tnc_set(int mode) -> bool;
+  auto set_tnc(int mode) -> bool;
 
+private:
+  // Kenwood-specific helper methods
   /**
    * @brief Get the USB Out Select setting
    */
@@ -153,6 +153,10 @@ private:
    * @brief Set a Kenwood menu item
    */
   auto kenwood_menu_set(int menu_num, int value) -> bool;
+
+  // Internal TNC helper (used by set_single)
+  auto kenwood_tnc_get() -> int;
+  auto kenwood_tnc_set(int mode) -> bool;
 
   // THD75-specific state backup variables
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting

@@ -156,8 +156,8 @@ void THD75::shutdown() {
   RadioController::shutdown();
 }
 
-// Kenwood helper method implementations
-int THD75::kenwood_tnc_get() {
+// TNC control functions (public interface)
+auto THD75::get_tnc() -> int {
   char cmd[] = "TN\r";
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -182,9 +182,58 @@ int THD75::kenwood_tnc_get() {
   return -1;
 }
 
-bool THD75::kenwood_tnc_set(int mode) {
+auto THD75::set_tnc(int mode) -> bool {
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  return bytes > 0;
+}
+
+// Internal TNC helpers (used by set_single)
+int THD75::kenwood_tnc_get() { return get_tnc(); }
+
+bool THD75::kenwood_tnc_set(int mode) { return set_tnc(mode); }
+
+// Kenwood helper method implementations
+int THD75::kenwood_menu_get(int menu_num) {
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
+
+    if (comma != std::string::npos && term_pos != std::string::npos) {
+      try {
+        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+      } catch (...) {
+        return -1;
+      }
+    }
+  }
+  return -1;
+}
+
+bool THD75::kenwood_menu_set(int menu_num, int value) {
+  if (value < 0)
+    return false;
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
   char buf[64] = {0};
   unsigned char term = '\r';
@@ -286,49 +335,6 @@ bool THD75::kenwood_power_set(PowerLevel val) {
   snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  return bytes > 0;
-}
-
-int THD75::kenwood_menu_get(int menu_num) {
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
-
-  char buf[64] = {0};
-  unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
-
-  if (bytes > 0) {
-    std::string resp(buf);
-    size_t comma = resp.find(',');
-
-    size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos)
-      term_pos = resp.find(';');
-
-    if (comma != std::string::npos && term_pos != std::string::npos) {
-      try {
-        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
-      } catch (...) {
-        return -1;
-      }
-    }
-  }
-  return -1;
-}
-
-bool THD75::kenwood_menu_set(int menu_num, int value) {
-  if (value < 0)
-    return false;
-
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
-
-  char buf[64] = {0};
-  unsigned char term = '\r';
   int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
