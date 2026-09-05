@@ -26,4 +26,12 @@
      
 6. **Commit**:
    - Generate a concise commit message detailing the changes and commit via `git commit -m`.
-   
+
+# Tool Usage & Editing Guidelines
+
+1. **No-Op Edit Prevention**:
+   - Do not attempt an `edit` tool call where the `before` and `after` blocks are identical.
+   - If an `edit` produces no functional change, inspect the target file before trying again.
+
+2. **Failed Search Recovery**:
+   - If a shell search command (e.g., `grep`) exits with code 1, read the target file contents directly to locate the actual line context instead of guessing edits.
