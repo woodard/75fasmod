@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  THD75 radio(RadioController::DEFAULT_MODEL, ports[0]);
+  THD75 radio(ports[0]);
   if (!radio.initialize()) {
     std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0]
               << "\n";

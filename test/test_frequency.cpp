@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
                               {nullptr, 0, nullptr, 0}};
 
   int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) != -1) {
+  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
+         -1) {
     switch (opt) {
     case 's':
       set_flag = true;
@@ -53,9 +54,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  THD75 radio(RadioController::DEFAULT_MODEL, ports[0]);
+  THD75 radio(ports[0]);
   if (!radio.initialize()) {
-    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0] << "\n";
+    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0]
+              << "\n";
     return 1;
   }
 
@@ -70,7 +72,8 @@ int main(int argc, char *argv[]) {
                              ? explicit_freq
                              : get_different_freq_in_band(current_freq_mhz);
     if (!radio.set_frequency(target_freq)) {
-      std::cerr << "[ERROR] Failed to set frequency to " << target_freq << " MHz\n";
+      std::cerr << "[ERROR] Failed to set frequency to " << target_freq
+                << " MHz\n";
       return 1;
     }
     std::cout << target_freq << "\n";

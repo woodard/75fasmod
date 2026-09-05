@@ -6,7 +6,7 @@
 #include "THD75.hpp"
 
 // Constructor
-THD75::THD75(rig_model_t model, const std::string &port, bool hamlib_debug)
+THD75::THD75(const std::string &port, rig_model_t model, bool hamlib_debug)
     : RadioController(model, port, hamlib_debug) {}
 
 // THD75-specific implementation using Hamlib's PTT function

@@ -74,13 +74,6 @@ public:
   };
 
   /**
-   * @brief Default Hamlib model for Kenwood TH-D75
-   *
-   * This is the Hamlib model ID for the Kenwood TH-D75 transceiver.
-   */
-  static constexpr rig_model_t DEFAULT_MODEL = 2042;
-
-  /**
    * @brief Construct a new Radio Controller object
    *
    * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
@@ -311,7 +304,7 @@ private:
   std::string port_;  ///< Serial port path
 
 protected:
-  RIG *rig_;          ///< Hamlib rig handle
+  RIG *rig_; ///< Hamlib rig handle
 
 private:
   rmode_t orig_mode_;    ///< Saved original radio mode

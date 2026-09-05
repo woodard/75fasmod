@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   bool hamlib_debug = false;
 
   // Default values
-  rig_model_t rig_model = RadioController::DEFAULT_MODEL;
+  rig_model_t rig_model = THD75::DEFAULT_MODEL;
   int burst_limit = 8;
   int flush_timeout_ms = 200;
 
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
   }
 
   // 3. Initialize Hardware & DSP Classes
-  THD75 radio(rig_model, serial_port, hamlib_debug);
+  THD75 radio(serial_port, rig_model, hamlib_debug);
   if (!radio.initialize()) {
     std::cerr << "Error: Failed to initialize radio controller.\n";
     return 1;
