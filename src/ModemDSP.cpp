@@ -10,13 +10,14 @@
 #include <gnuradio/digital/chunks_to_symbols.h>
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/filter/interp_fir_filter.h>
-#include <gnuradio/trellis/encoder.h>
 #include <gnuradio/top_block.h>
-#include <unistd.h>
+#include <gnuradio/trellis/encoder.h>
 #include <iostream>
 #include <stdexcept> // Ensure this is included at the top for std::exception
+#include <unistd.h>
 
-ModemDSP::ModemDSP(const std::string& alsa_tx_device, const std::string& alsa_rx_device) 
+ModemDSP::ModemDSP(const std::string &alsa_tx_device,
+                   const std::string &alsa_rx_device)
     : alsa_tx_device_(alsa_tx_device), alsa_rx_device_(alsa_rx_device) {}
 
 ModemDSP::~ModemDSP() {
@@ -29,13 +30,14 @@ bool ModemDSP::start_rx(int output_fd) {
 
   try {
     auto audio_src = gr::audio::source::make(48000, alsa_rx_device_);
-    auto fd_sink = gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
-    
+    auto fd_sink =
+        gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
+
     rx_tb_->start();
     std::cout << "[DSP] Continuous RX Flowgraph started.\n";
     return true;
-  } catch (const std::exception& e) {
-    std::cerr << "\n[DSP] CRITICAL ERROR in start_rx initializing ALSA device '" 
+  } catch (const std::exception &e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_rx initializing ALSA device '"
               << alsa_rx_device_ << "':\n -> " << e.what() << "\n\n";
     return false;
   }
@@ -60,12 +62,16 @@ bool ModemDSP::start_tx(int input_fd) {
   float rolloff = 0.35;
 
   try {
-    auto src = gr::blocks::file_descriptor_source::make(sizeof(uint8_t), input_fd, false);
+    auto src = gr::blocks::file_descriptor_source::make(sizeof(uint8_t),
+                                                        input_fd, false);
     auto repack = gr::blocks::repack_bits_bb::make(8, 3);
-    auto trellis_encoder = gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
-    auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(qam->points());
+    auto trellis_encoder =
+        gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
+    auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(
+        qam->points());
 
-    std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(sps, sps, 1.0, rolloff, 11 * sps);
+    std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
+        sps, sps, 1.0, rolloff, 11 * sps);
     auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
 
     auto complex_to_real = gr::blocks::complex_to_real::make(1);
@@ -83,8 +89,8 @@ bool ModemDSP::start_tx(int input_fd) {
     tx_tb_->start();
     std::cout << "[DSP] Continuous TX Flowgraph started.\n";
     return true;
-  } catch (const std::exception& e) {
-    std::cerr << "\n[DSP] CRITICAL ERROR in start_tx initializing ALSA device '" 
+  } catch (const std::exception &e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_tx initializing ALSA device '"
               << alsa_tx_device_ << "':\n -> " << e.what() << "\n\n";
     return false;
   }

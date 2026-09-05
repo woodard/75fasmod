@@ -1,13 +1,16 @@
 #include "Frame.hpp"
 
-Frame::Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len, std::vector<uint8_t> payload)
-    : ModemHeader(frame_type, seq_num, payload_len), payload(std::move(payload)) {}
+Frame::Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len,
+             std::vector<uint8_t> payload)
+    : ModemHeader(frame_type, seq_num, payload_len),
+      payload(std::move(payload)) {}
 
 uint32_t Frame::calc_crc() const {
   uint32_t crc = 0xFFFFFFFF;
-  
+
   // Hash inherited header fields
-  const uint8_t* data = reinterpret_cast<const uint8_t*>(static_cast<const ModemHeader*>(this));
+  const uint8_t *data =
+      reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
   size_t len = sizeof(ModemHeader);
   for (size_t i = 0; i < len; ++i) {
     crc ^= data[i];
@@ -15,7 +18,7 @@ uint32_t Frame::calc_crc() const {
       crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
     }
   }
-  
+
   // Hash payload
   for (size_t i = 0; i < payload.size(); ++i) {
     crc ^= payload[i];
@@ -23,20 +26,21 @@ uint32_t Frame::calc_crc() const {
       crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
     }
   }
-  
+
   return ~crc;
 }
 
 std::vector<uint8_t> Frame::cobs_encode() const {
   std::vector<uint8_t> raw_frame;
-  const uint8_t* hdr_ptr = reinterpret_cast<const uint8_t*>(static_cast<const ModemHeader*>(this));
+  const uint8_t *hdr_ptr =
+      reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
   raw_frame.insert(raw_frame.end(), hdr_ptr, hdr_ptr + sizeof(ModemHeader));
   raw_frame.insert(raw_frame.end(), payload.begin(), payload.end());
-  
+
   uint32_t crc = calc_crc();
-  uint8_t* crc_ptr = reinterpret_cast<uint8_t*>(&crc);
+  uint8_t *crc_ptr = reinterpret_cast<uint8_t *>(&crc);
   raw_frame.insert(raw_frame.end(), crc_ptr, crc_ptr + sizeof(uint32_t));
-  
+
   std::vector<uint8_t> output;
   output.resize(raw_frame.size() + raw_frame.size() / 254 + 2);
 

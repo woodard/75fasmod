@@ -1,14 +1,14 @@
-#include "RadioController.hpp"
-#include "ModemDSP.hpp"
 #include "DataSocket.hpp"
+#include "ModemDSP.hpp"
+#include "RadioController.hpp"
 #include <atomic>
 #include <csignal>
 #include <cstdlib>
+#include <filesystem>
 #include <getopt.h>
 #include <hamlib/rig.h>
 #include <iostream>
 #include <string>
-#include <filesystem>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -24,7 +24,8 @@ void print_usage(const char *prog_name) {
       << "Options:\n"
       << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
       << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
-      << "  -p, --port <device>   Serial port (default: auto-discover Kenwood TH-D75)\n"
+      << "  -p, --port <device>   Serial port (default: auto-discover Kenwood "
+         "TH-D75)\n"
       << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic "
          "Kenwood)\n"
       << "  -s, --sock <path>     Data socket path (default: "
@@ -119,8 +120,9 @@ int main(int argc, char *argv[]) {
 
   // 2. Discover Kenwood TH-D75 device if not explicitly specified
   if (serial_port.empty()) {
-    std::vector<std::string> discovered_ports = RadioController::find_tty_sysfs();
-    
+    std::vector<std::string> discovered_ports =
+        RadioController::find_tty_sysfs();
+
     if (discovered_ports.size() == 1) {
       serial_port = discovered_ports[0];
       std::cout << "Auto-discovered Kenwood TH-D75 at " << serial_port << "\n";
@@ -129,7 +131,8 @@ int main(int argc, char *argv[]) {
       for (size_t i = 0; i < discovered_ports.size(); ++i) {
         std::cout << "  [" << i << "] " << discovered_ports[i] << "\n";
       }
-      std::cout << "Select device (0-" << (discovered_ports.size() - 1) << "): ";
+      std::cout << "Select device (0-" << (discovered_ports.size() - 1)
+                << "): ";
       size_t choice;
       std::cin >> choice;
       if (choice < discovered_ports.size()) {
@@ -141,7 +144,9 @@ int main(int argc, char *argv[]) {
     } else {
       // Fall back to common default if discovery fails
       serial_port = "/dev/ttyUSB0";
-      std::cout << "Warning: Could not auto-discover Kenwood TH-D75, using default " << serial_port << "\n";
+      std::cout
+          << "Warning: Could not auto-discover Kenwood TH-D75, using default "
+          << serial_port << "\n";
     }
   }
 
@@ -162,12 +167,14 @@ int main(int argc, char *argv[]) {
   // Map the serial port to its matching ALSA soundcard
   std::string alsa_device = radio.find_alsa_device();
   if (alsa_device.empty()) {
-    std::cerr << "Warning: Could not map serial port to ALSA device. Defaulting to TH-D75 alias.\n";
+    std::cerr << "Warning: Could not map serial port to ALSA device. "
+                 "Defaulting to TH-D75 alias.\n";
     alsa_device = "hw:CARD=THD75,DEV=0";
   } else {
-    std::cout << "Mapped serial port " << serial_port << " to ALSA audio device " << alsa_device << "\n";
+    std::cout << "Mapped serial port " << serial_port
+              << " to ALSA audio device " << alsa_device << "\n";
   }
-  
+
   ModemDSP dsp(alsa_tx_device, alsa_device);
 
   // 4. Start the Data Socket Server

@@ -1,22 +1,24 @@
 #include "RadioController.hpp"
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <thread>
-#include <cstdlib>
-#include <fstream>
 
-std::string RadioController::read_sysfs_attr(const fs::path& filepath) {
+std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
   std::ifstream file(filepath);
   std::string value;
-  if (file >> value) return value;
+  if (file >> value)
+    return value;
   return "";
 }
 
 RadioController::RadioController(rig_model_t model, const std::string &port)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_width_(0), orig_menu_102_(UsbOutSelect::unknown), orig_power_(PowerLevel::UNKNOWN),
-      orig_tnc_state_(-1), orig_vfo_(RIG_VFO_NONE) {}
+      orig_width_(0), orig_menu_102_(UsbOutSelect::unknown),
+      orig_power_(PowerLevel::UNKNOWN), orig_tnc_state_(-1),
+      orig_vfo_(RIG_VFO_NONE) {}
 
 RadioController::~RadioController() {
   if (rig_) {
@@ -26,7 +28,8 @@ RadioController::~RadioController() {
     // Restore original menu 102 (only if we successfully queried it)
     if (orig_menu_102_ != UsbOutSelect::unknown) {
       if (!kenwood_usb_out_select_set(orig_menu_102_)) {
-        std::cerr << "[RIG] Warning: Failed to restore original Menu 102 setting.\n";
+        std::cerr
+            << "[RIG] Warning: Failed to restore original Menu 102 setting.\n";
       }
     }
 
@@ -39,7 +42,8 @@ RadioController::~RadioController() {
 
     // Restore original TNC state
     if (orig_tnc_state_ != -1) {
-      std::cout << "[RIG] Restoring TNC state to " << orig_tnc_state_ << "...\n";
+      std::cout << "[RIG] Restoring TNC state to " << orig_tnc_state_
+                << "...\n";
       if (!kenwood_tnc_set(orig_tnc_state_)) {
         std::cerr << "[RIG] Warning: Failed to restore original TNC state.\n";
       }
@@ -53,7 +57,8 @@ RadioController::~RadioController() {
 
     // Restore original operating mode and bandwidth
     if (orig_mode_ != RIG_MODE_NONE) {
-      std::cout << "[RIG] Restoring original mode (" << rig_strrmode(orig_mode_) << ")...\n";
+      std::cout << "[RIG] Restoring original mode (" << rig_strrmode(orig_mode_)
+                << ")...\n";
       rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
     }
 
@@ -71,7 +76,7 @@ bool RadioController::initialize(bool hamlib_debug) {
   std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (!rig_) {
-    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_ 
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
               << ". The model ID may not exist in this Hamlib build.\n";
     return false;
   }
@@ -80,7 +85,7 @@ bool RadioController::initialize(bool hamlib_debug) {
 
   int status = rig_open(rig_);
   if (status != RIG_OK) {
-    std::cerr << "[RIG] Error: rig_open() failed on " << port_ 
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_
               << " | Code: " << status << " (" << rigerror(status) << ")\n";
     return false;
   }
@@ -89,7 +94,8 @@ bool RadioController::initialize(bool hamlib_debug) {
 
   // 1. Save original operating mode and bandwidth
   if (rig_get_mode(rig_, RIG_VFO_CURR, &orig_mode_, &orig_width_) == RIG_OK) {
-    std::cout << "[RIG] Saved original mode: " << rig_strrmode(orig_mode_) << "\n";
+    std::cout << "[RIG] Saved original mode: " << rig_strrmode(orig_mode_)
+              << "\n";
   } else {
     std::cerr << "[RIG] Warning: Could not query starting radio mode.\n";
   }
@@ -119,12 +125,14 @@ bool RadioController::initialize(bool hamlib_debug) {
   // 4. Query power and Menu 102 state
   orig_power_ = kenwood_power_get();
   orig_menu_102_ = kenwood_usb_out_select_get();
-  
+
   if (orig_menu_102_ == UsbOutSelect::unknown) {
-    std::cerr << "\n[RIG] WARNING: Could not query Menu 102 via CAT.\n"
-              << "      Kenwood locks this menu over USB. Please manually ensure\n"
-              << "      Menu 102 (USB Out Select) is set to IF Output (1).\n\n";
-    // We purposefully DO NOT return false here. We bypass the error and continue.
+    std::cerr
+        << "\n[RIG] WARNING: Could not query Menu 102 via CAT.\n"
+        << "      Kenwood locks this menu over USB. Please manually ensure\n"
+        << "      Menu 102 (USB Out Select) is set to IF Output (1).\n\n";
+    // We purposefully DO NOT return false here. We bypass the error and
+    // continue.
   }
 
   std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
@@ -141,22 +149,27 @@ bool RadioController::initialize(bool hamlib_debug) {
   pbwidth_t active_width = 0;
   if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
     if (active_mode != RIG_MODE_PKTFM && active_mode != RIG_MODE_FM) {
-      std::cerr << "[RIG] WARNING: Radio failed to enter FM mode! Current mode: "
-                << rig_strrmode(active_mode) << "\n";
+      std::cerr
+          << "[RIG] WARNING: Radio failed to enter FM mode! Current mode: "
+          << rig_strrmode(active_mode) << "\n";
     } else {
-      std::cout << "[RIG] Verified active mode: " << rig_strrmode(active_mode) << "\n";
+      std::cout << "[RIG] Verified active mode: " << rig_strrmode(active_mode)
+                << "\n";
     }
   }
 
   // 6. Configure Kenwood 9600 bps data output path (Menu 102) safely
-  if (orig_menu_102_ != UsbOutSelect::unknown && orig_menu_102_ != UsbOutSelect::IF) {
-    std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a USB reset...\n";
+  if (orig_menu_102_ != UsbOutSelect::unknown &&
+      orig_menu_102_ != UsbOutSelect::IF) {
+    std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a "
+                 "USB reset...\n";
     if (!kenwood_usb_out_select_set(UsbOutSelect::IF)) {
-      std::cerr << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF output.\n";
+      std::cerr
+          << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF output.\n";
       return false;
     }
-    
-    // The radio is currently rebooting its USB interface. 
+
+    // The radio is currently rebooting its USB interface.
     // Close our stale handles before the OS gets upset.
     rig_close(rig_);
     rig_cleanup(rig_);
@@ -169,16 +182,17 @@ bool RadioController::initialize(bool hamlib_debug) {
     std::cout << "[RIG] Reconnecting to Hamlib after USB reset...\n";
     rig_ = rig_init(model_);
     rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
-    
+
     int re_status = rig_open(rig_);
     if (re_status != RIG_OK) {
-      std::cerr << "[RIG] Error: Failed to reconnect after USB reset. Code: " 
+      std::cerr << "[RIG] Error: Failed to reconnect after USB reset. Code: "
                 << re_status << "\n";
       return false;
     }
     std::cout << "[RIG] Successfully reconnected to radio.\n";
   } else if (orig_menu_102_ == UsbOutSelect::IF) {
-    std::cout << "[RIG] Menu 102 already set to IF Output. Skipping USB reset.\n";
+    std::cout
+        << "[RIG] Menu 102 already set to IF Output. Skipping USB reset.\n";
   }
 
   return true;
@@ -190,13 +204,13 @@ bool RadioController::set_frequency(double freq_mhz) {
 }
 
 bool RadioController::set_ptt(bool transmit) {
-  const char* cmd = transmit ? "TX\r" : "RX\r";
+  const char *cmd = transmit ? "TX\r" : "RX\r";
   char buf[64] = {0};
   unsigned char term = '\r';
-  
-  int bytes = rig_send_raw(rig_, (const unsigned char*)cmd, strlen(cmd), 
-                           (unsigned char*)buf, sizeof(buf) - 1, &term);
-  
+
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
     return false;
   }
@@ -238,19 +252,22 @@ bool RadioController::set_power_level(const std::string &level) {
 
 int RadioController::kenwood_menu_get(int menu_num) {
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num); // Standard Kenwood EX command
+  snprintf(cmd, sizeof(cmd), "EX%03d\r",
+           menu_num); // Standard Kenwood EX command
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " ("
+              << rigerror(bytes) << ")\n";
     return -1;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     // Suppress the giant error output since we now expect Menu 102 to throw a ?
     return -1;
   }
@@ -259,7 +276,8 @@ int RadioController::kenwood_menu_get(int menu_num) {
     std::string resp(buf);
     size_t comma = resp.find(',');
     size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos) term_pos = resp.find(';'); 
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
 
     if (comma != std::string::npos && term_pos != std::string::npos) {
       try {
@@ -277,19 +295,21 @@ bool RadioController::kenwood_menu_set(int menu_num, int value) {
     return false;
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value); 
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " ("
+              << rigerror(bytes) << ")\n";
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     return false;
   }
 
@@ -309,30 +329,34 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
   char bc_buf[32] = {0};
   unsigned char term = '\r';
 
-  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
-                              
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
   if (bc_bytes > 0) {
     std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
       active_band = 1;
     }
   }
 
   // Fetch power for the active band
   char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band); 
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error querying power level (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying power level ("
+              << rigerror(bytes) << ")\n";
     return PowerLevel::UNKNOWN;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying power: " << buf << "\n";
     return PowerLevel::UNKNOWN;
   }
@@ -341,10 +365,12 @@ RadioController::PowerLevel RadioController::kenwood_power_get() {
     std::string resp(buf);
     size_t comma = resp.find(',');
     size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos) term_pos = resp.find(';');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
 
     // PC response looks like "PC 0,3\r" (Band, Power)
-    if (comma != std::string::npos && term_pos != std::string::npos && term_pos > comma + 1) {
+    if (comma != std::string::npos && term_pos != std::string::npos &&
+        term_pos > comma + 1) {
       try {
         int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
         if (pwr_int >= 0 && pwr_int <= 3) {
@@ -367,29 +393,33 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
   char bc_buf[32] = {0};
   unsigned char term = '\r';
 
-  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
-                              
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
   if (bc_bytes > 0) {
     std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
       active_band = 1;
     }
   }
 
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val)); 
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error setting power level (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting power level ("
+              << rigerror(bytes) << ")\n";
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting power: " << buf << "\n";
     return false;
   }
@@ -398,7 +428,9 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 
   PowerLevel actual = kenwood_power_get();
   if (actual != val) {
-    std::cerr << "[RIG] Verification failed for Power Level. Expected " << static_cast<int>(val) << " but got " << static_cast<int>(actual) << ".\n";
+    std::cerr << "[RIG] Verification failed for Power Level. Expected "
+              << static_cast<int>(val) << " but got "
+              << static_cast<int>(actual) << ".\n";
     return false;
   }
 
@@ -406,19 +438,21 @@ bool RadioController::kenwood_power_set(PowerLevel val) {
 }
 
 int RadioController::kenwood_tnc_get() {
-  char cmd[] = "TN\r"; 
+  char cmd[] = "TN\r";
   char buf[64] = {0};
   unsigned char term = '\r';
-  
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0) {
-    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(bytes)
+              << ")\n";
     return -1;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error querying TNC state: " << buf << "\n";
     return -1;
   }
@@ -427,7 +461,7 @@ int RadioController::kenwood_tnc_get() {
     std::string resp(buf);
     size_t space_pos = resp.find(' ');
     size_t comma = resp.find(',');
-    
+
     if (comma != std::string::npos) {
       size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
       try {
@@ -442,19 +476,21 @@ int RadioController::kenwood_tnc_get() {
 
 bool RadioController::kenwood_tnc_set(int mode) {
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode); 
-  
+  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
+
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd), 
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
                            (unsigned char *)buf, sizeof(buf) - 1, &term);
 
   if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(bytes) << ")\n";
+    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(bytes)
+              << ")\n";
     return false;
   }
 
-  if (bytes > 0 && (buf[0] == '?' || (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
     std::cerr << "[RIG] Firmware error setting TNC state: " << buf << "\n";
     return false;
   }
@@ -463,7 +499,8 @@ bool RadioController::kenwood_tnc_set(int mode) {
 
   int actual = kenwood_tnc_get();
   if (actual != mode) {
-    std::cerr << "[RIG] Verification failed for TNC Mode. Expected " << mode << " but got " << actual << ".\n";
+    std::cerr << "[RIG] Verification failed for TNC Mode. Expected " << mode
+              << " but got " << actual << ".\n";
     return false;
   }
 
@@ -473,10 +510,14 @@ bool RadioController::kenwood_tnc_set(int mode) {
 RadioController::UsbOutSelect RadioController::kenwood_usb_out_select_get() {
   int value = kenwood_menu_get(102);
   switch (value) {
-    case 0: return UsbOutSelect::AF;
-    case 1: return UsbOutSelect::IF;
-    case 2: return UsbOutSelect::Detect;
-    default: return UsbOutSelect::unknown;
+  case 0:
+    return UsbOutSelect::AF;
+  case 1:
+    return UsbOutSelect::IF;
+  case 2:
+    return UsbOutSelect::Detect;
+  default:
+    return UsbOutSelect::unknown;
   }
 }
 
@@ -484,18 +525,21 @@ bool RadioController::kenwood_usb_out_select_set(UsbOutSelect value) {
   return kenwood_menu_set(102, static_cast<int>(value));
 }
 
-std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid,
-                                                       unsigned int target_pid) {
+std::vector<std::string>
+RadioController::find_tty_sysfs(unsigned int target_vid,
+                                unsigned int target_pid) {
   std::vector<std::string> found_ports;
   fs::path sys_tty = "/sys/class/tty";
-  
-  if (!fs::exists(sys_tty)) return found_ports;
 
-  for (const auto& entry : fs::directory_iterator(sys_tty)) {
+  if (!fs::exists(sys_tty))
+    return found_ports;
+
+  for (const auto &entry : fs::directory_iterator(sys_tty)) {
     fs::path dev_path = entry.path() / "device";
-    if (!fs::exists(dev_path)) continue;
+    if (!fs::exists(dev_path))
+      continue;
 
-    for (const char* parent_rel : {"..", "../..", "../../.."}) {
+    for (const char *parent_rel : {"..", "../..", "../../.."}) {
       fs::path vid_path = dev_path / parent_rel / "idVendor";
       fs::path pid_path = dev_path / parent_rel / "idProduct";
 
@@ -507,7 +551,7 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
         if (auto pid_str = read_sysfs_attr(pid_path); !pid_str.empty()) {
           pid = std::stoul(pid_str, nullptr, 16);
         }
-        
+
         if (vid == target_vid && pid == target_pid) {
           found_ports.push_back("/dev/" + entry.path().filename().string());
           break;
@@ -518,11 +562,12 @@ std::vector<std::string> RadioController::find_tty_sysfs(unsigned int target_vid
   return found_ports;
 }
 
-std::string RadioController::find_alsa_device(const std::string& serial_port) {
-  fs::path tty_name = fs::path(serial_port).filename(); 
+std::string RadioController::find_alsa_device(const std::string &serial_port) {
+  fs::path tty_name = fs::path(serial_port).filename();
   fs::path tty_dev_path = "/sys/class/tty" / tty_name / "device";
 
-  if (!fs::exists(tty_dev_path)) return "";
+  if (!fs::exists(tty_dev_path))
+    return "";
 
   fs::path usb_dev_path;
   try {
@@ -532,14 +577,16 @@ std::string RadioController::find_alsa_device(const std::string& serial_port) {
   }
 
   fs::path sound_class_path = "/sys/class/sound";
-  if (!fs::exists(sound_class_path)) return "";
+  if (!fs::exists(sound_class_path))
+    return "";
 
-  for (const auto& entry : fs::directory_iterator(sound_class_path)) {
+  for (const auto &entry : fs::directory_iterator(sound_class_path)) {
     std::string card_name = entry.path().filename().string();
-    
+
     if (card_name.find("card") == 0) {
       fs::path card_dev_path = entry.path() / "device";
-      if (!fs::exists(card_dev_path)) continue;
+      if (!fs::exists(card_dev_path))
+        continue;
 
       try {
         fs::path card_usb_path = fs::canonical(card_dev_path).parent_path();

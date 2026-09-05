@@ -1,7 +1,7 @@
 #pragma once
+#include <filesystem>
 #include <hamlib/rig.h>
 #include <string>
-#include <filesystem>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -21,12 +21,7 @@ public:
   };
 
   // USB Out Select menu item 102 values
-  enum class UsbOutSelect {
-    AF = 0,
-    IF = 1,
-    Detect = 2,
-    unknown
-  };
+  enum class UsbOutSelect { AF = 0, IF = 1, Detect = 2, unknown };
 
   RadioController(rig_model_t model, const std::string &port);
   ~RadioController();
@@ -37,19 +32,17 @@ public:
   bool set_ptt(bool transmit);
   bool get_dcd(bool &is_squelch_open);
 
-  static std::vector<std::string> find_tty_sysfs(){
+  static std::vector<std::string> find_tty_sysfs() {
     return find_tty_sysfs(0x2166, 0x9023);
   }
-  std::string find_alsa_device(){
-    return find_alsa_device(port_);
-  }
-  
+  std::string find_alsa_device() { return find_alsa_device(port_); }
+
   int kenwood_tnc_get();
   bool kenwood_tnc_set(int mode);
-  
+
   UsbOutSelect kenwood_usb_out_select_get();
   bool kenwood_usb_out_select_set(UsbOutSelect value);
-  
+
 private:
   PowerLevel kenwood_power_get();
   bool kenwood_power_set(PowerLevel val);
@@ -65,11 +58,11 @@ private:
   pbwidth_t orig_width_;
   UsbOutSelect orig_menu_102_;
   PowerLevel orig_power_; // Stores the original state using the enum
-  int orig_tnc_state_; // Store the original TNC state
-  vfo_t orig_vfo_; // Store the original VFO state
+  int orig_tnc_state_;    // Store the original TNC state
+  vfo_t orig_vfo_;        // Store the original VFO state
 
   static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
-						 unsigned int target_pid);
-  static std::string find_alsa_device(const std::string& serial_port);
-  static std::string read_sysfs_attr(const fs::path& filepath);
+                                                 unsigned int target_pid);
+  static std::string find_alsa_device(const std::string &serial_port);
+  static std::string read_sysfs_attr(const fs::path &filepath);
 };

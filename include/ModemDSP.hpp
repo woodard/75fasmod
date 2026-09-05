@@ -7,7 +7,8 @@
 
 class ModemDSP {
 public:
-  ModemDSP(const std::string& alsa_tx_device, const std::string& alsa_rx_device);
+  ModemDSP(const std::string &alsa_tx_device,
+           const std::string &alsa_rx_device);
   ~ModemDSP();
 
   bool start_rx(int output_fd);

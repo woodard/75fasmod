@@ -8,6 +8,8 @@ CXXFLAGS="$CXXFLAGS -std=c++20"
 # Check for required libraries using pkg-config
 PKG_CHECK_MODULES([HAMLIB], [hamlib])
 PKG_CHECK_MODULES([GNURADIO], [gnuradio-runtime gnuradio-audio gnuradio-blocks gnuradio-digital gnuradio-filter gnuradio-trellis])
+PKG_CHECK_MODULES([FMT], [fmt >= 8.0.0])
 
+# if the library is found.
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

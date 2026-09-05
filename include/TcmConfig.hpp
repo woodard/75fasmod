@@ -3,13 +3,7 @@
 #include <gnuradio/trellis/fsm.h>
 #include <vector>
 
-enum class ModulationScheme {
-  QAM16,
-  QAM32,
-  QAM64,
-  QAM128,
-  QAM256
-};
+enum class ModulationScheme { QAM16, QAM32, QAM64, QAM128, QAM256 };
 
 class TcmConfig {
 public:
@@ -17,5 +11,6 @@ public:
   static gr::trellis::fsm get_fsm(ModulationScheme scheme);
 
   // Generates custom QAM grid points (including cross-constellations)
-  static gr::digital::constellation_sptr get_constellation(ModulationScheme scheme);
+  static gr::digital::constellation_sptr
+  get_constellation(ModulationScheme scheme);
 };
