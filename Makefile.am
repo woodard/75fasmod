@@ -14,8 +14,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
     src/TcmConfig.cpp
 
 # Feed compiler and linker flags from pkg-config
-75fasmod_CXXFLAGS = $(HAMLIB_CFLAGS) $(GNURADIO_CFLAGS) -Wall -Wextra -pthread
-75fasmod_LDADD = $(HAMLIB_LIBS) $(GNURADIO_LIBS) -lpthread
+75fasmod_CXXFLAGS = $(HAMLIB_CFLAGS) $(GNURADIO_CFLAGS) $(FMT_CFLAGS) \
+                    $(VOLK_CFLAGS) -Wall -Wextra -pthread
+75fasmod_LDADD = $(HAMLIB_LIBS) $(GNURADIO_LIBS) $(FMT_LIBS) $(VOLK_LIBS) \
+                 -lpthread
 
 # Formatting target using clang-format on both directories
 .PHONY: format
