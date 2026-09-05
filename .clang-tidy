@@ -1,0 +1,7 @@
+---
+Checks: 'bugprone-*,modernize-*,performance-*,readability-*'
+WarningsAsErrors: ''
+CheckOptions:
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+...
