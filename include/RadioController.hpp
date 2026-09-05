@@ -89,7 +89,7 @@ public:
    * Restores the radio to its original state after modifications.
    * Call this method when done with the radio to clean up resources.
    */
-  void shutdown();
+  virtual void shutdown();
 
   /**
    * @brief Destroy the Radio Controller object
@@ -109,7 +109,7 @@ public:
    * @note This method modifies radio settings. Use save/restore methods if
    *       you need to restore settings later.
    */
-  bool initialize();
+  virtual bool initialize();
 
   /**
    * @brief Set the radio frequency
