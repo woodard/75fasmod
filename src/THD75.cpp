@@ -436,6 +436,11 @@ auto THD75::flip_single_dual(VFO vfo) -> bool {
 
 // Other VFO mode control functions
 auto THD75::set_other_mode(Mode mode) -> bool {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    return false;
+  }
+  
   // Get current VFO
   VFO current = get_current_vfo();
   VFO other = (current == VFO::A) ? VFO::B : VFO::A;
@@ -454,6 +459,11 @@ auto THD75::set_other_mode(Mode mode) -> bool {
 }
 
 auto THD75::get_other_mode() -> Mode {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    return Mode::FM; // Default fallback on error
+  }
+  
   // Get current VFO
   VFO current = get_current_vfo();
   VFO other = (current == VFO::A) ? VFO::B : VFO::A;
