@@ -61,6 +61,9 @@ RadioController::RadioController(rig_model_t model, std::string port,
     rig_ = nullptr;
     return;
   }
+
+  // Clear serial buffer before use
+  flush_serial();
 }
 
 RadioController::~RadioController() {
