@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 #include <string>
 
 namespace {
@@ -24,7 +25,7 @@ constexpr size_t BUFFER_SIZE_16 = 16;
 constexpr unsigned int MENU_ITEM_102 = 102;
 } // namespace
 
-#include "absl/strings/match.h"
+// #include "absl/strings/match.h"  // Disabled - replaced with std::string::find
 
 // Constructor
 THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
@@ -136,23 +137,72 @@ auto THD75::get_other_power_level(std::string &level) -> bool {
 auto THD75::initialize() -> bool {
   std::cerr << "[RIG] Backing up current radio state..." << std::endl;
 
-  // 1. Save current state BEFORE any changes
+  // 1. Check if in dual mode and save "other" VFO state first
+  bool const in_dual = !get_single();
+  if (in_dual) {
+    std::cerr << "[RIG] In dual mode - saving 'other' VFO state..."
+              << std::endl;
+
+    VFO const current = get_current_vfo();
+    VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
+    // Switch to other VFO
+    if (set_current_vfo(other)) {
+      // Save frequency
+      double freq = 0.0;
+      if (get_frequency(freq)) {
+        orig_other_frequency_ = static_cast<freq_t>(freq * 1e6);
+        orig_other_freq_saved_ = true;
+        std::cerr << "[RIG] Saved other VFO frequency: " << freq << " MHz"
+                  << std::endl;
+      }
+
+      // Save mode
+      Mode mode;
+      if (get_mode(mode)) {
+        orig_other_mode_ = static_cast<rmode_t>(mode);
+        orig_other_mode_saved_ = true;
+        std::cerr << "[RIG] Saved other VFO mode: " << static_cast<int>(mode)
+                  << std::endl;
+      }
+
+      // Save power level
+      std::string powerStr;
+      if (get_power_level(powerStr)) {
+        if (powerStr == "H")
+          orig_other_power_ = PowerLevel::HIGH;
+        else if (powerStr == "M")
+          orig_other_power_ = PowerLevel::MEDIUM;
+        else if (powerStr == "L")
+          orig_other_power_ = PowerLevel::LOW;
+        else if (powerStr == "EL")
+          orig_other_power_ = PowerLevel::EXTRA_LOW;
+        orig_other_power_saved_ = true;
+        std::cerr << "[RIG] Saved other VFO power: " << powerStr << std::endl;
+      }
+
+      // Restore original VFO
+      set_current_vfo(current);
+    }
+  }
+
+  // 2. Save current state (VFO, power, menu 102)
   rig_get_vfo(rig_, &orig_vfo_);
   orig_power_ = kenwood_power_get();
   orig_power_saved_ = true;
   orig_menu_102_ = kenwood_usb_out_select_get();
 
-  // 2. Call base class to save frequency and mode (BEFORE modifications)
+  // 3. Call base class to save frequency, mode, power for current VFO
   if (!RadioController::initialize()) {
     return false;
   }
 
-  // 3. Set to VFO B to allow menu 102 changes when in dual mode
+  // 4. Set to VFO B to allow menu 102 changes when in dual mode
   std::cerr << "[RIG] Setting radio to VFO B for menu 102 access..."
             << std::endl;
   rig_set_vfo(rig_, RIG_VFO_B);
 
-  // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
+  // 5. Configure Kenwood 9600 bps data output path (Menu 102) safely
   if (orig_menu_102_ != UsbOutSelect::unknown &&
       orig_menu_102_ != UsbOutSelect::IF) {
     std::cerr << "[RIG] Changing Menu 102 to IF Output (1). This will cause a "
@@ -190,7 +240,7 @@ auto THD75::initialize() -> bool {
               << std::endl;
   }
 
-  // 5. Set mode to Packet FM (9600 baud passband)
+  // 6. Set mode to Packet FM (9600 baud passband)
   std::cerr << "[RIG] Configuring radio for high-speed modem operation..."
             << std::endl;
   int mode_ret =
@@ -209,14 +259,72 @@ void THD75::shutdown() {
     std::cerr << "[RIG] Shutting down. Restoring original radio settings..."
               << std::endl;
 
-    // Restore original menu 102
+    // 1. Restore "other" VFO state if in dual mode
+    bool const in_dual = !get_single();
+    if (in_dual && orig_other_freq_saved_) {
+      std::cerr << "[RIG] Restoring 'other' VFO state..." << std::endl;
+
+      VFO const current = get_current_vfo();
+      VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
+      // Switch to other VFO
+      if (set_current_vfo(other)) {
+        // Restore frequency
+        if (orig_other_freq_saved_) {
+          double freq_mhz = static_cast<double>(orig_other_frequency_) / 1e6;
+          if (set_frequency(freq_mhz)) {
+            std::cerr << "[RIG] Restored other VFO frequency: " << freq_mhz
+                      << " MHz" << std::endl;
+          }
+        }
+
+        // Restore mode
+        if (orig_other_mode_saved_) {
+          if (set_mode(static_cast<Mode>(orig_other_mode_))) {
+            std::cerr << "[RIG] Restored other VFO mode" << std::endl;
+          }
+        }
+
+        // Restore power level
+        if (orig_other_power_saved_) {
+          std::string level;
+          switch (orig_other_power_) {
+          case PowerLevel::HIGH:
+            level = "H";
+            break;
+          case PowerLevel::MEDIUM:
+            level = "M";
+            break;
+          case PowerLevel::LOW:
+            level = "L";
+            break;
+          case PowerLevel::EXTRA_LOW:
+            level = "EL";
+            break;
+          default:
+            level = "UNKNOWN";
+          }
+          if (level != "UNKNOWN") {
+            if (set_power_level(level)) {
+              std::cerr << "[RIG] Restored other VFO power to " << level
+                        << std::endl;
+            }
+          }
+        }
+
+        // Restore original VFO
+        set_current_vfo(current);
+      }
+    }
+
+    // 2. Restore original menu 102
     if (orig_menu_102_ != UsbOutSelect::unknown) {
       if (!kenwood_usb_out_select_set(orig_menu_102_)) {
         std::cerr << "[RIG] Warning: Failed to restore Menu 102." << std::endl;
       }
     }
 
-    // Restore original VFO
+    // 3. Restore original VFO
     if (orig_vfo_ != RIG_VFO_NONE) {
       if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
         std::cerr << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_)
@@ -225,8 +333,13 @@ void THD75::shutdown() {
     }
   }
 
-  // Call base shutdown (restores frequency, mode, power level, closes rig)
+  // 4. Call base shutdown (restores frequency, mode, power level for current
+  // VFO, closes rig)
   RadioController::shutdown();
+}
+
+// Call base shutdown (restores frequency, mode, power level, closes rig)
+RadioController::shutdown();
 }
 
 // TNC control functions (public interface)
@@ -351,8 +464,8 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
 
   if (bc_bytes > 0) {
     std::string const bc_resp(bc_buf);
-    if (absl::StrContains(bc_resp, "BC 1") ||
-        absl::StrContains(bc_resp, "BC1")) {
+    if ((bc_resp.find("BC 1") != std::string::npos) ||
+        (bc_resp.find("BC1") != std::string::npos)) {
       active_band = 1;
     }
   }
@@ -408,8 +521,8 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
 
   if (bc_bytes > 0) {
     std::string const bc_resp(bc_buf);
-    if (absl::StrContains(bc_resp, "BC 1") ||
-        absl::StrContains(bc_resp, "BC1")) {
+    if ((bc_resp.find("BC 1") != std::string::npos) ||
+        (bc_resp.find("BC1") != std::string::npos)) {
       active_band = 1;
     }
   }
@@ -503,7 +616,7 @@ auto THD75::set_dual() -> bool {
   // Parse the response to get the current band
   std::string const bc_resp(bc_buf);
   int band = 0;
-  if (absl::StrContains(bc_resp, "BC 1") || absl::StrContains(bc_resp, "BC1")) {
+  if ((bc_resp.find("BC 1") != std::string::npos) || (bc_resp.find("BC1") != std::string::npos)) {
     band = 1;
   }
 

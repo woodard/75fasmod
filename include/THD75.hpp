@@ -242,6 +242,14 @@ private:
   UsbOutSelect orig_menu_102_{
       UsbOutSelect::unknown};    ///< Saved original USB Out Select setting
   vfo_t orig_vfo_{RIG_VFO_NONE}; ///< Saved original VFO state
+
+  // Backup variables for "other" VFO in dual mode
+  freq_t orig_other_frequency_{0}; ///< Saved original other VFO frequency
+  rmode_t orig_other_mode_{RIG_MODE_NONE}; ///< Saved original other VFO mode
+  PowerLevel orig_other_power_{PowerLevel::UNKNOWN}; ///< Saved other VFO power
+  bool orig_other_freq_saved_{false}; ///< Flag for other freq save
+  bool orig_other_mode_saved_{false}; ///< Flag for other mode save
+  bool orig_other_power_saved_{false};  ///< Flag for other power save
 };
 
 #endif // THD75_HPP
