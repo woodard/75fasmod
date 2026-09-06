@@ -58,10 +58,10 @@ auto main(int argc, char *argv[]) -> int {
      "Enable Hamlib debug logging");
 
   // Parse the command line
-  po::variables_map vm;
+  po::variables_map options_map;
   try {
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
+    po::store(po::parse_command_line(argc, argv, desc), options_map);
+    po::notify(options_map);
   } catch (const po::error &e) {
     std::cerr << "Error: " << e.what() << "\n";
     print_usage(argv[0], desc);
@@ -69,23 +69,24 @@ auto main(int argc, char *argv[]) -> int {
   }
 
   // Handle help
-  if (vm.count("help")) {
+  // NOLINTNEXTLINE(readability-container-contains)
+  if (options_map.count("help") > 0) {
     print_usage(argv[0], desc);
     return 0;
   }
 
   // Variable Declarations
-  double target_freq_mhz = vm["freq"].as<double>();
-  std::string power_level = vm["power"].as<std::string>();
-  std::string serial_port = vm["port"].as<std::string>();
-  std::string sock_path = vm["sock"].as<std::string>();
-  std::string alsa_tx_device = vm["alsa-tx"].as<std::string>();
-  bool hamlib_debug = vm["hamlib-debug"].as<bool>();
+  double target_freq_mhz = options_map["freq"].as<double>();
+  std::string power_level = options_map["power"].as<std::string>();
+  std::string serial_port = options_map["port"].as<std::string>();
+  std::string sock_path = options_map["sock"].as<std::string>();
+  std::string alsa_tx_device = options_map["alsa-tx"].as<std::string>();
+  bool hamlib_debug = options_map["hamlib-debug"].as<bool>();
 
   // Defaults
-  rig_model_t rig_model = vm["model"].as<rig_model_t>();
-  int burst_limit = vm["burst"].as<int>();
-  int flush_timeout_ms = vm["timeout"].as<int>();
+  rig_model_t rig_model = options_map["model"].as<rig_model_t>();
+  int burst_limit = options_map["burst"].as<int>();
+  int flush_timeout_ms = options_map["timeout"].as<int>();
 
   if (target_freq_mhz == 0.0) {
     std::cerr << "Error: You must specify a target frequency in MHz.\n";
