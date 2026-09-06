@@ -1,3 +1,8 @@
+/**
+ * @file RadioController.cpp
+ * @brief Base radio controller for hamlib interface
+ */
+
 #include "RadioController.hpp"
 #include <chrono>
 #include <cstdlib>
@@ -12,6 +17,12 @@ constexpr size_t BUFFER_SIZE = 64;
 constexpr unsigned int HEX_BASE = 16;
 } // namespace
 
+/**
+ * @brief Helper function to read sysfs attributes
+ *
+ * @param filepath Path to the sysfs file
+ * @return String value read from file, or empty string on error
+ */
 auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
   std::ifstream file(filepath);
   std::string value;
@@ -21,16 +32,27 @@ auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
   return "";
 }
 
-// Flush the serial port to clear any pending data
+/**
+ * @brief Flushes stale input bytes from the radio serial port
+ *
+ * Uses the modern Hamlib rig_data_pointer API to extract the serial port
+ * reference and calls rig_flush to clear operating system serial buffers.
+ */
 void RadioController::flush_serial() {
   if (rig_ != nullptr) {
-    // give it a little while for any data to show up.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     rig_flush(static_cast<hamlib_port_t *>(
         rig_data_pointer(rig_, RIG_PTRX_RIGPORT)));
   }
 }
 
+/**
+ * @brief Construct a new Radio Controller object
+ *
+ * @param model Hamlib rig model number
+ * @param port Serial port device path
+ * @param hamlib_debug Enable Hamlib debug output
+ */
 RadioController::RadioController(rig_model_t model, std::string port,
                                  bool hamlib_debug)
     : model_(model), port_(std::move(port)), rig_(nullptr),
@@ -38,8 +60,8 @@ RadioController::RadioController(rig_model_t model, std::string port,
       orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false),
       orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
       orig_power_saved_(false) {
+  
   // Enable Hamlib internal verbose trace logging only if requested
-  // Redirect Hamlib debug output from stdout to stderr before rig_init
   if (hamlib_debug) {
     rig_set_debug_level(RIG_DEBUG_TRACE);
     rig_set_debug_file(stderr);
@@ -48,32 +70,43 @@ RadioController::RadioController(rig_model_t model, std::string port,
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (rig_ == nullptr) {
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
+              << ". The model ID may not exist in this Hamlib build.\n";
     return;
   }
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
+  // Disable Hamlib 4.x+ background cache polling thread globally.
+  // Must be called BEFORE rig_open() so the thread is never spawned.
+  rig_set_cache_timeout_ms(rig_, 0, 0);
+
   int status = rig_open(rig_);
   if (status != RIG_OK) {
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_
+              << " | Code: " << status << " (" << rigerror(status) << ")\n";
     rig_close(rig_);
     rig_cleanup(rig_);
     rig_ = nullptr;
     return;
   }
 
+  // Allow interface to settle and clear initial buffer garbage
   flush_serial();
 }
 
-
+/**
+ * @brief Destroy the Radio Controller object
+ */
 RadioController::~RadioController() {
   shutdown();
-  if (rig_ != nullptr) {
-    set_ptt(false);
-    rig_close(rig_);
-    rig_cleanup(rig_);
-  }
 }
 
+/**
+ * @brief Initialize the radio controller and backup state
+ *
+ * @return true if initialization successful, false otherwise
+ */
 auto RadioController::initialize() -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -81,32 +114,26 @@ auto RadioController::initialize() -> bool {
 
   std::cerr << "[RIG] Saving original radio state..." << std::endl;
 
-  // Save original frequency
-  freq_t freq_hz = 0;
-  if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) == RIG_OK) {
-    orig_frequency_ = freq_hz;
+  // Save original frequency using virtual override (invokes THD75 CAT fallback)
+  double freq_mhz = 0.0;
+  if (this->get_frequency(freq_mhz)) {
+    orig_frequency_ = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
     orig_frequency_saved_ = true;
-    std::cerr << "[RIG] Saved frequency: "
-              << (static_cast<double>(freq_hz) / 1e6) << " MHz" << std::endl;
+    std::cerr << "[RIG] Saved frequency: " << freq_mhz << " MHz" << std::endl;
   } else {
     std::cerr << "[RIG] Warning: Could not get current frequency" << std::endl;
   }
 
-  // Save original mode and bandwidth
-  rmode_t mode = 0;
-  pbwidth_t width = 0;
-  if (rig_get_mode(rig_, RIG_VFO_CURR, &mode, &width) == RIG_OK) {
-    orig_mode_ = mode;
-    orig_width_ = width;
+  // Save original mode and bandwidth using virtual override
+  Mode mode = Mode::FM;
+  if (this->get_mode(mode)) {
+    orig_mode_ = static_cast<rmode_t>(mode);
     orig_mode_saved_ = true;
-    std::cerr << "[RIG] Saved mode: " << static_cast<int>(mode)
-              << ", width: " << width << std::endl;
+    std::cerr << "[RIG] Saved mode: " << static_cast<int>(mode) << std::endl;
   } else {
     std::cerr << "[RIG] Warning: Could not get current mode" << std::endl;
   }
 
-  // Save original power level (base class doesn't know how - derived classes
-  // set orig_power_)
   if (orig_power_ != PowerLevel::UNKNOWN) {
     orig_power_saved_ = true;
     std::cerr << "[RIG] Power level already saved by derived class"
@@ -120,6 +147,9 @@ auto RadioController::initialize() -> bool {
   return true;
 }
 
+/**
+ * @brief Shutdown the radio controller and restore backup state
+ */
 void RadioController::shutdown() {
   if (rig_ == nullptr) {
     return;
@@ -127,27 +157,26 @@ void RadioController::shutdown() {
 
   std::cerr << "[RIG] Restoring radio state..." << std::endl;
 
-  // Restore original frequency
+  // Restore original frequency using virtual override
   if (orig_frequency_saved_) {
-    if (rig_set_freq(rig_, RIG_VFO_CURR, orig_frequency_) == RIG_OK) {
-      std::cerr << "[RIG] Restored frequency: "
-                << (static_cast<double>(orig_frequency_) / 1e6) << " MHz"
-                << std::endl;
+    double freq_mhz = static_cast<double>(orig_frequency_) / FREQUENCY_MHZ_TO_HZ;
+    if (this->set_frequency(freq_mhz)) {
+      std::cerr << "[RIG] Restored frequency: " << freq_mhz << " MHz" << std::endl;
     } else {
       std::cerr << "[RIG] Warning: Failed to restore frequency" << std::endl;
     }
   }
 
-  // Restore original mode
+  // Restore original mode using virtual override
   if (orig_mode_saved_) {
-    if (rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_) == RIG_OK) {
+    if (this->set_mode(static_cast<Mode>(orig_mode_))) {
       std::cerr << "[RIG] Restored mode and bandwidth" << std::endl;
     } else {
       std::cerr << "[RIG] Warning: Failed to restore mode" << std::endl;
     }
   }
 
-  // Restore original power level
+  // Restore original power level using virtual override
   if (orig_power_saved_) {
     std::string level;
     switch (orig_power_) {
@@ -169,7 +198,7 @@ void RadioController::shutdown() {
       level = "UNKNOWN";
     }
     if (level != "UNKNOWN") {
-      if (set_power_level(level)) {
+      if (this->set_power_level(level)) {
         std::cerr << "[RIG] Restored power level" << std::endl;
       } else {
         std::cerr << "[RIG] Warning: Failed to restore power level"
@@ -186,6 +215,9 @@ void RadioController::shutdown() {
   rig_ = nullptr;
 }
 
+/**
+ * @brief Set the radio frequency via Hamlib
+ */
 auto RadioController::set_frequency(double freq_mhz) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -194,6 +226,9 @@ auto RadioController::set_frequency(double freq_mhz) -> bool {
   return rig_set_freq(rig_, RIG_VFO_CURR, freq_hz) == RIG_OK;
 }
 
+/**
+ * @brief Get the current VFO frequency via Hamlib
+ */
 auto RadioController::get_frequency(double &freq_mhz) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -206,6 +241,9 @@ auto RadioController::get_frequency(double &freq_mhz) -> bool {
   return true;
 }
 
+/**
+ * @brief Get the current radio mode via Hamlib
+ */
 auto RadioController::get_mode(Mode &mode) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -226,6 +264,9 @@ auto RadioController::get_mode(Mode &mode) -> bool {
   return true;
 }
 
+/**
+ * @brief Set the radio mode via Hamlib
+ */
 auto RadioController::set_mode(Mode mode) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -238,6 +279,9 @@ auto RadioController::set_mode(Mode mode) -> bool {
   return result;
 }
 
+/**
+ * @brief Set PTT (Push-to-Talk) state via Hamlib raw write
+ */
 auto RadioController::set_ptt(bool transmit) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -254,6 +298,9 @@ auto RadioController::set_ptt(bool transmit) -> bool {
   return (bytes >= 0 || bytes == -RIG_ETIMEOUT || bytes == RIG_ETIMEOUT);
 }
 
+/**
+ * @brief Get the DCD (Digital Carrier Detect) status
+ */
 auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
   if (rig_ == nullptr) {
     return false;
@@ -266,6 +313,9 @@ auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
   return false;
 }
 
+/**
+ * @brief Set the TX power level (Base class placeholder)
+ */
 auto RadioController::set_power_level(const std::string &level) -> bool {
   std::string lvl = level;
   for (auto &chr : lvl) {
@@ -287,19 +337,21 @@ auto RadioController::set_power_level(const std::string &level) -> bool {
     return false;
   }
 
-  // Suppress unused variable warning - this is a placeholder for derived
-  // classes
   (void)val;
-
   std::cerr << "[RIG] Setting TX power to " << lvl << "...\n";
   return true;
 }
 
+/**
+ * @brief Get the current TX power level (Base class placeholder)
+ */
 auto RadioController::get_power_level(std::string & /*level*/) -> bool {
-  // Base implementation returns false - THD75 should override
   return false;
 }
 
+/**
+ * @brief Find tty sysfs devices for a specific USB device PID/VID
+ */
 auto RadioController::find_tty_sysfs(unsigned int target_vid,
                                      unsigned int target_pid)
     -> std::vector<std::string> {
@@ -340,6 +392,9 @@ auto RadioController::find_tty_sysfs(unsigned int target_vid,
   return found_ports;
 }
 
+/**
+ * @brief Find ALSA device mapped to the serial port's parent USB hub
+ */
 auto RadioController::find_alsa_device(const std::string &serial_port)
     -> std::string {
   fs::path tty_name = fs::path(serial_port).filename();
