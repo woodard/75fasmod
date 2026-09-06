@@ -17,7 +17,7 @@ auto Frame::calc_crc() const -> uint32_t {
   uint32_t crc = CRC_INITIAL_VALUE;
 
   // Hash inherited header fields
-  auto data =
+  const auto *data =
       reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
   size_t len = sizeof(ModemHeader);
   for (size_t i = 0; i < len; ++i) {
@@ -28,7 +28,7 @@ auto Frame::calc_crc() const -> uint32_t {
   }
 
   // Hash payload using range-based for loop
-  for (auto &byte : payload) {
+  for (auto &byte : payload) { // NOLINT(readability-qualified-auto)
     crc ^= byte;
     for (int j = 0; j < CRC_BITS; ++j) {
       crc = (crc >> 1) ^ (CRC_POLY & (-(crc & 1)));
@@ -40,13 +40,13 @@ auto Frame::calc_crc() const -> uint32_t {
 
 auto Frame::cobs_encode() const -> std::vector<uint8_t> {
   std::vector<uint8_t> raw_frame;
-  auto hdr_ptr =
+  const auto *hdr_ptr =
       reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
   raw_frame.insert(raw_frame.end(), hdr_ptr, hdr_ptr + sizeof(ModemHeader));
   raw_frame.insert(raw_frame.end(), payload.begin(), payload.end());
 
   uint32_t crc = calc_crc();
-  uint8_t *crc_ptr = reinterpret_cast<uint8_t *>(&crc);
+  auto *crc_ptr = reinterpret_cast<uint8_t *>(&crc);
   raw_frame.insert(raw_frame.end(), crc_ptr, crc_ptr + sizeof(uint32_t));
 
   std::vector<uint8_t> output;
