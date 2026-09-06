@@ -12,6 +12,12 @@
 #include <string>
 #include <vector>
 
+namespace {
+constexpr int BURST_LIMIT = 8;
+constexpr int FLUSH_TIMEOUT_MS = 200;
+constexpr int SLEEP_DURATION_MS = 200;
+} // namespace
+
 namespace fs = std::filesystem;
 
 // Global flag to keep the daemon running
@@ -38,32 +44,38 @@ void print_usage(const char *prog_name) {
       << "  -d, --hamlib-debug   Enable Hamlib debug logging\n";
 }
 
-int main(int argc, char *argv[]) {
+auto main(int argc, char *argv[]) -> int {
   // Variable Declarations (Correctly scoped for the entire main function)
   double target_freq_mhz = 0.0;
-  std::string power_level = "";
-  std::string serial_port = "";
+  std::string power_level;
+  std::string serial_port;
   std::string sock_path = "/tmp/75fasmod_data.sock";
-  std::string alsa_tx_device = "";
+  std::string alsa_tx_device;
   bool hamlib_debug = false;
 
   // Default values
   rig_model_t rig_model = THD75::DEFAULT_MODEL;
-  int burst_limit = 8;
-  int flush_timeout_ms = 200;
+  int burst_limit = BURST_LIMIT;
+  int flush_timeout_ms = FLUSH_TIMEOUT_MS;
 
   const char *const short_opts = "f:w:p:m:s:b:t:h:a:d";
-  const option long_opts[] = {{"freq", required_argument, nullptr, 'f'},
-                              {"power", required_argument, nullptr, 'w'},
-                              {"port", required_argument, nullptr, 'p'},
-                              {"model", required_argument, nullptr, 'm'},
-                              {"sock", required_argument, nullptr, 's'},
-                              {"burst", required_argument, nullptr, 'b'},
-                              {"timeout", required_argument, nullptr, 't'},
-                              {"help", no_argument, nullptr, 'h'},
-                              {"alsa-tx", required_argument, nullptr, 'a'},
-                              {"hamlib-debug", no_argument, nullptr, 'd'},
-                              {nullptr, 0, nullptr, 0}};
+  // NOLINTNEXTLINE(modernize-avoid-c-arrays,
+  // modernize-use-designated-initializers)
+
+  // NOLINTNEXTLINE(miscellaneous-const-variable-initialization,
+  // modernize-avoid-c-arrays, modernize-use-designated-initializers)
+  const option long_opts[] = {
+      {"freq", required_argument, nullptr, 'f'}, // NOLINT
+      {"power", required_argument, nullptr, 'w'},
+      {"port", required_argument, nullptr, 'p'},
+      {"model", required_argument, nullptr, 'm'},
+      {"sock", required_argument, nullptr, 's'},
+      {"burst", required_argument, nullptr, 'b'},
+      {"timeout", required_argument, nullptr, 't'},
+      {"help", no_argument, nullptr, 'h'},
+      {"alsa-tx", required_argument, nullptr, 'a'},
+      {"hamlib-debug", no_argument, nullptr, 'd'},
+      {nullptr, 0, nullptr, 0}};
 
   int opt;
   while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
@@ -156,7 +168,8 @@ int main(int argc, char *argv[]) {
   if (!radio.initialize()) {
     std::cerr << "Error: Failed to initialize radio controller.\n";
     return 1;
-  } else {
+  }
+  {
     std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
     radio.set_frequency(target_freq_mhz);
 
@@ -187,7 +200,7 @@ int main(int argc, char *argv[]) {
   // 5. Main Daemon Loop
   std::cout << "Daemon is running. Press Ctrl+C to stop.\n";
   while (keep_running.load()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_DURATION_MS));
   }
 
   // 6. Cleanup
