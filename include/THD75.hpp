@@ -61,6 +61,31 @@ public:
   auto get_power_level(std::string &level) -> bool override;
 
   /**
+   * @brief Set the power level on the other VFO (not currently transmitting)
+   *
+   * Checks if in dual mode; if in single mode, returns false.
+   * Otherwise, switches to the other VFO, sets the power level, and restores
+   * original VFO.
+   *
+   * @param level Power level string ("EL", "L", "M", or "H")
+   * @return true if successful, false otherwise
+   */
+  auto set_other_power_level(const std::string &level) -> bool;
+
+  /**
+   * @brief Get the power level from the other VFO (not currently transmitting)
+   *
+   * Checks if in dual mode; if in single mode, returns "H" as fallback.
+   * Otherwise, switches to the other VFO, queries the power level, and restores
+   * original VFO.
+   *
+   * @param level Reference to store the power level string ("EL", "L", "M",
+   * "H")
+   * @return true if successful, false otherwise
+   */
+  auto get_other_power_level(std::string &level) -> bool;
+
+  /**
    * @brief Get the current VFO that will transmit when PTT is set
    *
    * @return VFO::A if VFO A will transmit, VFO::B if VFO B will transmit

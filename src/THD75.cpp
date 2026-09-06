@@ -81,6 +81,58 @@ auto THD75::get_power_level(std::string &level) -> bool {
   }
 }
 
+auto THD75::set_other_power_level(const std::string &level) -> bool {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    return false;
+  }
+
+  // Get current VFO
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
+  // Switch to other VFO, set power level, then restore original VFO
+  if (!set_current_vfo(other)) {
+    return false;
+  }
+
+  bool const result = set_power_level(level);
+
+  // Restore original VFO
+  set_current_vfo(current);
+
+  return result;
+}
+
+auto THD75::get_other_power_level(std::string &level) -> bool {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    level = "H"; // Default fallback to high power on error
+    return false;
+  }
+
+  // Get current VFO
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
+  // Switch to other VFO, get power level, then restore original VFO
+  if (!set_current_vfo(other)) {
+    level = "H"; // Default fallback to high power on error
+    return false;
+  }
+
+  bool const result = get_power_level(level);
+
+  // Restore original VFO
+  set_current_vfo(current);
+
+  if (!result) {
+    level = "H"; // Default fallback to high power on error
+  }
+
+  return result;
+}
+
 auto THD75::initialize() -> bool {
   std::cerr << "[RIG] Backing up current radio state..." << std::endl;
 
@@ -96,16 +148,19 @@ auto THD75::initialize() -> bool {
   }
 
   // 3. Set to VFO B to allow menu 102 changes when in dual mode
-  std::cerr << "[RIG] Setting radio to VFO B for menu 102 access..." << std::endl;
+  std::cerr << "[RIG] Setting radio to VFO B for menu 102 access..."
+            << std::endl;
   rig_set_vfo(rig_, RIG_VFO_B);
 
   // 4. Configure Kenwood 9600 bps data output path (Menu 102) safely
   if (orig_menu_102_ != UsbOutSelect::unknown &&
       orig_menu_102_ != UsbOutSelect::IF) {
     std::cerr << "[RIG] Changing Menu 102 to IF Output (1). This will cause a "
-                 "USB reset..." << std::endl;
+                 "USB reset..."
+              << std::endl;
     if (!kenwood_usb_out_select_set(UsbOutSelect::IF)) {
-      std::cerr << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF." << std::endl;
+      std::cerr << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF."
+                << std::endl;
       return false;
     }
 
@@ -114,7 +169,8 @@ auto THD75::initialize() -> bool {
     rig_cleanup(rig_);
     rig_ = nullptr;
 
-    std::cerr << "[RIG] Waiting 4 seconds for USB re-enumeration..." << std::endl;
+    std::cerr << "[RIG] Waiting 4 seconds for USB re-enumeration..."
+              << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(4));
 
     // Re-initialize Hamlib
@@ -124,30 +180,34 @@ auto THD75::initialize() -> bool {
 
     int const re_status = rig_open(rig_);
     if (re_status != RIG_OK) {
-      std::cerr << "[RIG] Error: Failed to reconnect. Code: " << re_status << std::endl;
+      std::cerr << "[RIG] Error: Failed to reconnect. Code: " << re_status
+                << std::endl;
       return false;
     }
     std::cerr << "[RIG] Successfully reconnected to radio." << std::endl;
   } else if (orig_menu_102_ == UsbOutSelect::IF) {
-    std::cerr << "[RIG] Menu 102 already set to IF Output. Skipping." << std::endl;
+    std::cerr << "[RIG] Menu 102 already set to IF Output. Skipping."
+              << std::endl;
   }
 
   // 5. Set mode to Packet FM (9600 baud passband)
-  std::cerr << "[RIG] Configuring radio for high-speed modem operation..." << std::endl;
+  std::cerr << "[RIG] Configuring radio for high-speed modem operation..."
+            << std::endl;
   int mode_ret =
       rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, BAUD_RATE_9600);
   if (mode_ret != RIG_OK) {
-    std::cerr << "[RIG] PKTFM mode rejected, falling back to standard FM..." << std::endl;
+    std::cerr << "[RIG] PKTFM mode rejected, falling back to standard FM..."
+              << std::endl;
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
   return true;
 }
 
-
 void THD75::shutdown() {
   if (rig_ != nullptr) {
-    std::cerr << "[RIG] Shutting down. Restoring original radio settings..." << std::endl;
+    std::cerr << "[RIG] Shutting down. Restoring original radio settings..."
+              << std::endl;
 
     // Restore original menu 102
     if (orig_menu_102_ != UsbOutSelect::unknown) {
@@ -159,16 +219,15 @@ void THD75::shutdown() {
     // Restore original VFO
     if (orig_vfo_ != RIG_VFO_NONE) {
       if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
-        std::cerr << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << std::endl;
+        std::cerr << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_)
+                  << std::endl;
       }
     }
-
   }
 
   // Call base shutdown (restores frequency, mode, power level, closes rig)
   RadioController::shutdown();
 }
-
 
 // TNC control functions (public interface)
 auto THD75::get_tnc() -> int {
