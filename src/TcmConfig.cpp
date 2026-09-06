@@ -2,54 +2,61 @@
 #include <cmath>
 #include <stdexcept>
 
-gr::trellis::fsm TcmConfig::get_fsm(ModulationScheme scheme) {
-  int k = 3; // Default QAM16 (3 info bits -> 4 coded bits)
+namespace {
+constexpr int FSM_MEMORY_STATES = 8;
+constexpr int FSM_INFO_BITS_DIVISOR = 2;
+constexpr int CONSTELLATION_ROT_SYMMETRY = 4;
+constexpr int CONSTELLATION_REAL_SECTORS = 2;
+constexpr int CONSTELLATION_IMAG_SECTORS = 2;
+} // namespace
+
+auto TcmConfig::get_fsm(ModulationScheme scheme) -> gr::trellis::fsm {
+  int info_bits = 3; // Default QAM16 (3 info bits -> 4 coded bits)
 
   switch (scheme) {
   case ModulationScheme::QAM16:
-    k = 3;
+    info_bits = 3;
     break;
   case ModulationScheme::QAM32:
-    k = 4;
+    info_bits = 4;
     break;
   case ModulationScheme::QAM64:
-    k = 5;
+    info_bits = 5;
     break;
   case ModulationScheme::QAM128:
-    k = 6;
+    info_bits = 6;
     break;
   case ModulationScheme::QAM256:
-    k = 7;
+    info_bits = 7;
     break;
   }
 
-  int I = 1 << k;       // 2^k input symbols
-  int S = 8;            // 8 internal memory states
-  int O = 1 << (k + 1); // 2^(k+1) output constellation indices
+  int num_input_symbols = 1 << info_bits;       // 2^k input symbols
+  int num_states = FSM_MEMORY_STATES;            // 8 internal memory states
+  int num_output_symbols = 1 << (info_bits + FSM_INFO_BITS_DIVISOR); // 2^(k+1) output constellation indices
 
-  std::vector<int> NS(I * S);
-  std::vector<int> OS(I * S);
+  std::vector<int> NS(num_input_symbols * num_states);
+  std::vector<int> OS(num_input_symbols * num_states);
 
-  for (int s = 0; s < S; ++s) {
-    for (int i = 0; i < I; ++i) {
-      int uncoded_bits = i >> 1;
-      int coded_bit = i & 1;
+  for (auto state = 0; state < S; ++state) {
+    for (auto input_sym = 0; input_sym < I; ++input_sym) {
+      int uncoded_bits = input_sym >> 1;
+      int coded_bit = input_sym & 1;
 
       // Rate-1/2 8-state systematic feedback polynomial transitions
-      int next_s = ((s << 1) | coded_bit) & 7;
-      int parity = ((s >> 2) ^ (s >> 1) ^ coded_bit) & 1;
+      int next_s = ((state << 1) | coded_bit) & (FSM_MEMORY_STATES - 1);
+      int parity = ((state >> 2) ^ (state >> 1) ^ coded_bit) & 1;
       int output_symbol = (uncoded_bits << 2) | (parity << 1) | coded_bit;
 
-      NS[s * I + i] = next_s;
-      OS[s * I + i] = output_symbol;
+      NS[state * I + input_sym] = next_s;
+      OS[state * I + input_sym] = output_symbol;
     }
   }
 
-  return gr::trellis::fsm(I, S, O, NS, OS);
+  return gr::trellis::fsm(num_input_symbols, num_states, num_output_symbols, NS, OS);
 }
 
-gr::digital::constellation_sptr
-TcmConfig::get_constellation(ModulationScheme scheme) {
+auto TcmConfig::get_constellation(ModulationScheme scheme) -> gr::digital::constellation_sptr {
   std::vector<gr_complex> points;
 
   switch (scheme) {
@@ -57,7 +64,7 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
     // 4x4 Square Grid
     for (int x = -3; x <= 3; x += 2) {
       for (int y = -3; y <= 3; y += 2) {
-        points.push_back(gr_complex(x / 3.0f, y / 3.0f));
+        points.push_back(gr_complex(x / 3.0, y / 3.0));
       }
     }
     break;
@@ -69,7 +76,7 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
       for (int y = -5; y <= 5; y += 2) {
         if (std::abs(x) == 5 && std::abs(y) == 5)
           continue; // Skip 4 corners
-        points.push_back(gr_complex(x / 5.0f, y / 5.0f));
+        points.push_back(gr_complex(x / 5.0, y / 5.0));
       }
     }
     break;
@@ -79,7 +86,7 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
     // 8x8 Square Grid
     for (int x = -7; x <= 7; x += 2) {
       for (int y = -7; y <= 7; y += 2) {
-        points.push_back(gr_complex(x / 7.0f, y / 7.0f));
+        points.push_back(gr_complex(x / 7.0, y / 7.0));
       }
     }
     break;
@@ -91,7 +98,7 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
       for (int y = -11; y <= 11; y += 2) {
         if (std::abs(x) >= 9 && std::abs(y) >= 9)
           continue; // Skip 4x4 corners
-        points.push_back(gr_complex(x / 11.0f, y / 11.0f));
+        points.push_back(gr_complex(x / 11.0, y / 11.0));
       }
     }
     break;
@@ -101,7 +108,7 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
     // 16x16 Square Grid
     for (int x = -15; x <= 15; x += 2) {
       for (int y = -15; y <= 15; y += 2) {
-        points.push_back(gr_complex(x / 15.0f, y / 15.0f));
+        points.push_back(gr_complex(x / 15.0, y / 15.0));
       }
     }
     break;
@@ -119,8 +126,8 @@ TcmConfig::get_constellation(ModulationScheme scheme) {
       4,          // Rotational symmetry (4-fold for QAM)
       2,          // Real sectors
       2,          // Imaginary sectors
-      1.0f,       // Width real sectors
-      1.0f,       // Width imaginary sectors
+      1.0,       // Width real sectors (uppercase)
+      1.0,       // Width imaginary sectors (uppercase)
       gr::digital::constellation::NO_NORMALIZATION // Normalization strategy
   );
 }
