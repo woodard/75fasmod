@@ -247,9 +247,9 @@ private:
   freq_t orig_other_frequency_{0}; ///< Saved original other VFO frequency
   rmode_t orig_other_mode_{RIG_MODE_NONE}; ///< Saved original other VFO mode
   PowerLevel orig_other_power_{PowerLevel::UNKNOWN}; ///< Saved other VFO power
-  bool orig_other_freq_saved_{false}; ///< Flag for other freq save
-  bool orig_other_mode_saved_{false}; ///< Flag for other mode save
-  bool orig_other_power_saved_{false};  ///< Flag for other power save
+  bool orig_other_freq_saved_{false};  ///< Flag for other freq save
+  bool orig_other_mode_saved_{false};  ///< Flag for other mode save
+  bool orig_other_power_saved_{false}; ///< Flag for other power save
 };
 
 #endif // THD75_HPP

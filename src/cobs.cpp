@@ -30,9 +30,10 @@ auto cobs_decode_frame(const std::vector<uint8_t> &input) -> Frame {
     uint16_t payload_len =
         *reinterpret_cast<const uint16_t *>(decoded.data() + 2);
 
-    std::vector<uint8_t> payload(decoded.begin() + sizeof(ModemHeader),
-                                 decoded.begin() + static_cast<std::ptrdiff_t>(decoded.size()) -
-                                     sizeof(uint32_t));
+    std::vector<uint8_t> payload(
+        decoded.begin() + sizeof(ModemHeader),
+        decoded.begin() + static_cast<std::ptrdiff_t>(decoded.size()) -
+            sizeof(uint32_t));
 
     Frame frame{frame_type, seq_num, payload_len, std::move(payload)};
 

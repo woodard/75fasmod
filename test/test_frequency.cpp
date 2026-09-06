@@ -25,10 +25,9 @@ static double get_different_freq_in_band(double current_freq_mhz) {
 
 int main(int argc, char *argv[]) {
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message")
-    ("set,s", po::value<std::string>()->implicit_value(""),
-     "Set frequency to specified MHz or a different one in band");
+  desc.add_options()("help,h", "Show this help message")(
+      "set,s", po::value<std::string>()->implicit_value(""),
+      "Set frequency to specified MHz or a different one in band");
 
   // Parse the command line
   po::variables_map vm;
@@ -49,7 +48,7 @@ int main(int argc, char *argv[]) {
 
   bool set_flag = vm.count("set");
   double explicit_freq = 0.0;
-  
+
   if (set_flag && vm["set"].as<std::string>().empty() == false) {
     std::string freq_str = vm["set"].as<std::string>();
     if (!freq_str.empty() && freq_str != "") {

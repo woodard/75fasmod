@@ -3,12 +3,12 @@
 #include "RadioController.hpp"
 #include "THD75.hpp"
 #include <atomic>
+#include <boost/program_options.hpp>
 #include <csignal>
 #include <cstdlib>
 #include <filesystem>
-#include <iostream>
-#include <boost/program_options.hpp>
 #include <hamlib/rig.h>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -28,34 +28,31 @@ std::atomic<bool> keep_running{true};
 void handle_signal(int /* sig */) { keep_running = false; }
 
 void print_usage(const char *prog_name, po::options_description &desc) {
-  std::cout
-      << "Usage: " << prog_name << " [options]\n"
-      << desc << "\n";
+  std::cout << "Usage: " << prog_name << " [options]\n" << desc << "\n";
 }
 
 auto main(int argc, char *argv[]) -> int {
   // Declare the supported options.
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message")
-    ("freq,f", po::value<double>()->default_value(0.0),
-     "Frequency to set in MHz (e.g., 144.390)")
-    ("power,w", po::value<std::string>(),
-     "TX Power level (EL, L, M, H)")
-    ("port,p", po::value<std::string>()->default_value(""),
-     "Serial port (default: auto-discover Kenwood TH-D75)")
-    ("model,m", po::value<rig_model_t>()->default_value(THD75::DEFAULT_MODEL),
-     "Hamlib rig model ID (default: 2 for generic Kenwood)")
-    ("sock,s", po::value<std::string>()->default_value("/tmp/75fasmod_data.sock"),
-     "Data socket path (default: /tmp/75fasmod_data.sock)")
-    ("burst,b", po::value<int>()->default_value(BURST_LIMIT),
-     "Max frames per TX burst (default: 8)")
-    ("timeout,t", po::value<int>()->default_value(FLUSH_TIMEOUT_MS),
-     "TX queue flush timeout in ms (default: 200)")
-    ("alsa-tx,a", po::value<std::string>(),
-     "ALSA transmit device (e.g., hw:5,0)")
-    ("hamlib-debug,d", po::bool_switch()->default_value(false),
-     "Enable Hamlib debug logging");
+  desc.add_options()("help,h", "Show this help message")(
+      "freq,f", po::value<double>()->default_value(0.0),
+      "Frequency to set in MHz (e.g., 144.390)")(
+      "power,w", po::value<std::string>(), "TX Power level (EL, L, M, H)")(
+      "port,p", po::value<std::string>()->default_value(""),
+      "Serial port (default: auto-discover Kenwood TH-D75)")(
+      "model,m", po::value<rig_model_t>()->default_value(THD75::DEFAULT_MODEL),
+      "Hamlib rig model ID (default: 2 for generic Kenwood)")(
+      "sock,s",
+      po::value<std::string>()->default_value("/tmp/75fasmod_data.sock"),
+      "Data socket path (default: /tmp/75fasmod_data.sock)")(
+      "burst,b", po::value<int>()->default_value(BURST_LIMIT),
+      "Max frames per TX burst (default: 8)")(
+      "timeout,t", po::value<int>()->default_value(FLUSH_TIMEOUT_MS),
+      "TX queue flush timeout in ms (default: 200)")(
+      "alsa-tx,a", po::value<std::string>(),
+      "ALSA transmit device (e.g., hw:5,0)")(
+      "hamlib-debug,d", po::bool_switch()->default_value(false),
+      "Enable Hamlib debug logging");
 
   // Parse the command line
   po::variables_map options_map;

@@ -16,6 +16,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <thread>
 
 namespace {
 constexpr int BAUD_RATE_9600 = 9600;
@@ -25,7 +26,8 @@ constexpr size_t BUFFER_SIZE_16 = 16;
 constexpr unsigned int MENU_ITEM_102 = 102;
 } // namespace
 
-// #include "absl/strings/match.h"  // Disabled - replaced with std::string::find
+// #include "absl/strings/match.h"  // Disabled - replaced with
+// std::string::find
 
 // Constructor
 THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
@@ -339,13 +341,10 @@ void THD75::shutdown() {
 }
 
 // Call base shutdown (restores frequency, mode, power level, closes rig)
-RadioController::shutdown();
-}
-
 // TNC control functions (public interface)
 auto THD75::get_tnc() -> int {
-  const char *tn_cmd = "TN\r";
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char cmd[] = "TN\r";
+  char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
 
   int const bytes = rig_send_raw(
@@ -371,10 +370,10 @@ auto THD75::get_tnc() -> int {
 }
 
 auto THD75::set_tnc(int mode) -> bool {
-  std::array<char, BUFFER_SIZE_32> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "TN %d,0\r", mode);
+  char cmd[BUFFER_SIZE_32];
+  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
@@ -386,10 +385,10 @@ auto THD75::set_tnc(int mode) -> bool {
 
 // Kenwood helper method implementations
 auto THD75::kenwood_menu_get(int menu_num) -> int {
-  std::array<char, BUFFER_SIZE_16> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "EX%03d\r", menu_num);
+  char cmd[BUFFER_SIZE_16];
+  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
@@ -421,10 +420,10 @@ auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
     return false;
   }
 
-  std::array<char, BUFFER_SIZE_32> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "EX%03d,%d\r", menu_num, value);
+  char cmd[BUFFER_SIZE_32];
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
@@ -455,7 +454,7 @@ auto THD75::kenwood_usb_out_select_set(UsbOutSelect value) -> bool {
 auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
-  std::array<char, BUFFER_SIZE_32> bc_buf{};
+  char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -471,10 +470,10 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   }
 
   // Fetch power for the active band
-  std::array<char, BUFFER_SIZE_16> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "PC %d\r", active_band);
+  char cmd[BUFFER_SIZE_16];
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -512,7 +511,7 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
 
   // Query active band
   int active_band = 0;
-  std::array<char, BUFFER_SIZE_32> bc_buf{};
+  char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -527,11 +526,10 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
     }
   }
 
-  std::array<char, BUFFER_SIZE_32> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "PC %d,%d\r", active_band,
-           static_cast<int>(val));
+  char cmd[BUFFER_SIZE_32];
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -579,10 +577,10 @@ auto THD75::get_single() -> bool {
 auto THD75::set_single(VFO vfo) -> bool {
   // Send BC command to set VFO and disable dual-watch
   int const band = (vfo == VFO::B) ? 1 : 0;
-  std::array<char, BUFFER_SIZE_16> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "BC %d,0\r", band);
+  char cmd[BUFFER_SIZE_16];
+  snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
@@ -602,7 +600,7 @@ auto THD75::get_dual() -> bool {
 
 auto THD75::set_dual() -> bool {
   // Query current band to set dual-watch on the current control band
-  std::array<char, BUFFER_SIZE_32> bc_buf{};
+  char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -616,15 +614,16 @@ auto THD75::set_dual() -> bool {
   // Parse the response to get the current band
   std::string const bc_resp(bc_buf);
   int band = 0;
-  if ((bc_resp.find("BC 1") != std::string::npos) || (bc_resp.find("BC1") != std::string::npos)) {
+  if ((bc_resp.find("BC 1") != std::string::npos) ||
+      (bc_resp.find("BC1") != std::string::npos)) {
     band = 1;
   }
 
   // Send BC command to enable dual-watch on the current band
-  std::array<char, BUFFER_SIZE_16> cmd;
-  snprintf(cmd, static_cast<int>(sizeof(cmd)), "BC %d,1\r", band);
+  char cmd[BUFFER_SIZE_16];
+  snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
 
-  std::array<char, BUFFER_SIZE_64> buf{};
+  char buf[BUFFER_SIZE_64] = {0};
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),

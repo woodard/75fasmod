@@ -12,8 +12,7 @@ namespace po = boost::program_options;
 
 int main(int argc, char *argv[]) {
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message");
+  desc.add_options()("help,h", "Show this help message");
 
   // Parse the command line
   po::variables_map vm;

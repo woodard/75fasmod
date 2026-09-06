@@ -15,37 +15,53 @@ namespace po = boost::program_options;
 // Helper function to convert Mode enum to string
 static std::string mode_to_string(RadioController::Mode mode) {
   switch (mode) {
-  case RadioController::Mode::FM: return "FM";
-  case RadioController::Mode::WFM: return "WFM";
-  case RadioController::Mode::AM: return "AM";
-  case RadioController::Mode::USB: return "USB";
-  case RadioController::Mode::LSB: return "LSB";
-  case RadioController::Mode::CW: return "CW";
-  case RadioController::Mode::CWR: return "CWR";
-  case RadioController::Mode::DD: return "DD";
-  default: return "UNKNOWN";
+  case RadioController::Mode::FM:
+    return "FM";
+  case RadioController::Mode::WFM:
+    return "WFM";
+  case RadioController::Mode::AM:
+    return "AM";
+  case RadioController::Mode::USB:
+    return "USB";
+  case RadioController::Mode::LSB:
+    return "LSB";
+  case RadioController::Mode::CW:
+    return "CW";
+  case RadioController::Mode::CWR:
+    return "CWR";
+  case RadioController::Mode::DD:
+    return "DD";
+  default:
+    return "UNKNOWN";
   }
 }
 
 // Helper function to convert string to Mode enum
 static RadioController::Mode string_to_mode(const std::string &str) {
-  if (str == "FM") return RadioController::Mode::FM;
-  if (str == "WFM") return RadioController::Mode::WFM;
-  if (str == "AM") return RadioController::Mode::AM;
-  if (str == "USB") return RadioController::Mode::USB;
-  if (str == "LSB") return RadioController::Mode::LSB;
-  if (str == "CW") return RadioController::Mode::CW;
-  if (str == "CWR") return RadioController::Mode::CWR;
-  if (str == "DD") return RadioController::Mode::DD;
+  if (str == "FM")
+    return RadioController::Mode::FM;
+  if (str == "WFM")
+    return RadioController::Mode::WFM;
+  if (str == "AM")
+    return RadioController::Mode::AM;
+  if (str == "USB")
+    return RadioController::Mode::USB;
+  if (str == "LSB")
+    return RadioController::Mode::LSB;
+  if (str == "CW")
+    return RadioController::Mode::CW;
+  if (str == "CWR")
+    return RadioController::Mode::CWR;
+  if (str == "DD")
+    return RadioController::Mode::DD;
   return RadioController::Mode::FM; // Default
 }
 
 int main(int argc, char *argv[]) {
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message")
-    ("set,s", po::value<std::string>()->implicit_value("USB"),
-     "Set mode to specified value or default to USB");
+  desc.add_options()("help,h", "Show this help message")(
+      "set,s", po::value<std::string>()->implicit_value("USB"),
+      "Set mode to specified value or default to USB");
 
   // Parse the command line
   po::variables_map vm;

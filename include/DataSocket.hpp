@@ -54,8 +54,8 @@ public:
    * @param burst_limit Maximum frames to transmit in a single burst
    * @param flush_timeout_ms Timeout in milliseconds to flush the transmit queue
    */
-  DataSocket(std::string socket_path, RadioController &radio,
-             ModemDSP &dsp, int burst_limit = DEFAULT_BURST_LIMIT,
+  DataSocket(std::string socket_path, RadioController &radio, ModemDSP &dsp,
+             int burst_limit = DEFAULT_BURST_LIMIT,
              int flush_timeout_ms = DEFAULT_FLUSH_TIMEOUT_MS);
 
   /**

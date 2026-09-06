@@ -25,9 +25,9 @@ constexpr int RRC_FILTER_TAPS_MULTIPLIER = 11;
 constexpr float SIGNAL_AMPLITUDE = 0.5F;
 } // namespace
 
-ModemDSP::ModemDSP(std::string alsa_tx_device,
-                   std::string alsa_rx_device)
-    : alsa_tx_device_(std::move(alsa_tx_device)), alsa_rx_device_(std::move(alsa_rx_device)) {}
+ModemDSP::ModemDSP(std::string alsa_tx_device, std::string alsa_rx_device)
+    : alsa_tx_device_(std::move(alsa_tx_device)),
+      alsa_rx_device_(std::move(alsa_rx_device)) {}
 
 ModemDSP::~ModemDSP() {
   stop_rx();

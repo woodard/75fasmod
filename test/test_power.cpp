@@ -27,10 +27,9 @@ static std::string get_different_power_level(const std::string &current_level) {
 
 int main(int argc, char *argv[]) {
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message")
-    ("set,s", po::value<std::string>()->implicit_value(""),
-     "Set power level to specified value or a different one");
+  desc.add_options()("help,h", "Show this help message")(
+      "set,s", po::value<std::string>()->implicit_value(""),
+      "Set power level to specified value or a different one");
 
   // Parse the command line
   po::variables_map vm;
@@ -51,7 +50,7 @@ int main(int argc, char *argv[]) {
 
   bool set_flag = vm.count("set");
   std::string explicit_level;
-  
+
   if (set_flag && vm["set"].as<std::string>().empty() == false) {
     explicit_level = vm["set"].as<std::string>();
   }

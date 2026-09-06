@@ -28,10 +28,9 @@ static double get_different_freq_in_band(double current_freq_mhz) {
 
 int main(int argc, char *argv[]) {
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "Show this help message")
-    ("set,s", po::value<std::string>()->implicit_value(""),
-     "Set frequency to specified MHz or a different one in band");
+  desc.add_options()("help,h", "Show this help message")(
+      "set,s", po::value<std::string>()->implicit_value(""),
+      "Set frequency to specified MHz or a different one in band");
 
   // Parse the command line
   po::variables_map vm;
@@ -69,9 +68,8 @@ int main(int argc, char *argv[]) {
   THD75 radio(ports[0], THD75::DEFAULT_MODEL, true);
 
   if (set_flag) {
-    double target_freq = (explicit_freq > 0.0)
-                             ? explicit_freq
-                             : get_different_freq_in_band(0.0);
+    double target_freq =
+        (explicit_freq > 0.0) ? explicit_freq : get_different_freq_in_band(0.0);
     if (!radio.set_other_frequency(target_freq)) {
       std::cerr << "[ERROR] Failed to set other frequency to " << target_freq
                 << " MHz\n";

@@ -4,6 +4,7 @@
 #include "RadioController.hpp"
 #include "cobs.hpp"
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <iostream>
 #include <poll.h>
@@ -11,7 +12,6 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <utility>
-#include <array>
 
 namespace {
 constexpr int LISTEN_BACKLOG_SIZE = 5;
@@ -33,10 +33,10 @@ constexpr int CYCLES_PER_SYMBOL = 3;
 } // namespace
 
 DataSocket::DataSocket(std::string socket_path, RadioController &radio,
-                       ModemDSP &dsp, int burst_limit,
-                       int flush_timeout_ms)
+                       ModemDSP &dsp, int burst_limit, int flush_timeout_ms)
     : socket_path_(std::move(socket_path)), server_fd_(-1), radio_(radio),
-      dsp_(dsp), burst_limit_(burst_limit), flush_timeout_ms_(flush_timeout_ms) {
+      dsp_(dsp), burst_limit_(burst_limit),
+      flush_timeout_ms_(flush_timeout_ms) {
   rx_pipe_[0] = -1;
   rx_pipe_[1] = -1;
   tx_pipe_[0] = -1;
@@ -161,15 +161,16 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
     if (poll_result > 0) {
       // 2. Read from App Socket
       if (poll_fds[0].revents & POLLIN) {
-        ssize_t bytes_read = read(client_fd, rx_buffer.data(), rx_buffer.size());
+        ssize_t bytes_read =
+            read(client_fd, rx_buffer.data(), rx_buffer.size());
         if (bytes_read <= 0) [[unlikely]] {
           break;
         }
 
         std::size_t offset = 0;
         while (static_cast<std::size_t>(bytes_read) > offset) {
-          std::size_t payload_size =
-              std::min(static_cast<std::size_t>(bytes_read - offset), MAX_PAYLOAD_SIZE);
+          std::size_t payload_size = std::min(
+              static_cast<std::size_t>(bytes_read - offset), MAX_PAYLOAD_SIZE);
           Frame frame(
               FrameType::DATA, current_seq++, payload_size,
               std::vector<uint8_t>(rx_buffer.begin() + offset,
@@ -192,8 +193,10 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
         ssize_t bytes = read(rx_pipe_[0], pipe_buf.data(), pipe_buf.size());
         if (bytes > 0) {
           rx_stream_accum.insert(rx_stream_accum.end(), pipe_buf.begin(),
-                                 pipe_buf.begin() + static_cast<std::ptrdiff_t>(bytes));
-          auto iterator = std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
+                                 pipe_buf.begin() +
+                                     static_cast<std::ptrdiff_t>(bytes));
+          auto iterator =
+              std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
           while (iterator != rx_stream_accum.end()) {
             std::vector<uint8_t> rx_encoded(rx_stream_accum.begin(), iterator);
             rx_stream_accum.erase(rx_stream_accum.begin(), iterator + 1);
@@ -209,7 +212,8 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
             } else {
               std::cerr << "[RX] Error: Frame failed CRC check!\n";
             }
-            iterator = std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
+            iterator =
+                std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
           }
         }
       }
@@ -217,9 +221,11 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
 
     // 4. TX Queue Processing & Deadlines
     if (!tx_queue_.empty() && now >= tx_resume_time_) {
-      bool threshold_met = tx_queue_.size() >= static_cast<std::size_t>(burst_limit_);
+      bool threshold_met =
+          tx_queue_.size() >= static_cast<std::size_t>(burst_limit_);
       auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                         now - queue_start_time_).count();
+                         now - queue_start_time_)
+                         .count();
       bool timeout_met = (elapsed >= flush_timeout_ms_);
 
       // If we are already transmitting, aggressively flush the queue
@@ -248,12 +254,16 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
         }
 
         // Stream into continuous GNU Radio pipe
-        write(tx_pipe_[1], stream_chunk.data(), static_cast<int>(stream_chunk.size()));
+        write(tx_pipe_[1], stream_chunk.data(),
+              static_cast<int>(stream_chunk.size()));
 
         // Add exact audio duration to our future unkey deadline (48000 Hz, 5
         // SPS, 3 bits/sym)
-        double total_symbols = (static_cast<double>(stream_chunk.size()) * BYTES_PER_SYMBOL) / CYCLES_PER_SYMBOL;
-        int duration_ms = static_cast<int>((total_symbols * SAMPLES_PER_SYMBOL * SECONDS_TO_MS) / SAMPLE_RATE);
+        double total_symbols =
+            (static_cast<double>(stream_chunk.size()) * BYTES_PER_SYMBOL) /
+            CYCLES_PER_SYMBOL;
+        int duration_ms = static_cast<int>(
+            (total_symbols * SAMPLES_PER_SYMBOL * SECONDS_TO_MS) / SAMPLE_RATE);
 
         ptt_drop_time_ += std::chrono::milliseconds(duration_ms);
 
@@ -261,7 +271,8 @@ void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
         if (frames_sent_in_burst_ >= burst_limit_) {
           // Extend PTT drop slightly to allow ALSA buffer drain
           ptt_drop_time_ += std::chrono::milliseconds(100);
-          tx_resume_time_ = ptt_drop_time_ + std::chrono::milliseconds(QUIET_TURNAROUND_DELAY_MS);
+          tx_resume_time_ = ptt_drop_time_ + std::chrono::milliseconds(
+                                                 QUIET_TURNAROUND_DELAY_MS);
         }
       }
     }

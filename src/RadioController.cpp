@@ -25,8 +25,9 @@ RadioController::RadioController(rig_model_t model, std::string port,
                                  bool hamlib_debug)
     : model_(model), port_(std::move(port)), rig_(nullptr),
       current_mode_(Mode::FM), orig_mode_(RIG_MODE_NONE),
-      orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false), orig_width_(0),
-      orig_power_(PowerLevel::UNKNOWN), orig_power_saved_(false) {
+      orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false),
+      orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
+      orig_power_saved_(false) {
   // Enable Hamlib internal verbose trace logging only if requested
   // Redirect Hamlib debug output from stdout to stderr before rig_init
   if (hamlib_debug) {
@@ -76,7 +77,8 @@ auto RadioController::initialize() -> bool {
   if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) == RIG_OK) {
     orig_frequency_ = freq_hz;
     orig_frequency_saved_ = true;
-    std::cerr << "[RIG] Saved frequency: " << (static_cast<double>(freq_hz) / 1e6) << " MHz" << std::endl;
+    std::cerr << "[RIG] Saved frequency: "
+              << (static_cast<double>(freq_hz) / 1e6) << " MHz" << std::endl;
   } else {
     std::cerr << "[RIG] Warning: Could not get current frequency" << std::endl;
   }
@@ -88,17 +90,21 @@ auto RadioController::initialize() -> bool {
     orig_mode_ = mode;
     orig_width_ = width;
     orig_mode_saved_ = true;
-    std::cerr << "[RIG] Saved mode: " << static_cast<int>(mode) << ", width: " << width << std::endl;
+    std::cerr << "[RIG] Saved mode: " << static_cast<int>(mode)
+              << ", width: " << width << std::endl;
   } else {
     std::cerr << "[RIG] Warning: Could not get current mode" << std::endl;
   }
 
-  // Save original power level (base class doesn't know how - derived classes set orig_power_)
+  // Save original power level (base class doesn't know how - derived classes
+  // set orig_power_)
   if (orig_power_ != PowerLevel::UNKNOWN) {
     orig_power_saved_ = true;
-    std::cerr << "[RIG] Power level already saved by derived class" << std::endl;
+    std::cerr << "[RIG] Power level already saved by derived class"
+              << std::endl;
   } else {
-    std::cerr << "[RIG] Note: Power level save not supported by this radio" << std::endl;
+    std::cerr << "[RIG] Note: Power level save not supported by this radio"
+              << std::endl;
   }
 
   std::cerr << "[RIG] Radio state saved successfully" << std::endl;
@@ -115,7 +121,9 @@ void RadioController::shutdown() {
   // Restore original frequency
   if (orig_frequency_saved_) {
     if (rig_set_freq(rig_, RIG_VFO_CURR, orig_frequency_) == RIG_OK) {
-      std::cerr << "[RIG] Restored frequency: " << (static_cast<double>(orig_frequency_) / 1e6) << " MHz" << std::endl;
+      std::cerr << "[RIG] Restored frequency: "
+                << (static_cast<double>(orig_frequency_) / 1e6) << " MHz"
+                << std::endl;
     } else {
       std::cerr << "[RIG] Warning: Failed to restore frequency" << std::endl;
     }
@@ -147,14 +155,16 @@ void RadioController::shutdown() {
       level = "EL";
       break;
     default:
-      std::cerr << "[RIG] Note: Unknown power level, skipping restoration" << std::endl;
+      std::cerr << "[RIG] Note: Unknown power level, skipping restoration"
+                << std::endl;
       level = "UNKNOWN";
     }
     if (level != "UNKNOWN") {
       if (set_power_level(level)) {
         std::cerr << "[RIG] Restored power level" << std::endl;
       } else {
-        std::cerr << "[RIG] Warning: Failed to restore power level" << std::endl;
+        std::cerr << "[RIG] Warning: Failed to restore power level"
+                  << std::endl;
       }
     }
   }
@@ -166,7 +176,6 @@ void RadioController::shutdown() {
   rig_cleanup(rig_);
   rig_ = nullptr;
 }
-
 
 auto RadioController::set_frequency(double freq_mhz) -> bool {
   auto freq_hz = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
