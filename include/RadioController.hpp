@@ -259,6 +259,7 @@ protected:
 
 protected:
   RIG *rig_; ///< Hamlib rig handle
+  Mode current_mode_; ///< Current radio mode (tracked for compatibility)
 
   // Backup variables for restoring radio state
   rmode_t orig_mode_;    ///< Saved original radio mode

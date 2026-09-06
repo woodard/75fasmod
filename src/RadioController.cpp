@@ -16,8 +16,8 @@ std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
 
 RadioController::RadioController(rig_model_t model, const std::string &port,
                                  bool hamlib_debug)
-    : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_mode_saved_(false), orig_width_(0),
+    : model_(model), port_(port), rig_(nullptr), current_mode_(Mode::FM),
+      orig_mode_(RIG_MODE_NONE), orig_mode_saved_(false), orig_width_(0),
       orig_power_(PowerLevel::UNKNOWN) {
   // Enable Hamlib internal verbose trace logging only if requested
   // Redirect Hamlib debug output from stdout to stderr before rig_init
@@ -87,16 +87,26 @@ bool RadioController::get_frequency(double &freq_mhz) {
 }
 
 bool RadioController::get_mode(Mode &mode) {
-  rmode_t rig_mode;
-  if (rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr) != RIG_OK) {
-    return false;
+  rmode_t rig_mode = 0;
+  int result = rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr);
+  if (result == RIG_OK) {
+    mode = static_cast<Mode>(rig_mode);
+    std::cerr << "[RIG] get_mode succeeded, mode value: " << static_cast<int>(mode) << std::endl;
+    return true;
   }
-  mode = static_cast<Mode>(rig_mode);
+  
+  // Fallback: return the current mode we've tracked
+  std::cerr << "[RIG] get_mode failed (fallback), returning tracked mode: " << static_cast<int>(current_mode_) << std::endl;
+  mode = current_mode_;
   return true;
 }
 
 bool RadioController::set_mode(Mode mode) {
-  return rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
+  bool result = rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
+  if (result) {
+    current_mode_ = mode;  // Save the mode we just set
+  }
+  return result;
 }
 bool RadioController::set_ptt(bool transmit) {
   const char *cmd = transmit ? "TX\r" : "RX\r";

@@ -1,0 +1,214 @@
+
+Bus 007 Device 024: ID 2166:9023 JVC Kenwood TH-D75
+Negotiated speed: Full Speed (12Mbps)
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          239 Miscellaneous Device
+  bDeviceSubClass         2 [unknown]
+  bDeviceProtocol         1 Interface Association
+  bMaxPacketSize0        64
+  idVendor           0x2166 JVC Kenwood
+  idProduct          0x9023 TH-D75
+  bcdDevice            1.00
+  iManufacturer           1 JVCKENWOOD
+  iProduct                2 TH-D75
+  iSerial                 0 
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x00ae
+    bNumInterfaces          4
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0xc0
+      Self Powered
+    MaxPower                0mA
+    Interface Association:
+      bLength                 8
+      bDescriptorType        11
+      bFirstInterface         0
+      bInterfaceCount         2
+      bFunctionClass          2 Communications
+      bFunctionSubClass       2 Abstract (modem)
+      bFunctionProtocol       1 AT-commands (v.25ter)
+      iFunction               5 CDC-ACM
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         2 Communications
+      bInterfaceSubClass      2 Abstract (modem)
+      bInterfaceProtocol      1 AT-commands (v.25ter)
+      iInterface              0 
+      CDC Header:
+        bcdCDC               1.10
+      CDC ACM:
+        bmCapabilities       0x02
+          line coding and serial state
+      CDC Union:
+        bMasterInterface        0
+        bSlaveInterface         1 
+      CDC Call Management:
+        bmCapabilities       0x03
+          call management
+          use DataInterface
+        bDataInterface          1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval              16
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass        10 CDC Data
+      bInterfaceSubClass      0 [unknown]
+      bInterfaceProtocol      0 
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x01  EP 1 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+    Interface Association:
+      bLength                 8
+      bDescriptorType        11
+      bFirstInterface         2
+      bInterfaceCount         2
+      bFunctionClass          1 Audio
+      bFunctionSubClass       1 Control Device
+      bFunctionProtocol       0 
+      iFunction               6 ADC1.0
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass         1 Audio
+      bInterfaceSubClass      1 Control Device
+      bInterfaceProtocol      0 
+      iInterface              7 ADC control
+      AudioControl Interface Descriptor:
+        bLength                 9
+        bDescriptorType        36
+        bDescriptorSubtype      1 (HEADER)
+        bcdADC               1.00
+        wTotalLength       0x001e
+        bInCollection           1
+        baInterfaceNr(0)        3
+      AudioControl Interface Descriptor:
+        bLength                 9
+        bDescriptorType        36
+        bDescriptorSubtype      3 (OUTPUT_TERMINAL)
+        bTerminalID             2
+        wTerminalType      0x0101 USB Streaming
+        bAssocTerminal          0
+        bSourceID               4
+        iTerminal               0 
+      AudioControl Interface Descriptor:
+        bLength                12
+        bDescriptorType        36
+        bDescriptorSubtype      2 (INPUT_TERMINAL)
+        bTerminalID             4
+        wTerminalType      0x0201 Microphone
+        bAssocTerminal          0
+        bNrChannels             1
+        wChannelConfig     0x0000
+        iChannelNames           0 
+        iTerminal               0 
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass         1 Audio
+      bInterfaceSubClass      2 Streaming
+      bInterfaceProtocol      0 
+      iInterface              8 ADC stream IN
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       1
+      bNumEndpoints           1
+      bInterfaceClass         1 Audio
+      bInterfaceSubClass      2 Streaming
+      bInterfaceProtocol      0 
+      iInterface              8 ADC stream IN
+      AudioStreaming Interface Descriptor:
+        bLength                 7
+        bDescriptorType        36
+        bDescriptorSubtype      1 (AS_GENERAL)
+        bTerminalLink           2
+        bDelay                  1 frames
+        wFormatTag         0x0001 PCM
+      AudioStreaming Interface Descriptor:
+        bLength                11
+        bDescriptorType        36
+        bDescriptorSubtype      2 (FORMAT_TYPE)
+        bFormatType             1 (FORMAT_TYPE_I)
+        bNrChannels             1
+        bSubframeSize           2
+        bBitResolution         16
+        bSamFreqType            1 Discrete
+        tSamFreq[ 0]        48000
+      Endpoint Descriptor:
+        bLength                 9
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            5
+          Transfer Type            Isochronous
+          Synch Type               Asynchronous
+          Usage Type               Data
+        wMaxPacketSize     0x0062  1x 98 bytes
+        bInterval               1
+        bRefresh                0
+        bSynchAddress           0
+        AudioStreaming Endpoint Descriptor:
+          bLength                 7
+          bDescriptorType        37
+          bDescriptorSubtype      1 (EP_GENERAL)
+          bmAttributes         0x00
+          bLockDelayUnits         0 Undefined
+          wLockDelay         0x0000
+Device Qualifier (for other device speed):
+  bLength                10
+  bDescriptorType         6
+  bcdUSB               2.00
+  bDeviceClass          239 Miscellaneous Device
+  bDeviceSubClass         2 [unknown]
+  bDeviceProtocol         1 Interface Association
+  bMaxPacketSize0        64
+  bNumConfigurations      1
+Device Status:     0x0001
+  Self Powered

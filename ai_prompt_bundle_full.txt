@@ -1,0 +1,3862 @@
+================================================================================
+PROJECT DIRECTORY STRUCTURE
+================================================================================
+
+.
+├── 75fasmod
+├── aclocal.m4
+├── ai_prompt_bundle_full.txt
+├── ar-lib
+├── autogen.sh
+├── .clang-format
+├── .clang-tidy
+├── compile
+├── compile_commands.json
+├── config.log
+├── config.status
+├── configure
+├── configure~
+├── configure.ac
+├── CONVENTIONS.md
+├── CONVENTIONS.md~
+├── COPYING
+├── depcomp
+├── device.out
+├── docker-compose.yaml
+├── docs
+│   └── html
+│       ├── annotated_dup.js
+│       ├── annotated.html
+│       ├── classDataSocket.html
+│       ├── classDataSocket.js
+│       ├── classDataSocket-members.html
+│       ├── classes.html
+│       ├── classFrame.html
+│       ├── classFrame.js
+│       ├── classFrame-members.html
+│       ├── classFrame.png
+│       ├── classModemDSP.html
+│       ├── classModemDSP.js
+│       ├── classModemDSP-members.html
+│       ├── classModemHeader.html
+│       ├── classModemHeader.js
+│       ├── classModemHeader-members.html
+│       ├── classModemHeader.png
+│       ├── classRadioController.html
+│       ├── classRadioController.js
+│       ├── classRadioController-members.html
+│       ├── classTcmConfig.html
+│       ├── classTcmConfig.js
+│       ├── classTcmConfig-members.html
+│       ├── clipboard.js
+│       ├── cobs_8cpp.html
+│       ├── cobs_8cpp.js
+│       ├── cobs_8cpp_source.html
+│       ├── cobs_8hpp.html
+│       ├── cobs_8hpp.js
+│       ├── cobs_8hpp_source.html
+│       ├── cookie.js
+│       ├── DataSocket_8cpp.html
+│       ├── DataSocket_8cpp_source.html
+│       ├── DataSocket_8hpp.html
+│       ├── DataSocket_8hpp.js
+│       ├── DataSocket_8hpp_source.html
+│       ├── dir_68267d1309a1af8e8297ef4c3efbcdba.html
+│       ├── dir_68267d1309a1af8e8297ef4c3efbcdba.js
+│       ├── dir_d44c64559bbebec7f509842c48db8b23.html
+│       ├── dir_d44c64559bbebec7f509842c48db8b23.js
+│       ├── doxygen_crawl.html
+│       ├── doxygen.css
+│       ├── doxygen.svg
+│       ├── dynsections.js
+│       ├── files_dup.js
+│       ├── files.html
+│       ├── Frame_8cpp.html
+│       ├── Frame_8cpp_source.html
+│       ├── Frame_8hpp.html
+│       ├── Frame_8hpp.js
+│       ├── Frame_8hpp_source.html
+│       ├── functions_enum.html
+│       ├── functions_func.html
+│       ├── functions.html
+│       ├── functions_vars.html
+│       ├── globals_enum.html
+│       ├── globals_func.html
+│       ├── globals.html
+│       ├── globals_vars.html
+│       ├── hierarchy.html
+│       ├── hierarchy.js
+│       ├── index.html
+│       ├── jquery.js
+│       ├── main_8cpp.html
+│       ├── main_8cpp.js
+│       ├── main_8cpp_source.html
+│       ├── menudata.js
+│       ├── menu.js
+│       ├── ModemDSP_8cpp.html
+│       ├── ModemDSP_8cpp_source.html
+│       ├── ModemDSP_8hpp.html
+│       ├── ModemDSP_8hpp.js
+│       ├── ModemDSP_8hpp_source.html
+│       ├── navtree.css
+│       ├── navtreedata.js
+│       ├── navtreeindex0.js
+│       ├── navtree.js
+│       ├── RadioController_8cpp.html
+│       ├── RadioController_8cpp_source.html
+│       ├── RadioController_8hpp.html
+│       ├── RadioController_8hpp.js
+│       ├── RadioController_8hpp_source.html
+│       ├── search
+│       │   ├── all_0.js
+│       │   ├── all_10.js
+│       │   ├── all_11.js
+│       │   ├── all_12.js
+│       │   ├── all_13.js
+│       │   ├── all_14.js
+│       │   ├── all_1.js
+│       │   ├── all_2.js
+│       │   ├── all_3.js
+│       │   ├── all_4.js
+│       │   ├── all_5.js
+│       │   ├── all_6.js
+│       │   ├── all_7.js
+│       │   ├── all_8.js
+│       │   ├── all_9.js
+│       │   ├── all_a.js
+│       │   ├── all_b.js
+│       │   ├── all_c.js
+│       │   ├── all_d.js
+│       │   ├── all_e.js
+│       │   ├── all_f.js
+│       │   ├── classes_0.js
+│       │   ├── classes_1.js
+│       │   ├── classes_2.js
+│       │   ├── classes_3.js
+│       │   ├── classes_4.js
+│       │   ├── enums_0.js
+│       │   ├── enums_1.js
+│       │   ├── enums_2.js
+│       │   ├── enums_3.js
+│       │   ├── enumvalues_0.js
+│       │   ├── enumvalues_1.js
+│       │   ├── enumvalues_2.js
+│       │   ├── enumvalues_3.js
+│       │   ├── enumvalues_4.js
+│       │   ├── enumvalues_5.js
+│       │   ├── enumvalues_6.js
+│       │   ├── enumvalues_7.js
+│       │   ├── enumvalues_8.js
+│       │   ├── files_0.js
+│       │   ├── files_1.js
+│       │   ├── files_2.js
+│       │   ├── files_3.js
+│       │   ├── files_4.js
+│       │   ├── files_5.js
+│       │   ├── functions_0.js
+│       │   ├── functions_1.js
+│       │   ├── functions_2.js
+│       │   ├── functions_3.js
+│       │   ├── functions_4.js
+│       │   ├── functions_5.js
+│       │   ├── functions_6.js
+│       │   ├── functions_7.js
+│       │   ├── functions_8.js
+│       │   ├── functions_9.js
+│       │   ├── functions_a.js
+│       │   ├── functions_b.js
+│       │   ├── functions_c.js
+│       │   ├── search.css
+│       │   ├── searchdata.js
+│       │   ├── search.js
+│       │   ├── variables_0.js
+│       │   ├── variables_1.js
+│       │   ├── variables_2.js
+│       │   ├── variables_3.js
+│       │   ├── variables_4.js
+│       │   ├── variables_5.js
+│       │   ├── variables_6.js
+│       │   ├── variables_7.js
+│       │   ├── variables_8.js
+│       │   ├── variables_9.js
+│       │   ├── variables_a.js
+│       │   ├── variables_b.js
+│       │   ├── variables_c.js
+│       │   ├── variables_d.js
+│       │   └── variables_e.js
+│       ├── tabs.css
+│       ├── TcmConfig_8cpp.html
+│       ├── TcmConfig_8cpp_source.html
+│       ├── TcmConfig_8hpp.html
+│       ├── TcmConfig_8hpp.js
+│       └── TcmConfig_8hpp_source.html
+├── Doxyfile
+├── Doxyfile.in
+├── .gitignore
+├── .goosehints
+├── include
+│   ├── cobs.hpp
+│   ├── DataSocket.hpp
+│   ├── Frame.hpp
+│   ├── ModemDSP.hpp
+│   ├── RadioController.hpp
+│   └── TcmConfig.hpp
+├── INSTALL
+├── install-sh
+├── LICENSE
+├── Makefile
+├── Makefile.am
+├── Makefile.in
+├── missing
+├── no-radio
+├── radio-notes.md
+├── radio-notes.md~
+├── radio.out
+├── radio.out~
+├── README.md
+├── scripts
+│   ├── bundle_project.sh
+│   └── run-linter.sh
+├── src
+│   ├── cobs.cpp
+│   ├── DataSocket.cpp
+│   ├── .dirstamp
+│   ├── Frame.cpp
+│   ├── main.cpp
+│   ├── ModemDSP.cpp
+│   ├── RadioController.cpp
+│   └── TcmConfig.cpp
+├── technical-notes.md
+├── technical-notes.md~
+├── test
+│   ├── .dirstamp
+│   ├── radio_power_test.cpp
+│   ├── run_frequency_test.sh
+│   ├── run_frequency_test.sh.log
+│   ├── run_frequency_test.sh.trs
+│   ├── test_frequency.cpp
+│   └── test_tx.py
+├── test-driver
+├── test_frequency
+├── test_radio_power
+├── test-suite.log
+├── typescript
+├── with-radio
+└── with-radio2
+
+8 directories, 233 files
+
+
+
+================================================================================
+FILE: autogen.sh
+================================================================================
+
+#!/bin/sh
+autoreconf --install --force --warnings=all
+
+
+================================================================================
+FILE: configure.ac
+================================================================================
+
+AC_INIT([75fasmod], [0.1.0], [your.email@example.com])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
+AC_PROG_CXX
+AM_PROG_AR
+
+#Force C++ 20 for std::jthread and modern features
+CXXFLAGS="$CXXFLAGS -std=c++20"
+
+#Check for required libraries using pkg-config
+PKG_CHECK_MODULES([HAMLIB], [hamlib])
+PKG_CHECK_MODULES([GNURADIO], [gnuradio-runtime gnuradio-audio gnuradio-blocks gnuradio-digital gnuradio-filter gnuradio-trellis])
+PKG_CHECK_MODULES([FMT], [fmt >= 8.0.0])
+PKG_CHECK_MODULES([VOLK], [volk])
+
+AC_CONFIG_FILES([Makefile Doxyfile])
+AC_OUTPUT
+
+
+
+================================================================================
+FILE: CONVENTIONS.md
+================================================================================
+
+# Reasoning & Output Guidelines
+- You are an expert software engineer.
+- Keep your internal <think> reasoning extremely concise (under 200 words).
+- Do NOT pace back and forth in your thoughts. 
+- Do NOT get caught in infinite reasoning loops. 
+- Formulate a brief plan, then immediately output the final code edits.
+
+
+
+================================================================================
+FILE: include/cobs.hpp
+================================================================================
+
+/**
+ * @file cobs.hpp
+ * @brief COBS (Consistent Overhead Byte Stuffing) encoding and decoding
+ *
+ * This module provides functions to encode and decode data using the COBS
+ * (Consistent Overhead Byte Stuffing) algorithm. COBS is commonly used in
+ * serial communications and packet framing to ensure reliable data transfer
+ * by eliminating null bytes from the data stream.
+ *
+ * @see Frame.hpp for the Frame class used with COBS
+ */
+
+#pragma once
+#include "Frame.hpp"
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+
+/**
+ * @brief Encodes a Frame using COBS algorithm
+ *
+ * Encodes a Frame object and returns the COBS-encoded bytes.
+ * The trailing 0x00 byte is NOT appended to the output.
+ *
+ * @param frame The Frame object to encode
+ * @return std::vector<uint8_t> COBS-encoded byte vector
+ *
+ * @note The encoded output can be transmitted over channels that cannot
+ *       handle null bytes (0x00)
+ *
+ * @see cobs_decode_frame() for decoding
+ */
+std::vector<uint8_t> cobs_encode(const Frame &frame);
+
+/**
+ * @brief Decodes COBS data and returns a Frame
+ *
+ * Decodes COBS-encoded data and reconstructs the original Frame object.
+ *
+ * @param input COBS-encoded byte vector
+ * @return Frame Decoded Frame object
+ *
+ * @see cobs_encode() for encoding
+ */
+Frame cobs_decode_frame(const std::vector<uint8_t> &input);
+
+
+
+================================================================================
+FILE: include/DataSocket.hpp
+================================================================================
+
+/**
+ * @file DataSocket.hpp
+ * @brief IPC socket server for 75fasmod modem data transfer
+ *
+ * This module provides a socket-based IPC (Inter-Process Communication)
+ * server that allows external processes to connect to the 75fasmod modem
+ * and exchange data with it. The server manages burst transmission
+ * limits and handles multiple client connections.
+ */
+
+#pragma once
+
+#include <chrono>
+#include <cstdint>
+#include <stop_token>
+#include <string>
+#include <thread>
+#include <vector>
+
+// Forward declarations to fix the compiler errors
+class RadioController;
+class ModemDSP;
+
+/**
+ * @brief Socket server for modem data transfer
+ *
+ * This class implements a Unix domain socket server that listens for
+ * connections from client processes. It manages data transfer between
+ * the modem and connected clients, handling burst transmission limits
+ * and PTT (Push-To-Talk) control.
+ *
+ * Key features:
+ * - Background thread for accepting connections
+ * - Burst transmission limiting to prevent radio overload
+ * - Automatic PTT control during transmission
+ * - Thread-safe queue management
+ */
+class DataSocket {
+public:
+  /**
+   * @brief Constructs a new DataSocket object
+   *
+   * @param socket_path Path for the Unix domain socket
+   * @param radio Reference to RadioController for PTT control
+   * @param dsp Reference to ModemDSP for signal processing
+   * @param burst_limit Maximum frames to transmit in a single burst
+   * @param flush_timeout_ms Timeout in milliseconds to flush the transmit queue
+   */
+  DataSocket(const std::string &socket_path, RadioController &radio,
+             ModemDSP &dsp, int burst_limit, int flush_timeout_ms);
+
+  /**
+   * @brief Destructor
+   *
+   * Stops the server thread and cleans up resources.
+   */
+  ~DataSocket();
+
+  /**
+   * @brief Starts the background server thread
+   *
+   * Starts a background thread to listen for IPC connections.
+   *
+   * @return true if thread started successfully, false otherwise
+   */
+  bool start();
+
+  /**
+   * @brief Stops the server thread and cleans up
+   *
+   * Signals the server thread to stop and waits for it to complete.
+   * Removes the socket file.
+   */
+  void stop();
+
+private:
+  void accept_loop(std::stop_token stoken);
+  void handle_client(int client_fd, std::stop_token &stoken);
+
+  std::string socket_path_;
+  int server_fd_;
+  std::jthread worker_thread_;
+
+  RadioController &radio_;
+  ModemDSP &dsp_;
+
+  int burst_limit_;
+  int flush_timeout_ms_;
+
+  int rx_pipe_[2];
+  int tx_pipe_[2];
+  int active_client_fd_;
+
+  std::vector<std::vector<uint8_t>> tx_queue_;
+  std::chrono::steady_clock::time_point queue_start_time_;
+
+  // Non-blocking MAC State Tracking
+  bool is_transmitting_ = false;
+  std::chrono::steady_clock::time_point ptt_drop_time_;
+  std::chrono::steady_clock::time_point tx_resume_time_; // MAC Cooldown
+  int frames_sent_in_burst_ = 0;
+};
+
+
+
+================================================================================
+FILE: include/Frame.hpp
+================================================================================
+
+/**
+ * @file Frame.hpp
+ * @brief Frame structure for 75fasmod data transmission
+ *
+ * This module defines the Frame class and related structures used for
+ * data transmission in the 75fasmod modem. Frames are the basic
+ * communication units that are encoded with COBS and transmitted over
+ * the radio link.
+ *
+ * Frame structure:
+ * - ModemHeader (frame_type, sequence_number, payload_length)
+ * - Payload (variable length data)
+ * - CRC32 (error detection checksum)
+ */
+
+#pragma once
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+
+#pragma pack(push, 1)
+
+/**
+ * @brief Enumeration of frame types
+ *
+ * Defines the type of data contained in a frame.
+ */
+enum class FrameType {
+  DATA = 0x01, ///< Data frame containing payload
+  ACK = 0x02   ///< Acknowledgment frame
+};
+
+/**
+ * @brief Modem header structure
+ *
+ * Contains metadata for frame identification and processing.
+ */
+class ModemHeader {
+public:
+  /**
+   * @brief Constructs a ModemHeader
+   * @param frame_type Type of frame (DATA or ACK)
+   * @param seq_num Sequence number (0-255, rolling)
+   * @param payload_len Length of the payload in bytes
+   */
+  ModemHeader(FrameType frame_type, uint8_t seq_num, uint16_t payload_len)
+      : frame_type(frame_type), seq_num(seq_num), payload_len(payload_len) {}
+
+  FrameType frame_type; // 0x01 = DATA, 0x02 = ACK
+  uint8_t seq_num;      // 0-255 rolling sequence
+  uint16_t payload_len; // Length of the inner data payload
+};
+
+#pragma pack(pop)
+
+/// Maximum payload size per frame (128 bytes)
+constexpr size_t MAX_PAYLOAD_SIZE = 128;
+
+/**
+ * @brief Data frame structure
+ *
+ * Represents a complete data frame with header, payload, and CRC checksum.
+ * Inherits from ModemHeader to include the header fields.
+ */
+class Frame : public ModemHeader {
+public:
+  /**
+   * @brief Constructs a Frame
+   * @param frame_type Type of frame (DATA or ACK)
+   * @param seq_num Sequence number (0-255, rolling)
+   * @param payload_len Length of the payload in bytes
+   * @param payload Data payload vector
+   */
+  Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len,
+        std::vector<uint8_t> payload);
+
+  /**
+   * @brief Calculates CRC32 checksum
+   * @return CRC32 value for the frame
+   */
+  uint32_t calc_crc() const;
+
+  /**
+   * @brief Encodes the frame using COBS
+   * @return COBS-encoded byte vector
+   */
+  std::vector<uint8_t> cobs_encode() const;
+
+  std::vector<uint8_t> payload; ///< Data payload
+  uint32_t crc = 0;             ///< CRC32 checksum
+};
+
+
+
+================================================================================
+FILE: include/ModemDSP.hpp
+================================================================================
+
+/**
+ * @file ModemDSP.hpp
+ * @brief Digital Signal Processing for 75fasmod modem
+ *
+ * This module provides the ModemDSP class that interfaces with GNU Radio
+ * for digital signal processing in the 75fasmod modem. It manages the
+ * GNU Radio top-block configuration for both receiver and transmitter
+ * chains, connecting to ALSA audio devices for hardware interfacing.
+ *
+ * The modem uses advanced modulation techniques (Adaptive QAM and TCM)
+ * to achieve high data rates on FM radio links.
+ */
+
+#pragma once
+#include <cstdint>
+#include <gnuradio/top_block.h>
+#include <memory>
+#include <string>
+#include <vector>
+
+/**
+ * @brief Digital Signal Processing manager for 75fasmod
+ *
+ * This class manages the GNU Radio signal processing chains for the modem.
+ * It handles receiver and transmitter setup, connecting to ALSA audio
+ * devices for hardware I/O.
+ *
+ * Key responsibilities:
+ * - Configure GNU Radio flowgraphs for RX and TX
+ * - Manage ALSA audio device connections
+ * - Provide simple start/stop interfaces for DSP streams
+ */
+class ModemDSP {
+public:
+  /**
+   * @brief Constructs a new ModemDSP object
+   *
+   * @param alsa_tx_device ALSA device path for transmission (e.g.,
+   * "plughw:0,0")
+   * @param alsa_rx_device ALSA device path for reception (e.g., "plughw:0,0")
+   */
+  ModemDSP(const std::string &alsa_tx_device,
+           const std::string &alsa_rx_device);
+
+  /**
+   * @brief Destructor
+   *
+   * Cleans up GNU Radio resources and closes ALSA connections.
+   */
+  ~ModemDSP();
+
+  /**
+   * @brief Starts receiver processing
+   *
+   * Initializes and starts the GNU Radio receiver flowgraph.
+   *
+   * @param output_fd File descriptor to write decoded data to
+   * @return true if started successfully, false otherwise
+   */
+  bool start_rx(int output_fd);
+
+  /**
+   * @brief Stops receiver processing
+   *
+   * Stops the receiver flowgraph and releases resources.
+   */
+  void stop_rx();
+
+  /**
+   * @brief Starts transmitter processing
+   *
+   * Initializes and starts the GNU Radio transmitter flowgraph.
+   *
+   * @param input_fd File descriptor to read data from
+   * @return true if started successfully, false otherwise
+   */
+  bool start_tx(int input_fd);
+
+  /**
+   * @brief Stops transmitter processing
+   *
+   * Stops the transmitter flowgraph and releases resources.
+   */
+  void stop_tx();
+
+private:
+  std::string alsa_tx_device_;
+  std::string alsa_rx_device_;
+  int tx_pipe_fd_ = -1;
+  gr::top_block_sptr rx_tb_; ///< GNU Radio receiver top block
+  gr::top_block_sptr tx_tb_; ///< GNU Radio transmitter top block
+};
+
+
+
+================================================================================
+FILE: include/RadioController.hpp
+================================================================================
+
+/**
+ * @file RadioController.hpp
+ * @brief Radio controller for Kenwood TH-D75 using Hamlib
+ *
+ * This module provides a high-level interface to control the Kenwood TH-D75
+ * radio transceiver using the Hamlib library. It handles frequency setting
+ * and querying, power level management, PTT control, and USB interface
+ * configuration for digital modem operation.
+ *
+ * @author 75fasmod developers
+ * @version 0.1.0
+ * @date 2024
+ */
+
+#ifndef RADIOCONTROLLER_HPP
+#define RADIOCONTROLLER_HPP
+
+#include <filesystem>
+#include <fstream>
+#include <functional>
+#include <hamlib/rig.h>
+#include <matvec.hpp>
+#include <matvec/tcd.hpp>
+#include <memory>
+#include <pillow.hpp>
+#include <pillow/pillow.hpp>
+#include <set>
+#include <string>
+#include <sys/socket.h>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
+
+namespace fs = std::filesystem;
+
+/**
+ * @brief Radio controller class for Kenwood TH-D75
+ *
+ * This class provides methods to control a Kenwood TH-D75 radio transceiver
+ * through Hamlib. It handles initialization, frequency control, power level
+ * management, PTT control, and USB interface configuration for digital
+ * modem operation.
+ *
+ * @note Requires Hamlib library with Kenwood TH-D75 backend support
+ * @note Currently supports Kenwood TH-D75 (rig_model_t:
+ * RIG_MODEL_KENWOOD_TH_D75)
+ */
+class RadioController {
+public:
+  /**
+   * @brief Power level enumeration for TX power control
+   *
+   * Maps to Kenwood CAT power level values for the TH-D75 radio.
+   */
+  enum class PowerLevel {
+    HIGH = 0,      ///< High power (maximum TX power)
+    MEDIUM = 1,    ///< Medium power
+    LOW = 2,       ///< Low power
+    EXTRA_LOW = 3, ///< Extra low power
+    UNKNOWN = -1   ///< Unknown or uninitialized power level
+  };
+
+  /**
+   * @brief USB Out Select enumeration for Menu Item 102
+   *
+   * Controls which signal path is routed to the USB/serial data port.
+   * This is essential for digital modem operation.
+   */
+  enum class UsbOutSelect {
+    AF = 0,     ///< Audio Frequency output (demodulated audio)
+    IF = 1,     ///< Intermediate Frequency output (raw signal)
+    Detect = 2, ///< Detection signal
+    unknown     ///< Unknown or undefined value
+  };
+
+  /**
+   * @brief Default Hamlib model for Kenwood TH-D75
+   *
+   * This is the Hamlib model ID for the Kenwood TH-D75 transceiver.
+   */
+  static constexpr rig_model_t DEFAULT_MODEL = 2042;
+
+  /**
+   * @brief Construct a new Radio Controller object
+   *
+   * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
+   * @param port Serial port device path (e.g., "/dev/ttyUSB0")
+   */
+  RadioController(rig_model_t model, const std::string &port);
+
+  /**
+   * @brief Destroy the Radio Controller object
+   *
+   * Closes the Hamlib rig connection if open.
+   */
+  ~RadioController();
+
+  /**
+   * @brief Initialize the radio controller
+   *
+   * Opens the connection to the radio, saves current settings, and configures
+   * the radio for high-speed modem operation by setting USB Out Select to IF.
+   *
+   * @param hamlib_debug Enable Hamlib debug output (default: false)
+   * @return true if initialization successful, false otherwise
+   *
+   * @note This method modifies radio settings. Use save/restore methods if
+   *       you need to restore settings later.
+   */
+  bool initialize(bool hamlib_debug = false);
+
+  /**
+   * @brief Set the radio frequency
+   *
+   * Sets the VFO frequency in megahertz.
+   *
+   * @param freq_mhz Frequency in megahertz
+   * @return true if set successfully, false otherwise
+   */
+  bool set_frequency(double freq_mhz);
+
+  /**
+   * @brief Get the current VFO frequency
+   *
+   * Queries the radio for the current VFO frequency in megahertz.
+   *
+   * @param freq_mhz Reference to store the frequency in megahertz
+   * @return true if query successful, false on error
+   */
+  bool get_frequency(double &freq_mhz);
+
+  /**
+   * @brief Set the TX power level
+   *
+   * Sets the transmission power level. Valid levels: "EL", "L", "M", "H".
+   *
+   * @param level Power level string ("EL", "L", "M", or "H")
+   * @return true if set successfully, false otherwise
+   */
+  bool set_power_level(const std::string &level);
+
+  /**
+   * @brief Get the current TX power level
+   *
+   * Queries the radio for the current TX power level.
+   *
+   * @param level Reference to store the power level string ("EL", "L", "M", or
+   * "H")
+   * @return true if query successful, false on error
+   */
+  bool get_power_level(std::string &level);
+
+  /**
+   * @brief Set PTT (Push-to-Talk) state
+   *
+   * Controls the transmit/receive state of the radio.
+   *
+   * @param transmit true for transmit, false for receive
+   * @return true if command successful, false otherwise
+   */
+  bool set_ptt(bool transmit);
+
+  /**
+   * @brief Get the DCD (Digital Carrier Detect) status
+   *
+   * Queries whether carrier is detected on the receive path.
+   *
+   * @param is_squelch_open Reference to store the DCD status
+   * @return true if query successful, false on error
+   */
+  bool get_dcd(bool &is_squelch_open);
+
+  /**
+   * @brief Find available serial tty devices in sysfs
+   *
+   * Searches /sys/class/tty for serial devices matching the TH-D75 USB PID/VID.
+   *
+   * @return Vector of device paths matching the TH-D75
+   */
+  static std::vector<std::string> find_tty_sysfs() {
+    return find_tty_sysfs(0x2166, 0x9023);
+  }
+
+  std::string find_alsa_device() { return find_alsa_device(port_); }
+
+protected:
+  /**
+   * @brief Get the Kenwood TNC mode
+   *
+   * Queries the TNC (Telegraph Noiseless Code) operating mode.
+   *
+   * @return TNC mode value, or -1 on error
+   */
+  int kenwood_tnc_get();
+
+  /**
+   * @brief Set the Kenwood TNC mode
+   *
+   * Sets the TNC operating mode.
+   *
+   * @param mode TNC mode value
+   * @return true if successful, false otherwise
+   */
+  bool kenwood_tnc_set(int mode);
+
+  /**
+   * @brief Get the USB Out Select setting
+   *
+   * Queries Menu Item 102 to determine the current USB data output path.
+   *
+   * @return UsbOutSelect enum value
+   */
+  UsbOutSelect kenwood_usb_out_select_get();
+
+  /**
+   * @brief Set the USB Out Select setting
+   *
+   * Sets Menu Item 102 to control USB data output path.
+   * Set to IF for digital modem operation.
+   *
+   * @param value UsbOutSelect enum value
+   * @return true if successful, false otherwise
+   */
+  bool kenwood_usb_out_select_set(UsbOutSelect value);
+
+  /**
+   * @brief Get the current power level
+   *
+   * Internal method to query the radio's power level.
+   *
+   * @return PowerLevel enum value
+   */
+  PowerLevel kenwood_power_get();
+
+  /**
+   * @brief Set the power level
+   *
+   * Internal method to set the radio's power level.
+   *
+   * @param val PowerLevel enum value
+   * @return true if successful, false otherwise
+   */
+  bool kenwood_power_set(PowerLevel val);
+
+  /**
+   * @brief Get a Kenwood menu item
+   *
+   * Queries a Kenwood CAT menu item by number.
+   *
+   * @param menu_num Menu item number
+   * @return Menu value, or -1 on error
+   */
+  int kenwood_menu_get(int menu_num);
+
+  /**
+   * @brief Set a Kenwood menu item
+   *
+   * Sets a Kenwood CAT menu item by number and value.
+   *
+   * @param menu_num Menu item number
+   * @param value Menu value to set
+   * @return true if successful, false otherwise
+   */
+  bool kenwood_menu_set(int menu_num, int value);
+
+  /**
+   * @brief Find tty sysfs devices for a specific USB device
+   *
+   * Searches for serial devices matching the given USB Vendor ID and Product
+   * ID.
+   *
+   * @param target_vid USB Vendor ID
+   * @param target_pid USB Product ID
+   * @return Vector of device paths
+   */
+  static std::vector<std::string> find_tty_sysfs(unsigned int target_vid,
+                                                 unsigned int target_pid);
+
+  /**
+   * @brief Find ALSA device for the radio
+   *
+   * Searches for an ALSA sound device associated with the radio's USB serial
+   * port.
+   *
+   * @param port Serial port path
+   * @return ALSA device name
+   */
+  static std::string find_alsa_device(const std::string &port);
+
+private:
+  /**
+   * @brief Helper function to read sysfs attributes
+   *
+   * Reads a string value from a sysfs file.
+   *
+   * @param filepath Path to the sysfs file
+   * @return String value read from file, or empty string on error
+   */
+  static std::string read_sysfs_attr(const fs::path &filepath);
+
+  rig_model_t model_; ///< Hamlib rig model
+  std::string port_;  ///< Serial port path
+  RIG *rig_;          ///< Hamlib rig handle
+
+  rmode_t orig_mode_;           ///< Saved original radio mode
+  bool orig_mode_saved_;       ///< Flag indicating if mode was saved
+
+  vfo_t orig_vfo_;               ///< Saved original VFO state
+  pbwidth_t orig_width_;       ///< Saved original bandwidth
+  PowerLevel orig_power_;      ///< Saved original power level
+  UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
+  int orig_tnc_state_;         ///< Saved original TNC state
+};
+
+#endif // RADIOCONTROLLER_HPP
+
+
+
+================================================================================
+FILE: include/TcmConfig.hpp
+================================================================================
+
+/**
+ * @file TcmConfig.hpp
+ * @brief TCM (Trellis Coded Modulation) configuration
+ *
+ * This module provides utilities for configuring Trellis Coded Modulation
+ * and QAM (Quadrature Amplitude Modulation) constellations for the 75fasmod
+ * modem. It uses GNU Radio's trellis and digital modules to generate
+ * the necessary Signal Processing objects.
+ *
+ * TCM combines convolutional coding with constellation modulation to
+ * achieve higher data rates while maintaining error correction capability.
+ */
+
+#pragma once
+#include <gnuradio/digital/constellation.h>
+#include <gnuradio/trellis/fsm.h>
+#include <vector>
+
+/**
+ * @brief Enumeration of supported modulation schemes
+ *
+ * Defines the available modulation orders for the modem.
+ * Higher orders provide higher data rates but require better SNR.
+ */
+enum class ModulationScheme {
+  QAM16,  ///< 16-QAM (4 bits per symbol)
+  QAM32,  ///< 32-QAM (5 bits per symbol)
+  QAM64,  ///< 64-QAM (6 bits per symbol)
+  QAM128, ///< 128-QAM (7 bits per symbol)
+  QAM256  ///< 256-QAM (8 bits per symbol)
+};
+
+/**
+ * @brief TCM configuration utility class
+ *
+ * Provides static methods to generate the GNU Radio objects needed
+ * for TCM modulation and demodulation. These include finite state
+ * machines (FSMs) for the convolutional encoder and constellation
+ * mappings for QAM modulation.
+ */
+class TcmConfig {
+public:
+  /**
+   * @brief Gets the gr-trellis FSM for the requested scheme
+   *
+   * Generates a finite state machine (FSM) for the convolutional
+   * encoder used in TCM. The FSM defines the state transitions
+   * and output symbols for the chosen modulation scheme.
+   *
+   * @param scheme Modulation scheme (QAM16, QAM32, etc.)
+   * @return gr::trellis::fsm Finite state machine for the encoder
+   */
+  static gr::trellis::fsm get_fsm(ModulationScheme scheme);
+
+  /**
+   * @brief Generates custom QAM grid points
+   *
+   * Creates a constellation mapping with cross-constellations
+   * optimized for the chosen modulation scheme. The constellations
+   * are designed for TCM operation.
+   *
+   * @param scheme Modulation scheme (QAM16, QAM32, etc.)
+   * @return gr::digital::constellation_sptr Constellation object
+   */
+  static gr::digital::constellation_sptr
+  get_constellation(ModulationScheme scheme);
+};
+
+
+
+================================================================================
+FILE: Makefile.am
+================================================================================
+
+bin_PROGRAMS = 75fasmod
+
+# Test programs
+check_PROGRAMS = test_frequency
+
+test_frequency_SOURCES = test/test_frequency.cpp src/RadioController.cpp
+test_frequency_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_frequency_LDADD = $(HAMLIB_LIBS)
+
+# Tell the C++ preprocessor where to find the header files
+AM_CPPFLAGS = -I$(top_srcdir)/include
+
+# List all source files from the src/ directory
+75fasmod_SOURCES = \
+	src/main.cpp \
+	src/DataSocket.cpp \
+	src/cobs.cpp \
+	src/Frame.cpp \
+	src/RadioController.cpp \
+	src/ModemDSP.cpp \
+	src/TcmConfig.cpp
+
+# Feed compiler and linker flags from pkg-config
+75fasmod_CXXFLAGS = $(HAMLIB_CFLAGS) $(GNURADIO_CFLAGS) $(FMT_CFLAGS) $(VOLK_CFLAGS) -Wall -Wextra -pthread
+75fasmod_LDADD = $(HAMLIB_LIBS) $(GNURADIO_LIBS) $(FMT_LIBS) $(VOLK_LIBS) -lpthread
+
+# Test runner
+TESTS = test/run_frequency_test.sh
+
+# Documentation targets
+.PHONY: docs
+docs: Doxyfile
+	doxygen Doxyfile
+
+# Clean documentation
+.PHONY: clean-docs
+clean-docs:
+	rm -rf docs/html docs/latex
+
+# Install documentation
+.PHONY: install-docs
+install-docs: docs
+
+
+
+================================================================================
+FILE: radio-notes.md
+================================================================================
+
+# Radio Notes
+
+## Frustrations about the radio
+Overall frustrations:
+* Only supports legacy Bluetooth. Not modern Bluetooth Low Energy.
+  * Only supports the Bluetooth HSP. This is a legacy Bluetooth
+    profile and isn't supported on the iPhone or newer headsets. It
+    would be nicer if it supported the more modern HFP. Even though it
+    is only mono.
+  * Only Supports Bluetooth SPP. This is also a legacy Bluetooth
+    profile and only supports connected mode. There are newer profiles
+    which take less energy.
+* Only does USB Audio out. It would be better if the sound card did
+  both Audio in and out.
+* Even though it has a IF tap that can capture a whole 15  
+
+
+### USB Audio
+The USB Audio feature on the TH-D75A/E supports audio output only.
+* The supported output format is 48 kHz, 16-bit, and monaural audio.
+* USB Audio outputs the same audio sound as the speaker output.
+* The output level of USB Audio can be adjusted in Menu No. 91A.
+* Audio sound is output from the USB even when a speaker microphone or earphone is connected.
+* When a Bluetooth headset is connected, USB Audio becomes a port used exclusively for the input and output of the Bluetooth headset.
+[Operating Tips 5.13.2]
+
+It would be so much nicer if they did full USB in and out. Since it is
+a dual band radio, Even though the signal is mono, provide
+
+### Bluetooth
+[Operating Tips 5.12.1] The TH-D75A/E does not support Bluetooth Low
+Energy (BLE). Therefore, it is not compatible with applications or
+devices that require BLE. It only supports communication via the HSP
+and SPP profiles.
+
+This includes the iPhone.
+
+#### HSP (Headset Profile)
+By connecting the TH-D75A/E to a Bluetooth-compatible headset device,
+the microphone and earphone of the headset can be used for making
+voice calls.
+
+PTT on the transceiver unit or speaker microphone is used to start
+transmission. (Transmission cannot be made directly from the Bluetooth
+headset, except for VOX operation, as PTT is not available via the
+Bluetooth headset.)
+
+To adjust the volume level when a Bluetooth device is connected, do so
+using the volume control of the headset. The sensitivity of the
+microphone can be adjusted in Menu No. 112.  
+
+Note: Audio sound cannot be output from the USB or SP port when a
+Bluetooth headset is connected. HFP (Hands-Free Profile) is not
+supported.
+
+#### SPP (Serial Port Profile)
+By pairing the TH-D75A/E with a PC and assigning a virtual serial
+port, it is possible to carry out serial communication with the PC
+wirelessly. Doing so enables wireless operation of APRS applications
+such as UI-View32 and MCP-D75. Also, serial communication with a PC is
+possible while a Bluetooth headset is being connected.  During virtual
+serial communication via Bluetooth, configuration of the baud rate is
+not necessary to ensure communication at the optimal speed. If it is
+necessary to configure the baud rate in the PC application program in
+use, select any of the available options.  Bluetooth ON (Bluetooth
+icon appears) Bluetooth (connected) icon lights up Bluetooth devices
+that are currently connected will appear in Menu No. 933.  Note:
+
+## AF vs IF mode
+When using a radio like the Kenwood TH-D75 for digital modes like FT8,
+the difference between **AF (Audio Frequency) mode** and **IF
+(Intermediate Frequency) mode** is essentially the difference between
+sending "processed music" versus sending "the raw digital file."
+
+Here is the practical breakdown:
+
+### 1. AF Mode (Audio Frequency)
+In AF mode, the radio does all the "work" of decoding the signal
+first. It takes the radio waves, extracts the audio, and then sends
+that audio signal over the USB cable to your computer.
+
+*   **How it works:** Radio $\rightarrow$ Demodulation $\rightarrow$
+    **Audio Processing (Filters/AGC)** $\rightarrow$ USB $\rightarrow$
+    PC.
+*   **The Downside:** The audio signal has been passed through the
+    radio's internal audio circuitry. This includes things like **AGC
+    (Automatic Gain Control)**, which changes the volume, and **Audio
+    Filters**, which might cut off certain frequencies.
+*   **Impact on FT8:** FT8 relies on extremely precise frequency
+    shifts (measured in just a few Hertz). If the radio's audio
+    filters or AGC "smear" or compress the signal, the computer may
+    struggle to decode the weak, precise tones, leading to failed
+    decodes.
+
+### 2. IF Mode (Intermediate Frequency / Data Mode)
+In IF mode, the radio bypasses the audio processing stage. It sends
+the "raw" digital data stream (the signal as it exists in the
+intermediate frequency stage) directly over the USB cable to your
+computer.
+
+*   **How $\text{it}$ works:** Radio $\rightarrow$ Demodulation
+    $\rightarrow$ **Raw Digital Stream** $\rightarrow$ USB
+    $\rightarrow$ PC.
+*   **The Advantage:** The signal is "pure." There is no radio-induced
+    distortion, no volume fluctuations from AGC, and no frequency
+    cutting from audio filters. Your computer (running WSJT-X)
+    receives the exact same signal that the radio is receiving.
+*   **Impact on FT8:** This is the "gold standard" for digital
+    modes. Because the signal is unprocessed, the software can see the
+    cleanest possible version of the FT8 tones, significantly
+    increasing your ability to decode very weak signals.
+	
+You cannot transmit when you are in IF mode.
+
+### Summary Comparison
+
+| Feature | **AF Mode (Audio)** | **IF Mode (Data/Raw)** |
+| :--- | :--- | :--- |
+| **Signal Quality** | Processed, potentially distorted | Raw, pure, and clean |
+| **Audio Filtering** | Subject to radio's audio filters | Bypasses radio's audio filters |
+| **AGC Impact** | Volume changes can affect decoding | No impact from radio AGC |
+| **Complexity** | Works with any basic audio setup | Requires a radio with a digital USB interface |
+| **Best For...** | SSB, CW, and simple voice communication | **FT8, FT4, and all digital modes** |
+
+**The Bottom Line:** For FT8, you should **always use IF mode** if
+your radio supports it. It eliminates the radio's audio hardware as a
+"weak link" in your signal chain.
+
+### Setting the correct mode
+
+Based on the search results from official Kenwood documentation and
+community discussions, the setting you are looking for is likely
+located in the following menu:
+
+*   **Menu No. 102 (USB Out Select)**
+
+According to the Kenwood product information for the TH-D75A/E, this
+specific menu item is used to configure the USB output behavior. While
+the snippet does not explicitly list the exact labels (e.g., "AF" vs
+"IF"), it identifies **Menu No. 102** as the place to check when
+managing the USB interface and its output modes.
+
+**Summary for your configuration:**
+1.  Navigate to the radio's menu system.
+2.  Locate **Menu No. 102**.
+3.  Look for the option within that menu that allows you to toggle
+    between the different output types (likely **AF/Audio** for
+    standard audio or **IF/Data** for digital modes).
+
+*Note: If you are using older guides that reference the TH-D74, they
+may mention Menu 980, but for the TH-D75, the official documentation
+points to Menu 102.*
+
+However you cannot set menu item 102 when the radio is in dual
+mode. You can't escape dual mode unless you have the TNC off.
+
+Method 1: Query Dual VFO State via Hamlib Hamlib exposes multi-receiver capabilities through VFO management.
+get_vfo_list / \get_vfo_list: Query the list of available VFOs.
+get_vfo (v): Queries the currently active VFO (returns VFOA, VFOB, Main, Sub, etc.).
+u DUAL / u DUAL_WATCH: If supported by the specific backend release, function state commands check specific operational flags.
+You can test function states in rigctl interactively:
+rigctl -m <TH-D75_model_id> -r /dev/ttyUSB0 u DUAL
+
+
+Method 2: Query Active Frequency/VFO Information When the radio is in Dual Watch mode, both Band A and Band B are active simultaneously. You can query parameter states across VFOs:
+# Query frequency on VFO A
+rigctl -m <model_id> -r /dev/ttyUSB0 get_freq VFOA
+
+# Query frequency on VFO B
+rigctl -m <model_id> -r /dev/ttyUSB0 get_freq VFOB
+
+
+If the backend accepts queries for Sub/VFO B without returning a target error, both bands are actively initialized.
+Method 3: Direct Native CAT Command (Most Reliable) Kenwood radios (including the TH-D74 and TH-D75) use standard Kenwood serial ASCII commands. You can pass raw serial commands through Hamlib using w or W (send_cmd / send_cmd_rx):
+BC Command (Band Control / Dual Status): Sending BC to a Kenwood handheld returns the status of Band A and Band B mode (e.g., whether single-band mode or dual-band mode is toggled).
+# Pass raw command 'BC;' to the TH-D75 via Hamlib
+rigctl -m <model_id> -r /dev/ttyUSB0 W "BC;"
+
+
+
+User prompt: What are the native Kenwood ASCII CAT commands for toggling dual watch and switching VFOs on the TH-D75?
+Response: Kenwood uses a consistent ASCII command structure across its handheld line (including the TH-D72, TH-D74, and TH-D75). Commands are sent over the serial port (USB or Bluetooth) in ASCII format followed by a carriage return (\r or ;).
+1. Toggling Dual Mode / Single Band Mode
+Command: BC (Band Control)
+Query State:
+BC
+
+Response format: BC x,y (where x is the Control/Main band and y is the Dual-Band state).
+Set Dual Mode ON (Dual Watch Active):
+BC 0,1    (Sets Control to Band A, Dual Mode ON)
+
+BC 1,1    (Sets Control to Band B, Dual Mode ON)
+
+
+Set Single Band Mode (Dual Watch Disabled):
+BC 0,0    (Sets Single Band Mode operating solely on Band A)
+
+BC 1,0    (Sets Single Band Mode operating solely on Band B)
+
+
+2. Switching Active VFO / Control Band
+To change which band is active for transmitting or active control without altering the dual-watch state:
+Command: BC or TXB (Transmit Band)
+Switch Control Band to Band A (VFO A):
+BC 0
+
+
+Switch Control Band to Band B (VFO B):
+BC 1
+
+
+Alternatively, to switch the transmit target directly:
+Set TX Band to A: TXB 0
+Set TX Band to B: TXB 1
+3. Switching Between VFO Mode and Memory Mode
+To switch between frequency/VFO mode and Memory/Call mode for the selected band:
+Command: VFO and MR
+Set Active Band to VFO Mode:
+VFO
+
+
+Set Active Band to Memory Mode:
+MR
+
+
+Set Active Band to Call Channel:
+CALL
+
+
+Sending via Hamlib (rigctl)
+To send these directly using Hamlib's pass-through command W (send_cmd_rx):
+# Query Dual Mode Status
+rigctl -m <model_id> -r /dev/ttyUSB0 W "BC;"
+
+# Enable Dual Mode with Band A Control
+rigctl -m <model_id> -r /dev/ttyUSB0 W "BC 0,1;"
+
+# Switch to VFO B as active control
+rigctl -m <model_id> -r /dev/ttyUSB0 W "BC 1;"
+
+
+
+User prompt: If I am trying to do this from C/C++ what function would I call?
+Response: To execute these native Kenwood CAT commands (BC;, BC 0,1;, etc.) directly through Hamlib's C/C++ API, use the rig_has_scan / rig_raw_cmd or rig_send_raw_cmd functions depending on your specific Hamlib version.
+The standard high-level Hamlib API function for sending raw serial pass-through commands is rig_send_raw_cmd() (or rig_has_scan / rig_pass_through in older releases).
+C/C++ Implementation Example
+#include <stdio.h>
+#include <string.h>
+#include <hamlib/rig.h>
+
+int main() {
+    RIG *my_rig;
+    rig_model_t my_model = RIG_MODEL_KENWOOD_THD74; // Or TH-D75 model ID when available
+    int res;
+
+    rig_set_debug(RIG_DEBUG_NONE);
+    my_rig = rig_init(my_model);
+    
+    // Configure serial port settings
+    strncpy(my_rig->state.rigport.pathname, "/dev/ttyUSB0", sizeof(my_rig->state.rigport.pathname));
+    my_rig->state.rigport.parm.serial.rate = 9600;
+
+    res = rig_open(my_rig);
+    if (res != RIG_OK) {
+        printf("Failed to open rig: %s\n", rigerror(res));
+        return 1;
+    }
+
+    // --- Sending Raw CAT Command via Hamlib C API ---
+    const char *cmd = "BC;\r";       // Kenwood command to query Dual/Band status
+    char response[64] = {0};
+    int response_len = 0;
+
+    /*
+     * rig_send_raw_cmd signature:
+     * rig_send_raw_cmd(RIG *rig, const char *in_buf, int in_len, 
+     *                  char *out_buf, int out_len, const char *term)
+     */
+    res = rig_send_raw_cmd(
+        my_rig,             // Rig handle
+        cmd,                // Raw ASCII string to send
+        strlen(cmd),        // Input command length
+        response,           // Buffer to store radio's response
+        sizeof(response),   // Maximum response buffer size
+        "\r"                // Response terminator character expected
+    );
+
+    if (res == RIG_OK) {
+        printf("Radio Response: %s\n", response);
+    } else {
+        printf("Failed to send command: %s\n", rigerror(res));
+    }
+
+    rig_close(my_rig);
+    rig_cleanup(my_rig);
+    return 0;
+}
+
+
+Key Hamlib C API Functions Reference
+rig_send_raw_cmd(): Sends raw command bytes to the rig hardware port and waits for a response up to the specified terminator character.
+rig_set_vfo(): High-level alternative to switch active VFO directly using Hamlib enums (e.g., rig_set_vfo(my_rig, RIG_VFO_A, RIG_VFO_B)).
+rig_get_vfo(): High-level function to retrieve current active VFO state (RIG_VFO_MAIN, RIG_VFO_SUB, RIG_VFO_A, etc.).
+
+User prompt: using hamlib or the raw kenwood CAT commands how do you find out if the TNC is on? i.e. either in APRS KISS12 or KISS96 mode?
+Response: To check if the TNC is active and what mode it is running in on a Kenwood handheld (like the TH-D75 or TH-D74), you query the TN (TNC Status) command over native Kenwood CAT commands.
+Hamlib does not expose a high-level rig_get_aprs_mode() abstraction for internal TNC states, so sending raw CAT commands via W / rig_send_raw_cmd() is the standard approach.
+1. Querying TNC Status (TN Command)
+Send the raw command TN; to the radio.
+Command:
+TN;
+
+
+Returned Responses:
+TN 0: TNC is OFF.
+TN 1: TNC is ON in APRS Mode (Internal Packet/APRS active).
+TN 2: TNC is ON in KISS Mode (1200 bps).
+TN 3: TNC is ON in KISS Mode (9600 bps).
+(Note: Depending on firmware revisions, TN 1 is standard internal APRS mode, while TN 2 and TN 3 designate KISS 1200 and KISS 9600 respectively).
+2. C / C++ Implementation with Hamlib
+Use rig_send_raw_cmd() to issue TN; and parse the integer returned after TN :
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <hamlib/rig.h>
+
+enum TNCMode {
+    TNC_OFF = 0,
+    TNC_APRS = 1,
+    TNC_KISS_1200 = 2,
+    TNC_KISS_9600 = 3,
+    TNC_UNKNOWN = -1
+};
+
+TNCMode check_tnc_status(RIG *my_rig) {
+    const char *cmd = "TN;\r";
+    char response[32] = {0};
+
+    int res = rig_send_raw_cmd(
+        my_rig,
+        cmd,
+        strlen(cmd),
+        response,
+        sizeof(response) - 1,
+        "\r"
+    );
+
+    if (res != RIG_OK) {
+        printf("Error querying TNC: %s\n", rigerror(res));
+        return TNC_UNKNOWN;
+    }
+
+    // Response format expected: "TN 0", "TN 1", "TN 2", or "TN 3"
+    if (strncmp(response, "TN ", 3) == 0) {
+        int status = atoi(&response[3]);
+        return (TNCMode)status;
+    }
+
+    return TNC_UNKNOWN;
+}
+
+int main() {
+    // Standard Hamlib init sequence ...
+    RIG *my_rig = rig_init(RIG_MODEL_KENWOOD_THD74); // Replace with TH-D75 model ID when available
+    strncpy(my_rig->state.rigport.pathname, "/dev/ttyUSB0", sizeof(my_rig->state.rigport.pathname));
+    my_rig->state.rigport.parm.serial.rate = 9600;
+
+    if (rig_open(my_rig) != RIG_OK) return 1;
+
+    TNCMode mode = check_tnc_status(my_rig);
+
+    switch (mode) {
+        case TNC_OFF:
+            printf("TNC is OFF\n");
+            break;
+        case TNC_APRS:
+            printf("TNC is active in Internal APRS Mode\n");
+            break;
+        case TNC_KISS_1200:
+            printf("TNC is active in KISS 1200 bps Mode\n");
+            break;
+        case TNC_KISS_9600:
+            printf("TNC is active in KISS 9600 bps Mode\n");
+            break;
+        default:
+            printf("Could not determine TNC status.\n");
+            break;
+    }
+
+    rig_close(my_rig);
+    rig_cleanup(my_rig);
+    return 0;
+}
+
+
+3. Setting the TNC State via CAT
+To toggle or switch TNC modes directly programmatically:
+Turn OFF TNC: TN 0;
+Enable APRS Mode: TN 1;
+Enable KISS 1200 Mode: TN 2;
+Enable KISS 9600 Mode: TN 3;
+
+User prompt: can you cite a source where you are finding all these CAT commands?
+Response: The primary sources for these serial CAT commands come directly from Kenwood official technical documentation, Hamlib source code, and the APRS/packet radio developer community:
+Kenwood Official Command Specifications:
+Kenwood TH-D74/TH-D75 Command Reference Protocols: Kenwood publishes official PC Control / Command Reference Manuals for its digital transceivers (such as the TH-D72, TH-D74, and TH-D75) outlining the serial control syntax over USB/Bluetooth COM ports.
+Commands like BC (Band Control), TXB (Transmit Band), VFO, and TN (TNC Control) are defined in these protocol guides.
+Hamlib Source Repository (Backend Drivers):
+The C drivers in the Hamlib GitHub repository (specifically kenwood/kenwood.c, kenwood/thd72.c, and kenwood/thd74.c) implement these specific raw byte sequences.
+You can inspect how Hamlib interacts with Kenwood handhelds directly in the codebase under rigs/kenwood/.
+TNC / APRS Developer Documentation:
+The TN command for toggling internal TNC state (0 = Off, 1 = APRS Mode, 2 = KISS 1200, 3 = KISS 9600) is heavily documented in open-source APRS software projects (such as Dire Wolf, Xastir, and YAAC) where developers issue direct setup commands to Kenwood hardware over virtual serial ports.
+
+User prompt: What CAT command allows you to figure out which band the TNC is currently using if it is on?
+Response: To determine which band (Band A or Band B) the TNC is assigned to on Kenwood handhelds, use the TNC command (or query parameter TN / TNC status depending on parameter flags) or query the BC (Band Control) state.
+1. The TNC Command
+Querying TNC returns the current TNC band allocation alongside its operational state.
+Query Command:
+TNC
+
+
+Response Format:
+TNC x,y
+
+
+x (TNC Mode / State):
+0 = Off
+1 = APRS / Packet Mode
+2 = KISS 1200 bps
+3 = KISS 9600 bps
+y (TNC Band Target):
+0 = Band A (Main / Top)
+1 = Band B (Sub / Bottom)
+Example: A response of TNC 1,0 indicates the TNC is turned ON in APRS mode and attached to Band A. A response of TNC 2,1 means KISS 1200 is running on Band B.
+2. Switching the TNC Band via CAT
+If you need to programmatically assign the TNC to a specific band:
+Set TNC to Band A:
+TNC 1,0    (Sets APRS/TNC mode ON on Band A)
+
+
+Set TNC to Band B:
+TNC 1,1    (Sets APRS/TNC mode ON on Band B)
+
+
+3. C / C++ Implementation Example
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <hamlib/rig.h>
+
+void get_tnc_band(RIG *my_rig) {
+    const char *cmd = "TNC;\r";
+    char response[32] = {0};
+
+    int res = rig_send_raw_cmd(
+        my_rig,
+        cmd,
+        strlen(cmd),
+        response,
+        sizeof(response) - 1,
+        "\r"
+    );
+
+    if (res == RIG_OK && strncmp(response, "TNC ", 4) == 0) {
+        int mode = 0;
+        int band = 0;
+        
+        // Parse "TNC x,y"
+        if (sscanf(response, "TNC %d,%d", &mode, &band) == 2) {
+            if (mode == 0) {
+                printf("TNC is currently OFF.\n");
+            } else {
+                printf("TNC Mode: %d | Assigned Band: Band %s\n", 
+                       mode, (band == 0) ? "A" : "B");
+            }
+            return;
+        }
+    }
+
+    printf("Failed to query TNC band status: %s\n", response);
+}
+
+In Hamlib, both **`rig_send_raw()`** and **`rig_send_raw_cmd()`** allow low-level pass-through access to the rig's communication port, but they serve fundamentally different network/hardware purposes and handle communication framing differently.
+
+---
+
+### **1. `rig_send_raw_cmd()` (Text/CAT Pass-Through)**
+
+Use **`rig_send_raw_cmd()`** when sending high-level ASCII CAT commands to radios that use text-based command interfaces (like Kenwood, Elecraft, or Ten-Tec).
+
+```c
+int rig_send_raw_cmd(RIG *rig, const char *in_buf, int in_len,
+                     char *out_buf, int out_len, const char *term);
+
+```
+
+* **Purpose:** It writes a text command to the transceiver and automatically reads back the response, stopping when it sees a specific termination character (like `\r` or `;`) or reaches a timeout.
+* **Termination Handling:** It uses the `term` string parameter to detect the end of the radio's response (e.g., `";"` for Kenwood or Yaesu CAT commands).
+* **Expected Usage:** Sending text string queries (such as `"BC;"` or `"TN;"`) where you expect an ASCII formatted string returned in `out_buf`.
+
+---
+
+### **2. `rig_send_raw()` (Raw Binary Byte I/O)**
+
+Use **`rig_send_raw()`** when sending raw binary packets or working with byte-oriented protocols (like Icom CI-V, Yaesu binary CAT protocols, or raw serial streams).
+
+```c
+int rig_send_raw(RIG *rig, const unsigned char *in_buf, int in_len,
+                 unsigned char *out_buf, int out_len);
+
+```
+
+* **Purpose:** It performs a direct write/read on the serial or network port buffer without searching for ASCII line terminators or string boundaries.
+* **Termination Handling:** It relies strictly on reading a predetermined byte length (`out_len`) or stopping when the underlying port read buffer clears out / times out.
+* **Expected Usage:** Sending raw byte arrays, binary hex frames, or custom hardware control commands that contain non-printable characters or `0x00` (NUL) bytes.
+
+---
+
+### **Summary**
+
+| Feature | `rig_send_raw_cmd()` | `rig_send_raw()` |
+| --- | --- | --- |
+| **Data Format** | Null-terminated or text ASCII strings | Raw binary byte arrays (`unsigned char*`) |
+| **Response Terminator** | Looks for explicit terminator string (e.g., `"\r"` or `";"`) | Reads fixed number of bytes or until timeout |
+| **Typical Target Radios** | Kenwood (`BC;`), Elecraft (`FA;`) | Icom CI-V hex frames (`0xFE 0xFE...`), Yaesu binary |
+| **Best Choice For TH-D75** | **Yes** (For standard text commands) | Only if interfacing with custom binary streams |
+
+
+
+================================================================================
+FILE: README.md
+================================================================================
+
+# 75fasmod
+
+[![Status:
+Experimental](https://img.shields.io/badge/status-experimental-red.svg)](#)
+[![License: Open
+Source](https://img.shields.io/badge/license-open--source-blue.svg)](#)
+
+**75fasmod** is an experimental, high-speed, open-source modem
+designed specifically for the **Kenwood TH-D75**. The project's
+mission is to achieve data rates comparable to proprietary solutions
+like VARA FM by utilizing advanced modulation techniques within an
+entirely open-source framework.
+
+## 🚀 The Vision
+While existing high-speed FM modems often rely on OFDM, **75fasmod**
+takes inspiration from the legendary V.34 modems of the 1990s. By
+utilizing **Adaptive QAM (Quadrature Amplitude Modulation)** combined
+with **TCM (Trellis Coded Modulation)**, this project aims to maximize
+throughput on the exceptionally flat audio response provided by the
+Kenwood TH-D75 hardware.
+
+## ✨ Key Features
+* **Advanced Modulation**: Implementation of Adaptive QAM + TCM for
+  high-efficiency signal transmission.
+* **Robust Framing**: Utilizes **COBS** (Consistent Overhead Byte
+  Stuffating) [1] and **CRC32** checksums for reliable data framing
+  and error detection.
+* **Hardware Optimized**: Specifically tuned for the audio
+  characteristics of the Kenwood TH-D75.
+* **Modern C++**: Built using **C++20** standards for high-performance
+  digital signal processing [1].
+
+## 🛠 Technical Stack
+The project leverages industry-standard libraries for signal
+processing and hardware interfacing:
+* **GNU Radio**: The core engine for the Digital Signal Processing
+  (DSP) pipeline, handling modulation, filtering, and constellation
+  mapping.
+* **Hamlib**: Provides the interface for robust radio control and
+  command execution.
+* **ALSA (Advanced Linux Sound Architecture)**: Manages the routing of
+  processed digital audio to the radio hardware.
+
+## 🏗 Architecture
+The project follows a modular C++ structure:
+* `include/`: Contains core logic headers including `ModemDSP.hpp`,
+  `RadioController.hpp`, and `TcmConfig.hpp`.
+* `src/`: Contains implementation files for the DSP pipeline and radio
+  control logic.
+* `test/`: Includes Python-based testing utilities (e.g.,
+  `test_tx.py`) for verifying transmission sequences.
+
+## ⚠️ Current Development Status
+**This project is in a highly experimental, early stage of
+development.**
+* **Modulation**: The modulation pipeline is currently undergoing
+  fundamental refinement to resolve DSP "kinks."
+* **Demodulation**: The demodulator is currently a **dummy
+  implementation** and does not yet perform full signal decoding.
+* **Stability**: The codebase is unstable and intended for research
+  and development purposes only.
+
+## 🛠 Installation & Building
+The project uses the **Autotools** build system.
+
+### Prerequisites
+Ensure you have the following installed:
+* GNU Radio
+* Hamlib
+* ALSA development headers
+* Autotools (`autoconf`, `automake`, `make`)
+* A C++20 compatible compiler (e.g., GCC 10+)
+
+### Build Steps
+```bash
+# Generate build files
+./autogen.sh
+
+# Configure the project
+./configure
+
+# Compile
+make
+
+# Format code (optional)
+make format
+```
+
+## Contributing
+
+This project is in its early, experimental stages, and we welcome all
+forms of contribution!
+
+## 🤖 Development Methodology: AI-Assisted Engineering
+This project serves as a experiment in **AI-assisted software
+development**. The codebase is largely authored using modern AI
+tools. One of the goals is to explore how LLMs and AI agents can
+accelerate complex engineering tasks. I'm being asked to use these
+tools for work where the results probably actually matter. To learn, I
+needed something that didn't matter to play with.
+
+The main tools that I have used were Gemini's web interface, aider
+connected to a local ollama instance running various models.
+
+### 🛠 Bug Reports & Stability
+The codebase is currently unstable and intended for research and
+development . If you encounter crashes, unexpected behavior, or
+audio artifacts, please open an issue.
+
+### 📻 Hardware Testing
+If you have a Kenwood TH-D75, please help us test the modulation side
+of the pipeline  and report on the results. Your feedback on audio
+quality is invaluable.
+
+### 🧠 Technical Feedback
+We are looking for expertise in GNU Radio, ALSA, and digital
+modulation (QAM/TCM) to help resolve current development "kinks"
+. If you have insights into the DSP pipeline, please reach out.
+
+### 🤖 AI-Assisted Development
+This project is an experiment in using AI to accelerate complex
+engineering tasks . We welcome anyone interested in sharing
+workflows, prompt engineering strategies, or tools used to assist in
+the creation and refinement of this codebase.
+
+## 👤 Author
+Ben Woodard **AE6BC**
+
+## 📄 License
+GPL-3.0
+
+
+
+
+
+================================================================================
+FILE: scripts/bundle_project.sh
+================================================================================
+
+#!/bin/bash
+
+OUTPUT="ai_prompt_bundle_full.txt"
+echo "Generating AI prompt bundle in $OUTPUT..."
+
+# Clear or create the output file
+> "$OUTPUT"
+
+# ------------------------------------------------------------------------------
+# 1. Append Directory Structure
+# ------------------------------------------------------------------------------
+echo "================================================================================" >> "$OUTPUT"
+echo "PROJECT DIRECTORY STRUCTURE" >> "$OUTPUT"
+echo "================================================================================" >> "$OUTPUT"
+echo "" >> "$OUTPUT"
+
+# Use 'tree' if available for better readability, otherwise fallback to 'find'
+if command -v tree >/dev/null 2>&1; then
+    tree -a -I '.git|.libs|.deps|autom4te.cache|build|*.o|*.lo|*.la|*.so|.aider*' >> "$OUTPUT"
+else
+    find . -type f \
+        -not -path '*/\.git/*' \
+        -not -path '*/\.libs/*' \
+        -not -path '*/\.deps/*' \
+        -not -path '*/autom4te.cache/*' \
+        -not -name '.aider*' | sort >> "$OUTPUT"
+fi
+echo -e "\n\n" >> "$OUTPUT"
+
+# ------------------------------------------------------------------------------
+# 2. Append File Contents
+# ------------------------------------------------------------------------------
+# Find all relevant source, build, and documentation files
+find . -type f \
+    \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \
+       -o -name "*.sh" -o -name "*.am" -o -name "*.ac" -o -name "*.md" \) \
+    -not -path '*/\.git/*' \
+    -not -path '*/\.libs/*' \
+    -not -path '*/\.deps/*' \
+    -not -path '*/autom4te.cache/*' \
+    -not -name '.aider*' | sort | while read -r FILE; do
+
+    # Strip the leading './' from the find output for cleaner paths
+    CLEAN_NAME="${FILE#./}"
+
+    # Exclude massive generated Autotools scripts that waste context window
+    if [[ "$CLEAN_NAME" == "ltmain.sh" || "$CLEAN_NAME" == "config.sub" || "$CLEAN_NAME" == "config.guess" ]]; then
+        continue
+    fi
+
+    echo "Adding: $CLEAN_NAME"
+
+    echo "================================================================================" >> "$OUTPUT"
+    echo "FILE: $CLEAN_NAME" >> "$OUTPUT"
+    echo "================================================================================" >> "$OUTPUT"
+    echo "" >> "$OUTPUT"
+    
+    # Append the file content
+    cat "$FILE" >> "$OUTPUT"
+    
+    echo -e "\n\n" >> "$OUTPUT"
+done
+
+echo "Done! Bundle created at: $OUTPUT"
+
+
+================================================================================
+FILE: scripts/run-linter.sh
+================================================================================
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Navigate to project root relative to script path
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+EXIT_CODE=0
+
+echo "=== 1. Checking Code Formatting (clang-format) ==="
+SRC_FILES=$(find src include -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" -o -name "*.cc" -o -name "*.hh" \) 2>/dev/null || true)
+
+if [ -n "$SRC_FILES" ]; then
+    if ! clang-format --dry-run -Werror $SRC_FILES 2>&1; then
+        echo "❌ Formatting issues found. Fix using: clang-format -i <file>"
+        EXIT_CODE=1
+    else
+        echo "✅ Code formatting check passed."
+    fi
+else
+    echo "⚠️ No C/C++ source files found for formatting."
+fi
+
+echo ""
+echo "=== 2. Running Static Analysis (clang-tidy) ==="
+
+# Locate compilation database generated by bear
+COMPDB_DIR=""
+if [ -f "compile_commands.json" ]; then
+    COMPDB_DIR="."
+elif [ -f "build/compile_commands.json" ]; then
+    COMPDB_DIR="build"
+fi
+
+if [ -z "$COMPDB_DIR" ]; then
+    echo "❌ Error: compile_commands.json not found."
+    echo "👉 Please run your build with bear first (e.g., 'bear -- make -C build')."
+    exit 1
+fi
+
+# Determine available clang-tidy runner (parallel runner preferred)
+TIDY_RUNNER=""
+if command -v run-clang-tidy >/dev/null 2>&1; then
+    TIDY_RUNNER="run-clang-tidy"
+elif command -v run-clang-tidy.py >/dev/null 2>&1; then
+    TIDY_RUNNER="run-clang-tidy.py"
+fi
+
+if [ -n "$TIDY_RUNNER" ]; then
+    # Run clang-tidy in parallel across files in the compilation database
+    if ! "$TIDY_RUNNER" -p "$COMPDB_DIR" -warnings-as-errors='*' -quiet 2>&1; then
+        echo "❌ Clang-tidy static analysis issues detected."
+        EXIT_CODE=1
+    else
+        echo "✅ Clang-tidy static analysis passed."
+    fi
+else
+    # Fallback to direct clang-tidy execution on each source file
+    echo "ℹ️ run-clang-tidy not found; executing clang-tidy sequentially..."
+    TIDY_FAILED=0
+    for file in $SRC_FILES; do
+        if [[ "$file" =~ \.(cpp|cc|cxx|c)$ ]]; then
+            if ! clang-tidy -p "$COMPDB_DIR" -warnings-as-errors='*' "$file" --quiet 2>&1; then
+                TIDY_FAILED=1
+            fi
+        fi
+    done
+
+    if [ $TIDY_FAILED -ne 0 ]; then
+        echo "❌ Clang-tidy static analysis issues detected."
+        EXIT_CODE=1
+    else
+        echo "✅ Clang-tidy static analysis passed."
+    fi
+fi
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "❌ Linter suite failed."
+    exit 1
+fi
+
+echo ""
+echo "✅ All lint checks passed successfully!"
+exit 0
+
+
+
+================================================================================
+FILE: src/cobs.cpp
+================================================================================
+
+#include "cobs.hpp"
+#include <cstring>
+
+Frame cobs_decode_frame(const std::vector<uint8_t> &input) {
+  std::vector<uint8_t> decoded;
+  decoded.reserve(input.size());
+
+  size_t read_index = 0;
+  while (read_index < input.size()) {
+    uint8_t code = input[read_index];
+    if (read_index + code > input.size() && code != 1) {
+      return Frame(FrameType::DATA, 0, 0, {});
+    }
+    read_index++;
+    for (uint8_t i = 1; i < code; i++) {
+      decoded.push_back(input[read_index++]);
+    }
+    if (code < 0xFF && read_index < input.size()) {
+      decoded.push_back(0);
+    }
+  }
+
+  if (decoded.size() >= sizeof(ModemHeader) + sizeof(uint32_t)) {
+    FrameType frame_type = static_cast<FrameType>(decoded[0]);
+    uint8_t seq_num = decoded[1];
+    uint16_t payload_len =
+        *reinterpret_cast<const uint16_t *>(decoded.data() + 2);
+
+    std::vector<uint8_t> payload(decoded.begin() + sizeof(ModemHeader),
+                                 decoded.begin() + decoded.size() -
+                                     sizeof(uint32_t));
+
+    Frame frame(frame_type, seq_num, payload_len, std::move(payload));
+
+    uint32_t rx_crc;
+    std::memcpy(&rx_crc, decoded.data() + decoded.size() - sizeof(uint32_t),
+                sizeof(uint32_t));
+    frame.crc = rx_crc;
+
+    return frame;
+  }
+
+  return Frame(FrameType::DATA, 0, 0, {});
+}
+
+
+================================================================================
+FILE: src/DataSocket.cpp
+================================================================================
+
+#include "DataSocket.hpp"
+#include "Frame.hpp"
+#include "ModemDSP.hpp"
+#include "RadioController.hpp"
+#include "cobs.hpp"
+#include <algorithm>
+#include <cstring>
+#include <iostream>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+
+DataSocket::DataSocket(const std::string &socket_path, RadioController &radio,
+                       ModemDSP &dsp, int burst_limit, int flush_timeout_ms)
+    : socket_path_(socket_path), server_fd_(-1), radio_(radio), dsp_(dsp),
+      burst_limit_(burst_limit), flush_timeout_ms_(flush_timeout_ms) {
+  rx_pipe_[0] = -1;
+  rx_pipe_[1] = -1;
+  tx_pipe_[0] = -1;
+  tx_pipe_[1] = -1;
+  active_client_fd_ = -1;
+}
+
+DataSocket::~DataSocket() { stop(); }
+
+bool DataSocket::start() {
+  server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (server_fd_ < 0)
+    return false;
+
+  struct sockaddr_un addr{};
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, socket_path_.c_str(), sizeof(addr.sun_path) - 1);
+  unlink(socket_path_.c_str());
+
+  if (bind(server_fd_, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    return false;
+  if (listen(server_fd_, 5) < 0)
+    return false;
+
+  if (pipe(rx_pipe_) < 0)
+    return false;
+  if (pipe(tx_pipe_) < 0)
+    return false; // Create TX Pipe
+
+  if (!dsp_.start_rx(rx_pipe_[1]))
+    return false;
+  if (!dsp_.start_tx(tx_pipe_[0]))
+    return false;
+
+  worker_thread_ = std::jthread(
+      [this](std::stop_token stoken) { this->accept_loop(stoken); });
+  std::cout << "Data socket listening on " << socket_path_ << "\n";
+  return true;
+}
+
+void DataSocket::stop() {
+  if (worker_thread_.joinable()) {
+    worker_thread_.request_stop();
+    worker_thread_.join();
+  }
+  dsp_.stop_rx();
+  dsp_.stop_tx();
+
+  if (rx_pipe_[0] >= 0) {
+    close(rx_pipe_[0]);
+    rx_pipe_[0] = -1;
+  }
+  if (rx_pipe_[1] >= 0) {
+    close(rx_pipe_[1]);
+    rx_pipe_[1] = -1;
+  }
+  if (tx_pipe_[0] >= 0) {
+    close(tx_pipe_[0]);
+    tx_pipe_[0] = -1;
+  }
+  if (tx_pipe_[1] >= 0) {
+    close(tx_pipe_[1]);
+    tx_pipe_[1] = -1;
+  }
+  if (server_fd_ >= 0) {
+    close(server_fd_);
+    server_fd_ = -1;
+    unlink(socket_path_.c_str());
+  }
+}
+
+void DataSocket::accept_loop(std::stop_token stoken) {
+  struct pollfd pfd{};
+  pfd.fd = server_fd_;
+  pfd.events = POLLIN;
+
+  while (!stoken.stop_requested()) {
+    if (poll(&pfd, 1, 100) > 0 && (pfd.revents & POLLIN)) {
+      int client_fd = accept(server_fd_, nullptr, nullptr);
+      if (client_fd >= 0) {
+        handle_client(client_fd, stoken);
+        close(client_fd);
+      }
+    }
+  }
+}
+
+void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
+  active_client_fd_ = client_fd;
+  struct pollfd pfds[2];
+  pfds[0].fd = client_fd;
+  pfds[0].events = POLLIN;
+  pfds[1].fd = rx_pipe_[0];
+  pfds[1].events = POLLIN;
+
+  std::vector<uint8_t> rx_buffer(2048);
+  std::vector<uint8_t> rx_stream_accum;
+  uint8_t current_seq = 0;
+  tx_queue_.clear();
+
+  while (!stoken.stop_requested()) {
+    int ret = poll(pfds, 2, 10); // 10ms loop allows fast deadline checking
+    auto now = std::chrono::steady_clock::now();
+
+    // 1. Unkey PTT if deadline has passed
+    if (is_transmitting_ && now >= ptt_drop_time_) {
+      radio_.set_ptt(false);
+      is_transmitting_ = false;
+      frames_sent_in_burst_ = 0;
+      std::cout << "[MAC] Burst finished. PTT dropped.\n";
+    }
+
+    if (ret > 0) {
+      // 2. Read from App Socket
+      if (pfds[0].revents & POLLIN) {
+        ssize_t bytes_read =
+            read(client_fd, rx_buffer.data(), rx_buffer.size());
+        if (bytes_read <= 0)
+          break;
+
+        size_t offset = 0;
+        while (offset < static_cast<size_t>(bytes_read)) {
+          size_t payload_size =
+              std::min<size_t>(bytes_read - offset, MAX_PAYLOAD_SIZE);
+          Frame frame(
+              FrameType::DATA, current_seq++, payload_size,
+              std::vector<uint8_t>(rx_buffer.begin() + offset,
+                                   rx_buffer.begin() + offset + payload_size));
+
+          std::vector<uint8_t> tx_encoded = frame.cobs_encode();
+          tx_encoded.push_back(0x00);
+
+          if (tx_queue_.empty())
+            queue_start_time_ = now;
+          tx_queue_.push_back(tx_encoded);
+          offset += payload_size;
+        }
+      }
+
+      // 3. Read from DSP RX Pipe
+      if (pfds[1].revents & POLLIN) {
+        std::vector<uint8_t> pipe_buf(1024);
+        ssize_t bytes = read(rx_pipe_[0], pipe_buf.data(), pipe_buf.size());
+        if (bytes > 0) {
+          rx_stream_accum.insert(rx_stream_accum.end(), pipe_buf.begin(),
+                                 pipe_buf.begin() + bytes);
+          auto it =
+              std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
+          while (it != rx_stream_accum.end()) {
+            std::vector<uint8_t> rx_encoded(rx_stream_accum.begin(), it);
+            rx_stream_accum.erase(rx_stream_accum.begin(), it + 1);
+
+            Frame decoded_frame = cobs_decode_frame(rx_encoded);
+            if (!decoded_frame.payload.empty()) {
+              std::cout << "[RX] Valid Frame -> Type: 0x0"
+                        << static_cast<int>(decoded_frame.frame_type)
+                        << " | Seq: " << (int)decoded_frame.seq_num
+                        << " | Len: " << decoded_frame.payload_len << "\n";
+              write(client_fd, decoded_frame.payload.data(),
+                    decoded_frame.payload_len);
+            } else {
+              std::cerr << "[RX] Error: Frame failed CRC check!\n";
+            }
+            it =
+                std::find(rx_stream_accum.begin(), rx_stream_accum.end(), 0x00);
+          }
+        }
+      }
+    }
+
+    // 4. TX Queue Processing & Deadlines
+    if (!tx_queue_.empty() && now >= tx_resume_time_) {
+      bool threshold_met =
+          (tx_queue_.size() >= static_cast<size_t>(burst_limit_));
+      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         now - queue_start_time_)
+                         .count();
+      bool timeout_met = (elapsed >= flush_timeout_ms_);
+
+      // If we are already transmitting, aggressively flush the queue
+      if (threshold_met || timeout_met || is_transmitting_) {
+
+        std::vector<uint8_t> stream_chunk;
+
+        // Key up if we aren't already
+        if (!is_transmitting_) {
+          radio_.set_ptt(true);
+          is_transmitting_ = true;
+          ptt_drop_time_ =
+              now + std::chrono::milliseconds(80); // Hardware relay delay
+
+          // Prepend 16-byte Training Preamble on first key-up
+          for (int i = 0; i < 16; ++i)
+            stream_chunk.push_back(0xAA);
+        }
+
+        // Pull frames up to burst limit
+        while (!tx_queue_.empty() && frames_sent_in_burst_ < burst_limit_) {
+          stream_chunk.insert(stream_chunk.end(), tx_queue_.front().begin(),
+                              tx_queue_.front().end());
+          tx_queue_.erase(tx_queue_.begin());
+          frames_sent_in_burst_++;
+        }
+
+        // Stream into continuous GNU Radio pipe
+        write(tx_pipe_[1], stream_chunk.data(), stream_chunk.size());
+
+        // Add exact audio duration to our future unkey deadline (48000 Hz, 5
+        // SPS, 3 bits/sym)
+        double total_symbols = (stream_chunk.size() * 8.0) / 3.0;
+        int duration_ms =
+            static_cast<int>((total_symbols * 5.0 * 1000.0) / 48000.0);
+
+        ptt_drop_time_ += std::chrono::milliseconds(duration_ms);
+
+        // Enforce Half-Duplex MAC Cooldown if limit reached
+        if (frames_sent_in_burst_ >= burst_limit_) {
+          // Extend PTT drop slightly to allow ALSA buffer drain
+          ptt_drop_time_ += std::chrono::milliseconds(100);
+          tx_resume_time_ = ptt_drop_time_ + std::chrono::milliseconds(
+                                                 300); // 300ms quiet turnaround
+        }
+      }
+    }
+  }
+  active_client_fd_ = -1;
+}
+
+
+
+================================================================================
+FILE: src/Frame.cpp
+================================================================================
+
+#include "Frame.hpp"
+
+Frame::Frame(FrameType frame_type, uint8_t seq_num, uint16_t payload_len,
+             std::vector<uint8_t> payload)
+    : ModemHeader(frame_type, seq_num, payload_len),
+      payload(std::move(payload)) {}
+
+uint32_t Frame::calc_crc() const {
+  uint32_t crc = 0xFFFFFFFF;
+
+  // Hash inherited header fields
+  const uint8_t *data =
+      reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
+  size_t len = sizeof(ModemHeader);
+  for (size_t i = 0; i < len; ++i) {
+    crc ^= data[i];
+    for (int j = 0; j < 8; ++j) {
+      crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
+    }
+  }
+
+  // Hash payload
+  for (size_t i = 0; i < payload.size(); ++i) {
+    crc ^= payload[i];
+    for (int j = 0; j < 8; ++j) {
+      crc = (crc >> 1) ^ (0xEDB88320 & (-(crc & 1)));
+    }
+  }
+
+  return ~crc;
+}
+
+std::vector<uint8_t> Frame::cobs_encode() const {
+  std::vector<uint8_t> raw_frame;
+  const uint8_t *hdr_ptr =
+      reinterpret_cast<const uint8_t *>(static_cast<const ModemHeader *>(this));
+  raw_frame.insert(raw_frame.end(), hdr_ptr, hdr_ptr + sizeof(ModemHeader));
+  raw_frame.insert(raw_frame.end(), payload.begin(), payload.end());
+
+  uint32_t crc = calc_crc();
+  uint8_t *crc_ptr = reinterpret_cast<uint8_t *>(&crc);
+  raw_frame.insert(raw_frame.end(), crc_ptr, crc_ptr + sizeof(uint32_t));
+
+  std::vector<uint8_t> output;
+  output.resize(raw_frame.size() + raw_frame.size() / 254 + 2);
+
+  size_t read_index = 0;
+  size_t write_index = 1;
+  size_t code_index = 0;
+  uint8_t code = 1;
+
+  while (read_index < raw_frame.size()) {
+    if (raw_frame[read_index] == 0) {
+      output[code_index] = code;
+      code = 1;
+      code_index = write_index++;
+      read_index++;
+    } else {
+      output[write_index++] = raw_frame[read_index++];
+      code++;
+      if (code == 0xFF) {
+        output[code_index] = code;
+        code = 1;
+        code_index = write_index++;
+      }
+    }
+  }
+  output[code_index] = code;
+  output.resize(write_index);
+  return output;
+}
+
+
+================================================================================
+FILE: src/main.cpp
+================================================================================
+
+#include "DataSocket.hpp"
+#include "ModemDSP.hpp"
+#include "RadioController.hpp"
+#include <atomic>
+#include <csignal>
+#include <cstdlib>
+#include <filesystem>
+#include <getopt.h>
+#include <hamlib/rig.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+namespace fs = std::filesystem;
+
+// Global flag to keep the daemon running
+std::atomic<bool> keep_running{true};
+
+void handle_signal(int /* sig */) { keep_running = false; }
+
+void print_usage(const char *prog_name) {
+  std::cout
+      << "Usage: " << prog_name << " [options]\n"
+      << "Options:\n"
+      << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
+      << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
+      << "  -p, --port <device>   Serial port (default: auto-discover Kenwood "
+         "TH-D75)\n"
+      << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic "
+         "Kenwood)\n"
+      << "  -s, --sock <path>     Data socket path (default: "
+         "/tmp/75fasmod_data.sock)\n"
+      << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
+      << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: 200)\n"
+      << "  -h, --help            Show this help message\n"
+      << "  -a, --alsa-tx <device>  ALSA transmit device (e.g., hw:5,0)\n"
+      << "  -d, --hamlib-debug   Enable Hamlib debug logging\n";
+}
+
+int main(int argc, char *argv[]) {
+  // Variable Declarations (Correctly scoped for the entire main function)
+  double target_freq_mhz = 0.0;
+  std::string power_level = "";
+  std::string serial_port = "";
+  std::string sock_path = "/tmp/75fasmod_data.sock";
+  std::string alsa_tx_device = "";
+  bool hamlib_debug = false;
+
+  // Default values
+  rig_model_t rig_model = RadioController::DEFAULT_MODEL;
+  int burst_limit = 8;
+  int flush_timeout_ms = 200;
+
+  const char *const short_opts = "f:w:p:m:s:b:t:h:a:d";
+  const option long_opts[] = {{"freq", required_argument, nullptr, 'f'},
+                              {"power", required_argument, nullptr, 'w'},
+                              {"port", required_argument, nullptr, 'p'},
+                              {"model", required_argument, nullptr, 'm'},
+                              {"sock", required_argument, nullptr, 's'},
+                              {"burst", required_argument, nullptr, 'b'},
+                              {"timeout", required_argument, nullptr, 't'},
+                              {"help", no_argument, nullptr, 'h'},
+                              {"alsa-tx", required_argument, nullptr, 'a'},
+                              {"hamlib-debug", no_argument, nullptr, 'd'},
+                              {nullptr, 0, nullptr, 0}};
+
+  int opt;
+  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
+         -1) {
+    switch (opt) {
+    case 'f':
+      target_freq_mhz = std::stod(optarg);
+      break;
+    case 'w':
+      power_level = optarg;
+      break;
+    case 'p':
+      serial_port = optarg;
+      break;
+    case 'm':
+      rig_model = std::stoi(optarg);
+      break;
+    case 's':
+      sock_path = optarg;
+      break;
+    case 'b':
+      burst_limit = std::stoi(optarg);
+      break;
+    case 't':
+      flush_timeout_ms = std::stoi(optarg);
+      break;
+    case 'h':
+      print_usage(argv[0]);
+      return 0;
+    case 'a':
+      alsa_tx_device = optarg;
+      break;
+    case 'd':
+      hamlib_debug = true;
+      break;
+    default:
+      print_usage(argv[0]);
+      return 1;
+    }
+  }
+
+  if (target_freq_mhz == 0.0) {
+    std::cerr << "Error: You must specify a target frequency in MHz.\n";
+    return 1;
+  }
+
+  if (alsa_tx_device.empty()) {
+    std::cerr << "Error: You must specify an ALSA transmit device.\n";
+    return 1;
+  }
+
+  // 1. Setup Signal Handler
+  std::signal(SIGINT, handle_signal);
+  std::signal(SIGTERM, handle_signal);
+
+  // 2. Discover Kenwood TH-D75 device if not explicitly specified
+  if (serial_port.empty()) {
+    std::vector<std::string> discovered_ports =
+        RadioController::find_tty_sysfs();
+
+    if (discovered_ports.size() == 1) {
+      serial_port = discovered_ports[0];
+      std::cout << "Auto-discovered Kenwood TH-D75 at " << serial_port << "\n";
+    } else if (discovered_ports.size() > 1) {
+      std::cout << "Multiple Kenwood TH-D75 devices found:\n";
+      for (size_t i = 0; i < discovered_ports.size(); ++i) {
+        std::cout << "  [" << i << "] " << discovered_ports[i] << "\n";
+      }
+      std::cout << "Select device (0-" << (discovered_ports.size() - 1)
+                << "): ";
+      size_t choice;
+      std::cin >> choice;
+      if (choice < discovered_ports.size()) {
+        serial_port = discovered_ports[choice];
+      } else {
+        std::cerr << "Invalid selection\n";
+        return 1;
+      }
+    } else {
+      // Fall back to common default if discovery fails
+      serial_port = "/dev/ttyUSB0";
+      std::cout
+          << "Warning: Could not auto-discover Kenwood TH-D75, using default "
+          << serial_port << "\n";
+    }
+  }
+
+  // 3. Initialize Hardware & DSP Classes
+  RadioController radio(rig_model, serial_port);
+  if (!radio.initialize(hamlib_debug)) {
+    std::cerr << "Error: Failed to initialize radio controller.\n";
+    return 1;
+  } else {
+    std::cout << "Setting frequency to " << target_freq_mhz << " MHz...\n";
+    radio.set_frequency(target_freq_mhz);
+
+    if (!power_level.empty()) {
+      radio.set_power_level(power_level);
+    }
+  }
+
+  // Map the serial port to its matching ALSA soundcard
+  std::string alsa_device = radio.find_alsa_device();
+  if (alsa_device.empty()) {
+    std::cerr << "Warning: Could not map serial port to ALSA device. "
+                 "Defaulting to TH-D75 alias.\n";
+    alsa_device = "hw:CARD=THD75,DEV=0";
+  } else {
+    std::cout << "Mapped serial port " << serial_port
+              << " to ALSA audio device " << alsa_device << "\n";
+  }
+
+  ModemDSP dsp(alsa_tx_device, alsa_device);
+
+  // 4. Start the Data Socket Server
+  DataSocket data_sock(sock_path, radio, dsp, burst_limit, flush_timeout_ms);
+  if (!data_sock.start()) {
+    return 1;
+  }
+
+  // 5. Main Daemon Loop
+  std::cout << "Daemon is running. Press Ctrl+C to stop.\n";
+  while (keep_running.load()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
+
+  // 6. Cleanup
+  std::cout << "\nShutting down daemon...\n";
+  data_sock.stop();
+
+  return 0;
+}
+
+
+
+================================================================================
+FILE: src/ModemDSP.cpp
+================================================================================
+
+#include "ModemDSP.hpp"
+#include "TcmConfig.hpp"
+#include <gnuradio/audio/sink.h>
+#include <gnuradio/audio/source.h>
+#include <gnuradio/blocks/complex_to_real.h>
+#include <gnuradio/blocks/file_descriptor_sink.h>
+#include <gnuradio/blocks/file_descriptor_source.h>
+#include <gnuradio/blocks/multiply_const.h>
+#include <gnuradio/blocks/repack_bits_bb.h>
+#include <gnuradio/digital/chunks_to_symbols.h>
+#include <gnuradio/filter/firdes.h>
+#include <gnuradio/filter/interp_fir_filter.h>
+#include <gnuradio/top_block.h>
+#include <gnuradio/trellis/encoder.h>
+#include <iostream>
+#include <stdexcept> // Ensure this is included at the top for std::exception
+#include <unistd.h>
+
+ModemDSP::ModemDSP(const std::string &alsa_tx_device,
+                   const std::string &alsa_rx_device)
+    : alsa_tx_device_(alsa_tx_device), alsa_rx_device_(alsa_rx_device) {}
+
+ModemDSP::~ModemDSP() {
+  stop_rx();
+  stop_tx();
+}
+
+bool ModemDSP::start_rx(int output_fd) {
+  rx_tb_ = gr::make_top_block("rx_continuous_flowgraph");
+
+  try {
+    auto audio_src = gr::audio::source::make(48000, alsa_rx_device_);
+    auto fd_sink =
+        gr::blocks::file_descriptor_sink::make(sizeof(uint8_t), output_fd);
+
+    rx_tb_->start();
+    std::cout << "[DSP] Continuous RX Flowgraph started.\n";
+    return true;
+  } catch (const std::exception &e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_rx initializing ALSA device '"
+              << alsa_rx_device_ << "':\n -> " << e.what() << "\n\n";
+    return false;
+  }
+}
+
+void ModemDSP::stop_rx() {
+  if (rx_tb_) {
+    rx_tb_->stop();
+    rx_tb_->wait();
+    rx_tb_.reset();
+  }
+}
+
+bool ModemDSP::start_tx(int input_fd) {
+  tx_pipe_fd_ = input_fd;
+  tx_tb_ = gr::make_top_block("tx_continuous_flowgraph");
+
+  auto fsm = TcmConfig::get_fsm(ModulationScheme::QAM16);
+  auto qam = TcmConfig::get_constellation(ModulationScheme::QAM16);
+
+  int sps = 5;
+  float rolloff = 0.35;
+
+  try {
+    auto src = gr::blocks::file_descriptor_source::make(sizeof(uint8_t),
+                                                        input_fd, false);
+    auto repack = gr::blocks::repack_bits_bb::make(8, 3);
+    auto trellis_encoder =
+        gr::trellis::encoder<uint8_t, uint8_t>::make(fsm, 0, 0);
+    auto mapper = gr::digital::chunks_to_symbols<uint8_t, gr_complex>::make(
+        qam->points());
+
+    std::vector<float> rrc_taps = gr::filter::firdes::root_raised_cosine(
+        sps, sps, 1.0, rolloff, 11 * sps);
+    auto rrc_filter = gr::filter::interp_fir_filter_ccf::make(sps, rrc_taps);
+
+    auto complex_to_real = gr::blocks::complex_to_real::make(1);
+    auto gain = gr::blocks::multiply_const_ff::make(0.5);
+    auto sink = gr::audio::sink::make(48000, alsa_tx_device_, true);
+
+    tx_tb_->connect(src, 0, repack, 0);
+    tx_tb_->connect(repack, 0, trellis_encoder, 0);
+    tx_tb_->connect(trellis_encoder, 0, mapper, 0);
+    tx_tb_->connect(mapper, 0, rrc_filter, 0);
+    tx_tb_->connect(rrc_filter, 0, complex_to_real, 0);
+    tx_tb_->connect(complex_to_real, 0, gain, 0);
+    tx_tb_->connect(gain, 0, sink, 0);
+
+    tx_tb_->start();
+    std::cout << "[DSP] Continuous TX Flowgraph started.\n";
+    return true;
+  } catch (const std::exception &e) {
+    std::cerr << "\n[DSP] CRITICAL ERROR in start_tx initializing ALSA device '"
+              << alsa_tx_device_ << "':\n -> " << e.what() << "\n\n";
+    return false;
+  }
+}
+
+void ModemDSP::stop_tx() {
+  if (tx_tb_) {
+    tx_tb_->stop();
+    tx_tb_->wait();
+    tx_tb_.reset();
+  }
+}
+
+
+
+================================================================================
+FILE: src/RadioController.cpp
+================================================================================
+
+#include "RadioController.hpp"
+#include <chrono>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <thread>
+
+std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
+  std::ifstream file(filepath);
+  std::string value;
+  if (file >> value)
+    return value;
+  return "";
+}
+
+RadioController::RadioController(rig_model_t model, const std::string &port)
+    : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
+      orig_width_(0), orig_menu_102_(UsbOutSelect::unknown),
+      orig_power_(PowerLevel::UNKNOWN), orig_tnc_state_(-1),
+      orig_vfo_(RIG_VFO_NONE) {}
+
+RadioController::~RadioController() {
+  if (rig_) {
+    std::cout << "[RIG] Shutting down. Restoring original radio settings...\n";
+    set_ptt(false);
+
+    // Restore original menu 102 (only if we successfully queried it)
+    if (orig_menu_102_ != UsbOutSelect::unknown) {
+      if (!kenwood_usb_out_select_set(orig_menu_102_)) {
+        std::cerr
+            << "[RIG] Warning: Failed to restore original Menu 102 setting.\n";
+      }
+    }
+
+    // Restore original VFO
+    if (orig_vfo_ != RIG_VFO_NONE) {
+      if (rig_set_vfo(rig_, orig_vfo_) == RIG_OK) {
+        std::cout << "[RIG] Restored VFO to " << rig_strvfo(orig_vfo_) << "\n";
+      }
+    }
+
+    // Restore original TNC state
+    if (orig_tnc_state_ != -1) {
+      std::cout << "[RIG] Restoring TNC state to " << orig_tnc_state_
+                << "...\n";
+      if (!kenwood_tnc_set(orig_tnc_state_)) {
+        std::cerr << "[RIG] Warning: Failed to restore original TNC state.\n";
+      }
+    }
+
+    if (orig_power_ != PowerLevel::UNKNOWN) {
+      if (!kenwood_power_set(orig_power_)) {
+        std::cerr << "[RIG] Warning: Failed to restore original TX power.\n";
+      }
+    }
+
+    // Restore original operating mode and bandwidth
+    if (orig_mode_ != RIG_MODE_NONE) {
+      std::cout << "[RIG] Restoring original mode (" << rig_strrmode(orig_mode_)
+                << ")...\n";
+      rig_set_mode(rig_, RIG_VFO_CURR, orig_mode_, orig_width_);
+    }
+
+    rig_close(rig_);
+    rig_cleanup(rig_);
+  }
+}
+
+bool RadioController::initialize(bool hamlib_debug) {
+  // Enable Hamlib internal verbose trace logging only if requested
+  if (hamlib_debug) {
+    rig_set_debug_level(RIG_DEBUG_TRACE);
+  }
+
+  std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
+  rig_ = rig_init(model_);
+  if (!rig_) {
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
+              << ". The model ID may not exist in this Hamlib build.\n";
+    return false;
+  }
+
+  rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+
+  int status = rig_open(rig_);
+  if (status != RIG_OK) {
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_
+              << " | Code: " << status << " (" << rigerror(status) << ")\n";
+    return false;
+  }
+
+  std::cout << "[RIG] Backing up current radio state...\n";
+
+  // 1. Save original operating mode and bandwidth
+  if (rig_get_mode(rig_, RIG_VFO_CURR, &orig_mode_, &orig_width_) == RIG_OK) {
+    std::cout << "[RIG] Saved original mode: " << rig_strrmode(orig_mode_)
+              << "\n";
+  } else {
+    std::cerr << "[RIG] Warning: Could not query starting radio mode.\n";
+  }
+
+  // 2. Save current VFO state
+  if (rig_get_vfo(rig_, &orig_vfo_) == RIG_OK) {
+    std::cout << "[RIG] Saved VFO state: " << rig_strvfo(orig_vfo_) << "\n";
+  }
+
+  // 3. Save TNC state before any modifications
+  orig_tnc_state_ = kenwood_tnc_get();
+  std::cout << "[RIG] Saved TNC state: " << orig_tnc_state_ << "\n";
+
+  // Turn off TNC if it's on to allow dual mode changes
+  if (orig_tnc_state_ != 0 && orig_tnc_state_ != -1) {
+    std::cout << "[RIG] Turning off TNC to allow dual mode changes...\n";
+    if (!kenwood_tnc_set(0)) {
+      std::cerr << "[RIG] CRITICAL ERROR: Could not turn off TNC.\n";
+      return false;
+    }
+  }
+
+  // Set to VFO B to allow menu 102 changes when in dual mode
+  std::cout << "[RIG] Setting radio to VFO B for menu 102 access...\n";
+  rig_set_vfo(rig_, RIG_VFO_B);
+
+  // 4. Query power and Menu 102 state
+  orig_power_ = kenwood_power_get();
+  orig_menu_102_ = kenwood_usb_out_select_get();
+
+  if (orig_menu_102_ == UsbOutSelect::unknown) {
+    std::cerr
+        << "\n[RIG] WARNING: Could not query Menu 102 via CAT.\n"
+        << "      Kenwood locks this menu over USB. Please manually ensure\n"
+        << "      Menu 102 (USB Out Select) is set to IF Output (1).\n\n";
+    // We purposefully DO NOT return false here. We bypass the error and
+    // continue.
+  }
+
+  std::cout << "[RIG] Configuring radio for high-speed modem operation...\n";
+
+  // 5. Set mode to Packet FM (9600 baud passband)
+  int mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
+  if (mode_ret != RIG_OK) {
+    std::cout << "[RIG] PKTFM mode rejected, falling back to standard FM...\n";
+    mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
+  }
+
+  // Verify radio is in an FM mode
+  rmode_t active_mode = RIG_MODE_NONE;
+  pbwidth_t active_width = 0;
+  if (rig_get_mode(rig_, RIG_VFO_CURR, &active_mode, &active_width) == RIG_OK) {
+    if (active_mode != RIG_MODE_PKTFM && active_mode != RIG_MODE_FM) {
+      std::cerr
+          << "[RIG] WARNING: Radio failed to enter FM mode! Current mode: "
+          << rig_strrmode(active_mode) << "\n";
+    } else {
+      std::cout << "[RIG] Verified active mode: " << rig_strrmode(active_mode)
+                << "\n";
+    }
+  }
+
+  // 6. Configure Kenwood 9600 bps data output path (Menu 102) safely
+  if (orig_menu_102_ != UsbOutSelect::unknown &&
+      orig_menu_102_ != UsbOutSelect::IF) {
+    std::cout << "[RIG] Changing Menu 102 to IF Output (1). This will cause a "
+                 "USB reset...\n";
+    if (!kenwood_usb_out_select_set(UsbOutSelect::IF)) {
+      std::cerr
+          << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF output.\n";
+      return false;
+    }
+
+    // The radio is currently rebooting its USB interface.
+    // Close our stale handles before the OS gets upset.
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
+
+    std::cout << "[RIG] Waiting 4 seconds for USB re-enumeration...\n";
+    std::this_thread::sleep_for(std::chrono::seconds(4));
+
+    // Re-initialize Hamlib now that the radio has returned
+    std::cout << "[RIG] Reconnecting to Hamlib after USB reset...\n";
+    rig_ = rig_init(model_);
+    rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+
+    int re_status = rig_open(rig_);
+    if (re_status != RIG_OK) {
+      std::cerr << "[RIG] Error: Failed to reconnect after USB reset. Code: "
+                << re_status << "\n";
+      return false;
+    }
+    std::cout << "[RIG] Successfully reconnected to radio.\n";
+  } else if (orig_menu_102_ == UsbOutSelect::IF) {
+    std::cout
+        << "[RIG] Menu 102 already set to IF Output. Skipping USB reset.\n";
+  }
+
+  return true;
+}
+
+bool RadioController::set_frequency(double freq_mhz) {
+  freq_t freq_hz = static_cast<freq_t>(freq_mhz * 1000000.0);
+  return rig_set_freq(rig_, RIG_VFO_CURR, freq_hz) == RIG_OK;
+}
+
+bool RadioController::get_frequency(double &freq_mhz) {
+  freq_t freq_hz;
+  if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) != RIG_OK) {
+    return false;
+  }
+  freq_mhz = static_cast<double>(freq_hz) / 1000000.0;
+  return true;
+}
+
+bool RadioController::set_ptt(bool transmit) {
+  const char *cmd = transmit ? "TX\r" : "RX\r";
+  char buf[64] = {0};
+  unsigned char term = '\r';
+
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    return false;
+  }
+  return true;
+}
+
+bool RadioController::get_dcd(bool &is_squelch_open) {
+  dcd_t dcd_status;
+  if (rig_get_dcd(rig_, RIG_VFO_CURR, &dcd_status) == RIG_OK) {
+    is_squelch_open = (dcd_status == RIG_DCD_ON);
+    return true;
+  }
+  return false;
+}
+
+bool RadioController::set_power_level(const std::string &level) {
+  std::string lvl = level;
+  for (auto &c : lvl)
+    c = std::toupper(c);
+
+  PowerLevel val = PowerLevel::UNKNOWN;
+  if (lvl == "H")
+    val = PowerLevel::HIGH;
+  else if (lvl == "M")
+    val = PowerLevel::MEDIUM;
+  else if (lvl == "L")
+    val = PowerLevel::LOW;
+  else if (lvl == "EL")
+    val = PowerLevel::EXTRA_LOW;
+  else {
+    std::cerr << "Error: Invalid power level '" << level
+              << "'. Use EL, L, M, or H.\n";
+    return false;
+  }
+
+  std::cout << "[RIG] Setting TX power to " << lvl << "...\n";
+  return kenwood_power_set(val);
+}
+
+bool RadioController::get_power_level(std::string &level) {
+  PowerLevel pwr = kenwood_power_get();
+  switch (pwr) {
+  case PowerLevel::HIGH:
+    level = "H";
+    return true;
+  case PowerLevel::MEDIUM:
+    level = "M";
+    return true;
+  case PowerLevel::LOW:
+    level = "L";
+    return true;
+  case PowerLevel::EXTRA_LOW:
+    level = "EL";
+    return true;
+  default:
+    return false;
+  }
+}
+
+int RadioController::kenwood_menu_get(int menu_num) {
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "EX%03d\r",
+           menu_num); // Standard Kenwood EX command
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying Menu " << menu_num << " ("
+              << rigerror(bytes) << ")\n";
+    return -1;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    // Suppress the giant error output since we now expect Menu 102 to throw a ?
+    return -1;
+  }
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
+
+    if (comma != std::string::npos && term_pos != std::string::npos) {
+      try {
+        return std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+      } catch (...) {
+        return -1;
+      }
+    }
+  }
+  return -1;
+}
+
+bool RadioController::kenwood_menu_set(int menu_num, int value) {
+  if (value < 0)
+    return false;
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error configuring Menu " << menu_num << " ("
+              << rigerror(bytes) << ")\n";
+    return false;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    return false;
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  int actual = kenwood_menu_get(menu_num);
+  if (actual != value) {
+    return false;
+  }
+
+  return true;
+}
+
+RadioController::PowerLevel RadioController::kenwood_power_get() {
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // Fetch power for the active band
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying power level ("
+              << rigerror(bytes) << ")\n";
+    return PowerLevel::UNKNOWN;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error querying power: " << buf << "\n";
+    return PowerLevel::UNKNOWN;
+  }
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t comma = resp.find(',');
+    size_t term_pos = resp.find('\r');
+    if (term_pos == std::string::npos)
+      term_pos = resp.find(';');
+
+    // PC response looks like "PC 0,3\r" (Band, Power)
+    if (comma != std::string::npos && term_pos != std::string::npos &&
+        term_pos > comma + 1) {
+      try {
+        int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+        if (pwr_int >= 0 && pwr_int <= 3) {
+          return static_cast<PowerLevel>(pwr_int);
+        }
+      } catch (...) {
+        return PowerLevel::UNKNOWN;
+      }
+    }
+  }
+  return PowerLevel::UNKNOWN;
+}
+
+bool RadioController::kenwood_power_set(PowerLevel val) {
+  if (val == PowerLevel::UNKNOWN)
+    return false;
+
+  // Query active band (0 = Band A, 1 = Band B)
+  int active_band = 0;
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes =
+      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
+  if (bc_bytes > 0) {
+    std::string bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error setting power level ("
+              << rigerror(bytes) << ")\n";
+    return false;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error setting power: " << buf << "\n";
+    return false;
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+  PowerLevel actual = kenwood_power_get();
+  if (actual != val) {
+    std::cerr << "[RIG] Verification failed for Power Level. Expected "
+              << static_cast<int>(val) << " but got "
+              << static_cast<int>(actual) << ".\n";
+    return false;
+  }
+
+  return true;
+}
+
+int RadioController::kenwood_tnc_get() {
+  char cmd[] = "TN\r";
+  char buf[64] = {0};
+  unsigned char term = '\r';
+
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0) {
+    std::cerr << "[RIG] Transport error querying TNC state (" << rigerror(bytes)
+              << ")\n";
+    return -1;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error querying TNC state: " << buf << "\n";
+    return -1;
+  }
+
+  if (bytes > 0) {
+    std::string resp(buf);
+    size_t space_pos = resp.find(' ');
+    size_t comma = resp.find(',');
+
+    if (comma != std::string::npos) {
+      size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
+      try {
+        return std::stoi(resp.substr(start, comma - start));
+      } catch (...) {
+        return -1;
+      }
+    }
+  }
+  return -1;
+}
+
+bool RadioController::kenwood_tnc_set(int mode) {
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+
+  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
+    std::cerr << "[RIG] Transport error setting TNC state (" << rigerror(bytes)
+              << ")\n";
+    return false;
+  }
+
+  if (bytes > 0 && (buf[0] == '?' ||
+                    (buf[0] == 'E' && (buf[1] == '\r' || buf[1] == '\0')))) {
+    std::cerr << "[RIG] Firmware error setting TNC state: " << buf << "\n";
+    return false;
+  }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  int actual = kenwood_tnc_get();
+  if (actual != mode) {
+    std::cerr << "[RIG] Verification failed for TNC Mode. Expected " << mode
+              << " but got " << actual << ".\n";
+    return false;
+  }
+
+  return true;
+}
+
+RadioController::UsbOutSelect RadioController::kenwood_usb_out_select_get() {
+  int value = kenwood_menu_get(102);
+  switch (value) {
+  case 0:
+    return UsbOutSelect::AF;
+  case 1:
+    return UsbOutSelect::IF;
+  case 2:
+    return UsbOutSelect::Detect;
+  default:
+    return UsbOutSelect::unknown;
+  }
+}
+
+bool RadioController::kenwood_usb_out_select_set(UsbOutSelect value) {
+  return kenwood_menu_set(102, static_cast<int>(value));
+}
+
+std::vector<std::string>
+RadioController::find_tty_sysfs(unsigned int target_vid,
+                                unsigned int target_pid) {
+  std::vector<std::string> found_ports;
+  fs::path sys_tty = "/sys/class/tty";
+
+  if (!fs::exists(sys_tty))
+    return found_ports;
+
+  for (const auto &entry : fs::directory_iterator(sys_tty)) {
+    fs::path dev_path = entry.path() / "device";
+    if (!fs::exists(dev_path))
+      continue;
+
+    for (const char *parent_rel : {"..", "../..", "../../.."}) {
+      fs::path vid_path = dev_path / parent_rel / "idVendor";
+      fs::path pid_path = dev_path / parent_rel / "idProduct";
+
+      if (fs::exists(vid_path) && fs::exists(pid_path)) {
+        unsigned int vid = 0, pid = 0;
+        if (auto vid_str = read_sysfs_attr(vid_path); !vid_str.empty()) {
+          vid = std::stoul(vid_str, nullptr, 16);
+        }
+        if (auto pid_str = read_sysfs_attr(pid_path); !pid_str.empty()) {
+          pid = std::stoul(pid_str, nullptr, 16);
+        }
+
+        if (vid == target_vid && pid == target_pid) {
+          found_ports.push_back("/dev/" + entry.path().filename().string());
+          break;
+        }
+      }
+    }
+  }
+  return found_ports;
+}
+
+std::string RadioController::find_alsa_device(const std::string &serial_port) {
+  fs::path tty_name = fs::path(serial_port).filename();
+  fs::path tty_dev_path = "/sys/class/tty" / tty_name / "device";
+
+  if (!fs::exists(tty_dev_path))
+    return "";
+
+  fs::path usb_dev_path;
+  try {
+    usb_dev_path = fs::canonical(tty_dev_path).parent_path();
+  } catch (...) {
+    return "";
+  }
+
+  fs::path sound_class_path = "/sys/class/sound";
+  if (!fs::exists(sound_class_path))
+    return "";
+
+  for (const auto &entry : fs::directory_iterator(sound_class_path)) {
+    std::string card_name = entry.path().filename().string();
+
+    if (card_name.find("card") == 0) {
+      fs::path card_dev_path = entry.path() / "device";
+      if (!fs::exists(card_dev_path))
+        continue;
+
+      try {
+        fs::path card_usb_path = fs::canonical(card_dev_path).parent_path();
+        if (card_usb_path == usb_dev_path) {
+          std::string card_num = card_name.substr(4);
+          return "hw:" + card_num + ",0";
+        }
+      } catch (...) {
+        continue;
+      }
+    }
+  }
+  return "";
+}
+
+
+================================================================================
+FILE: src/TcmConfig.cpp
+================================================================================
+
+#include "TcmConfig.hpp"
+#include <cmath>
+#include <stdexcept>
+
+gr::trellis::fsm TcmConfig::get_fsm(ModulationScheme scheme) {
+  int k = 3; // Default QAM16 (3 info bits -> 4 coded bits)
+
+  switch (scheme) {
+  case ModulationScheme::QAM16:
+    k = 3;
+    break;
+  case ModulationScheme::QAM32:
+    k = 4;
+    break;
+  case ModulationScheme::QAM64:
+    k = 5;
+    break;
+  case ModulationScheme::QAM128:
+    k = 6;
+    break;
+  case ModulationScheme::QAM256:
+    k = 7;
+    break;
+  }
+
+  int I = 1 << k;       // 2^k input symbols
+  int S = 8;            // 8 internal memory states
+  int O = 1 << (k + 1); // 2^(k+1) output constellation indices
+
+  std::vector<int> NS(I * S);
+  std::vector<int> OS(I * S);
+
+  for (int s = 0; s < S; ++s) {
+    for (int i = 0; i < I; ++i) {
+      int uncoded_bits = i >> 1;
+      int coded_bit = i & 1;
+
+      // Rate-1/2 8-state systematic feedback polynomial transitions
+      int next_s = ((s << 1) | coded_bit) & 7;
+      int parity = ((s >> 2) ^ (s >> 1) ^ coded_bit) & 1;
+      int output_symbol = (uncoded_bits << 2) | (parity << 1) | coded_bit;
+
+      NS[s * I + i] = next_s;
+      OS[s * I + i] = output_symbol;
+    }
+  }
+
+  return gr::trellis::fsm(I, S, O, NS, OS);
+}
+
+gr::digital::constellation_sptr
+TcmConfig::get_constellation(ModulationScheme scheme) {
+  std::vector<gr_complex> points;
+
+  switch (scheme) {
+  case ModulationScheme::QAM16: {
+    // 4x4 Square Grid
+    for (int x = -3; x <= 3; x += 2) {
+      for (int y = -3; y <= 3; y += 2) {
+        points.push_back(gr_complex(x / 3.0f, y / 3.0f));
+      }
+    }
+    break;
+  }
+
+  case ModulationScheme::QAM32: {
+    // 6x6 Cross Grid (36 points - 4 corners = 32 points)
+    for (int x = -5; x <= 5; x += 2) {
+      for (int y = -5; y <= 5; y += 2) {
+        if (std::abs(x) == 5 && std::abs(y) == 5)
+          continue; // Skip 4 corners
+        points.push_back(gr_complex(x / 5.0f, y / 5.0f));
+      }
+    }
+    break;
+  }
+
+  case ModulationScheme::QAM64: {
+    // 8x8 Square Grid
+    for (int x = -7; x <= 7; x += 2) {
+      for (int y = -7; y <= 7; y += 2) {
+        points.push_back(gr_complex(x / 7.0f, y / 7.0f));
+      }
+    }
+    break;
+  }
+
+  case ModulationScheme::QAM128: {
+    // 12x12 Cross Grid (144 points - 16 corner points = 128 points)
+    for (int x = -11; x <= 11; x += 2) {
+      for (int y = -11; y <= 11; y += 2) {
+        if (std::abs(x) >= 9 && std::abs(y) >= 9)
+          continue; // Skip 4x4 corners
+        points.push_back(gr_complex(x / 11.0f, y / 11.0f));
+      }
+    }
+    break;
+  }
+
+  case ModulationScheme::QAM256: {
+    // 16x16 Square Grid
+    for (int x = -15; x <= 15; x += 2) {
+      for (int y = -15; y <= 15; y += 2) {
+        points.push_back(gr_complex(x / 15.0f, y / 15.0f));
+      }
+    }
+    break;
+  }
+  }
+
+  std::vector<int> symbol_map(points.size());
+  for (size_t i = 0; i < points.size(); ++i) {
+    symbol_map[i] = static_cast<int>(i);
+  }
+
+  return gr::digital::constellation_rect::make(
+      points,     // Constellation points
+      symbol_map, // Symbol map (pre_diff_code)
+      4,          // Rotational symmetry (4-fold for QAM)
+      2,          // Real sectors
+      2,          // Imaginary sectors
+      1.0f,       // Width real sectors
+      1.0f,       // Width imaginary sectors
+      gr::digital::constellation::NO_NORMALIZATION // Normalization strategy
+  );
+}
+
+
+================================================================================
+FILE: technical-notes.md
+================================================================================
+
+# Technical Notes
+
+## The Shannon limit
+
+To determine the Shannon limit (maximum theoretical channel capacity)
+for a channel with a bandwidth of **3200 Hz**, you must apply the
+**Shannon-Hartley Theorem**:
+
+$$C = B \times \log_2(1 + \text{SNR})$$
+
+Where:
+
+* $C$ = Channel Capacity in **bits per second (bps)**
+* $B$ = Channel Bandwidth in **Hz** ($3,200 \text{ Hz}$)
+* $\text{SNR}$ = Signal-to-Noise Ratio as a **linear ratio** (not in dB)
+
+Because the Shannon limit depends heavily on the channel's
+Signal-to-Noise Ratio (SNR), the maximum capacity varies based on link
+quality:
+
+### Channel Capacity at Common SNR Levels
+
+To calculate the linear SNR from a decibel value
+($\text{SNR}_{\text{dB}}$):
+
+$$\text{SNR}_{\text{linear}} = 10^{\left(\frac{\text{SNR}_{\text{dB}}}{10}\right)}$$
+
+| Channel Condition | $\text{SNR}_{\text{dB}}$ | $\text{SNR}_{\text{linear}}$ | $\log_2(1 + \text{SNR})$ | Maximum Capacity ($C$) |
+| --- | --- | --- | --- | --- |
+| **Very Weak Signal** | $0 \text{ dB}$ | $1.0$ | $\approx 1 \text{ bit/symbol}$ | **3,200 bps** (~3.2 kbps) |
+| **Fair / Low Signal** | $10 \text{ dB}$ | $10.0$ | $\approx 3.46 \text{ bits/symbol}$ | **11,068 bps** (~11.1 kbps) |
+| **Good Signal** | $20 \text{ dB}$ | $100.0$ | $\approx 6.66 \text{ bits/symbol}$ | **21,306 bps** (~21.3 kbps) |
+| **Strong Signal** | $30 \text{ dB}$ | $1000.0$ | $\approx 9.97 \text{ bits/symbol}$ | **31,895 bps** (~31.9 kbps) |
+| **Pristine / High SNR** | $40 \text{ dB}$ | $10,000.0$ | $\approx 13.29 \text{ bits/symbol}$ | **42,520 bps** (~42.5 kbps) |
+
+---
+
+### Practical Application (e.g., VARA FM)
+
+A 3200 Hz passband roughly corresponds to a **standard voice-grade
+SSB/FM radio channel** (such as VARA FM Narrow mode):
+
+* At a typical strong signal level of **$25 \text{ dB}$ SNR**
+  ($\text{SNR} \approx 316.2$):
+
+$$C = 3,200 \times \log_2(1 + 316.2) = 3,200 \times 8.31 \approx
+\mathbf{26,590 \text{ bps}}$$
+
+Real-world digital protocols (like VARA FM Narrow, which reaches
+roughly $12,000 \text{ bps}$) achieve around **40% to 50%** of the
+theoretical Shannon limit due to Forward Error Correction (FEC)
+overhead, symbol training preambles, phase jitter, and filter edge
+roll-offs.
+
+## Half-Duplex Turnaround Time Analysis
+
+To determine the ideal MAC quiet period after a max-frame burst, we
+have to account for the physical delays in the hardware chain:
+
+    Local RX Settling: ~50 ms (Time for your TH-D75 to drop PTT and
+    stabilize the receiver).
+
+    Remote Squelch & DSP: ~30 ms (Time for the receiving radio to open
+    its squelch and GNU Radio to decode the frame).
+
+    Remote PTT Assertion: ~80 ms (Time for the remote radio's internal
+    relays to physically switch to TX).
+
+    Remote Preamble: ~20 ms (Time to send the synchronization bytes).
+
+    Buffer Margin: ~120 ms (Safety padding for OS context switching
+    and ALSA buffering).
+
+Recommendation: A minimum 300 ms MAC Cooldown after dropping PTT. If
+you hit your burst_limit_, you stop transmitting, drop PTT, and ignore
+your local TX queue for 300 ms to give the other radio a chance to
+seize the channel.
+
+## Trellis FSM
+
+A Trellis FSM (Finite State Machine) file defines the state-transition
+rules and coding memory of a convolutional encoder used in Trellis
+Coded Modulation (TCM). It tells GNU Radio's `gr-trellis` module how
+input bit sequences transition between internal memory states and map
+to output constellation indices.
+
+**What is a Trellis FSM File?**
+
+In `gr-trellis`, an FSM file is a text file (or in-memory structure)
+representing the encoder's state machine. It contains four core
+components:
+
+* **$I$ (Input Alphabet Size):** Number of possible input symbols
+  ($2^k$, where $k$ is the number of unencoded data bits per symbol).
+* **$S$ (Number of States):** Total internal memory states ($2^m$,
+  where $m$ is the number of memory bits).
+* **$O$ (Output Alphabet Size):** Number of encoded output symbols
+  ($2^{k+1}$).
+* **Next State (NS) & Output Symbol (OS) Tables:** Matrices mapping
+  every `(current_state, input_symbol)` pair to its `next_state` and
+  corresponding `output_symbol_index`.
+
+**How Do We Generate One?**
+
+You can generate an `.fsm` file using Python helper scripts or define
+it directly in C++ memory:
+
+1. **Using Python / GNU Radio Utilities:**
+GNU Radio provides Python bindings in `gnuradio.trellis` to generate FSMs from generator matrix polynomials or systematic matrix definitions, which can then be saved to disk:
+```python
+from gnuradio import trellis
+# Example: Generate an FSM from generator polynomials
+fsm = trellis.fsm(k, n, [poly1, poly2, ...])
+fsm.write_fsm_file("tcm_16qam.fsm")
+
+```
+
+
+2. **Direct C++ Instantiation (Recommended for Daemons):**
+To avoid managing external text files on disk in your `75fasmod` daemon, you can instantiate `gr::trellis::fsm` directly in C++ using `std::vector<int>` for the NS and OS tables:
+```cpp
+#include <gnuradio/trellis/fsm.h>
+
+// fsm(I, S, O, NS_table, OS_table)
+gr::trellis::fsm tcm_fsm(I, S, O, ns_matrix, os_matrix);
+
+```
+
+
+
+**Do You Need One for Each Constellation?**
+
+**Yes.** Standard Ungerboeck TCM pairs a rate $k/(k+1)$ convolutional
+encoder with a constellation of size $2^{k+1}$. Because the input and
+output symbol dimensions scale exponentially with the constellation
+order, each modulation level requires its own distinct FSM:
+
+* **16-QAM TCM (Rate 3/4):** $k=3$ data bits $\rightarrow$ $I = 2^3 = 8$, $O = 2^4 = 16$ constellation points.
+* **64-QAM TCM (Rate 5/6):** $k=5$ data bits $\rightarrow$ $I = 2^5 = 32$, $O = 2^6 = 64$ constellation points.
+* **256-QAM TCM (Rate 7/8):** $k=7$ data bits $\rightarrow$ $I = 2^7 = 128$, $O = 2^8 = 256$ constellation points.
+
+For an adaptive modem, you will define a dedicated FSM object and
+matching constellation map for each constellation order you plan to
+support.
+
+## QAM limitations
+
+512-QAM is not practical over the TH-D75's analog FM audio
+path. 512-QAM requires an Error Vector Magnitude (EVM) better than -33
+dB (an SNR > 35 dB) and near-zero phase jitter, whereas FM
+discriminator circuits, group-delay distortion, and 16-bit audio
+codecs cap your usable channel SNR to roughly 22–28 dB. This makes
+**256-QAM the absolute theoretical ceiling** and **64-QAM the
+realistic high-throughput target**.
+
+### Constellation & Trellis FSM Breakdown
+
+Standard 2D Ungerboeck TCM uses an 8-state ($S = 8$) or 16-state
+convolutional encoder where the input alphabet size is $I = 2^k$ (for
+$k$ information bits) and the output symbol alphabet size is $O =
+2^{k+1}$.
+
+| Modulation | Grid Construction | Info Bits ($k$) | Constellation Points ($2^{k+1}$) | FSM Input ($I$) | FSM Output ($O$) |
+| --- | --- | --- | --- | --- | --- |
+| **16-QAM** | $4 \times 4$ Square | 3 bits/symbol | 16 points | 8 | 16 |
+| **32-QAM** | $6 \times 6$ Cross (1 point removed per corner) | 4 bits/symbol | 32 points | 16 | 32 |
+| **64-QAM** | $8 \times 8$ Square | 5 bits/symbol | 64 points | 32 | 64 |
+| **128-QAM** | $12 \times 12$ Cross (4 points removed per corner) | 6 bits/symbol | 128 points | 64 | 128 |
+| **256-QAM** | $16 \times 16$ Square | 7 bits/symbol | 256 points | 128 | 256 |
+
+
+
+================================================================================
+FILE: test/radio_power_test.cpp
+================================================================================
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+#include <hamlib/rig.h>
+#include "RadioController.hpp"
+
+// Since the user specifically wants to test the transition of power levels 
+// and verify it, and the target methods are protected, I will create a 
+// "TestableRadioController" that inherits from RadioController and 
+// exposes those methods for the purpose of this integration test.
+
+class TestableRadioController : public RadioController {
+public:
+    using RadioController::RadioController; // Inherit constructor
+
+    // Expose the protected methods for testing
+    PowerLevel get_power_internal() {
+        return kenwood_power_get();
+    }
+
+    bool set_power_internal(PowerLevel val) {
+        return kenwood_power_set(val);
+    }
+};
+
+int main() {
+    std::cout << "[TEST] Starting Radio Power Integration Test (Testable Variant)...\n" << std::endl;
+
+    // 1. Find the serial port
+    std::cout << "[STEP 1] Searching for radio serial port via sysfs..." << std::endl;
+    std::vector<std::string> ports = RadioController::find_tty_sysfs();
+    
+    if (ports.empty()) {
+        std::cerr << "[ERROR] No radio serial ports found! Check your USB connection." << std::endl;
+        return 1;
+    }
+
+    std::string radio_port = ports[0];
+    std::cout << "[SUCCESS] Found radio on: " << radio_port << std::endl;
+
+    // 2. Instantiate TestableRadioController
+    std::cout << "\n[STEP 2] Instantiating TestableRadioController..." << std::endl;
+    TestableRadioController radio(RadioController::DEFAULT_MODEL, radio_port);
+
+    if (!radio.initialize()) {
+        std::cerr << "[ERROR] Failed to initialize RadioController on " << radio_port << std::endl;
+        return 1;
+    }
+    std::cout << "[SUCCESS] RadioController initialized." << std::endl;
+
+    // 3. Perform the requested sequence
+    // - Get current power
+    // - Set to something different
+    // - Verify
+
+    std::cout << "\n[STEP 3] Testing Power Level Sequence..." << std::endl;
+
+    // Get original power
+    RadioController::PowerLevel original_power = radio.get_power_internal();
+    std::cout << "[INFO] Original Power Level (enum value): " << static_cast<int>(original_power) << std::endl;
+
+    // Choose a different power level for testing
+    // We'll try 'LOW' (PowerLevel::LOW is usually 2)
+    RadioController::PowerLevel target_power = RadioController::PowerLevel::LOW;
+    
+    // If original is already LOW, let's try HIGH instead
+    if (original_power == target_power) {
+        target_power = RadioController::PowerLevel::HIGH;
+    }
+
+    std::cout << "[INFO] Setting power to: " << static_cast<int>(target_power) << "..." << std::endl;
+
+    if (!radio.set_power_internal(target_power)) {
+        std::cerr << "[ERROR] Failed to set power level!" << std::endl;
+        return 1;
+    }
+
+    // Verify
+    std::cout << "[INFO] Verifying power level..." << std::endl;
+    RadioController::PowerLevel verified_power = radio.get_power_internal();
+    std::cout << "[INFO] Verified Power Level: " << static_cast<int>(verified_power) << std::endl;
+
+    if (verified_power == target_power) {
+        std::cout << "\n[SUCCESS] Power level sequence test PASSED!" << std::endl;
+    } else {
+        std::cerr << "\n[ERROR] Power level mismatch! Expected " 
+                  << static_cast<int>(target_power) 
+                  << " but got " << static_cast<int>(verified_power) << std::endl;
+        return 1;
+    }
+
+    // Cleanup: Restore original power
+    std::cout << "\n[CLEANUP] Restoring original power level..." << std::endl;
+    radio.set_power_internal(original_power);
+
+    std::cout << "[TEST] Integration test completed successfully." << std::endl;
+    return 0;
+}
+
+
+
+================================================================================
+FILE: test/run_frequency_test.sh
+================================================================================
+
+#!/bin/bash
+# Script runner for test_frequency
+# This script runs the frequency test twice and compares the results
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+TEST_BIN="${PROJECT_DIR}/test_frequency"
+
+# Check if the test binary exists
+if [ ! -x "$TEST_BIN" ]; then
+    echo "[ERROR] Test binary not found at $TEST_BIN"
+    echo "[INFO] Run 'make check' from the project directory first"
+    exit 1
+fi
+
+# Set a test frequency (within the 2m ham band: 144-148 MHz)
+SET_FREQ="145.500"
+
+echo "========================================"
+echo "Frequency Test - Setting Frequency"
+echo "========================================"
+
+# First invocation: Set the frequency
+echo "[RUNNING] First invocation with -s $SET_FREQ..."
+FIRST_OUTPUT=$( "$TEST_BIN" -s "$SET_FREQ" 2>&1 )
+echo "$FIRST_OUTPUT"
+
+# Extract the frequency that was set (from [OUTPUT] line)
+FIRST_FREQ=$( echo "$FIRST_OUTPUT" | grep "^\[OUTPUT\]" | awk '{print $2}' | tr -d ' ' )
+
+echo ""
+echo "========================================"
+echo "Frequency Test - Getting Frequency"
+echo "========================================"
+
+# Second invocation: Get the frequency
+echo "[RUNNING] Second invocation without -s..."
+SECOND_OUTPUT=$( "$TEST_BIN" 2>&1 )
+echo "$SECOND_OUTPUT"
+
+# Extract the frequency that was read (from [OUTPUT] line)
+SECOND_FREQ=$( echo "$SECOND_OUTPUT" | grep "^\[OUTPUT\]" | awk '{print $2}' | tr -d ' ' )
+
+echo ""
+echo "========================================"
+echo "Comparison"
+echo "========================================"
+
+echo "First frequency (set):  $FIRST_FREQ MHz"
+echo "Second frequency (get): $SECOND_FREQ MHz"
+
+# Compare the two frequencies (with some tolerance for floating point)
+FIRST_INT=$( echo "$FIRST_FREQ" | awk '{printf "%.0f", $1 * 1000}' )
+SECOND_INT=$( echo "$SECOND_FREQ" | awk '{printf "%.0f", $1 * 1000}' )
+
+if [ "$FIRST_INT" = "$SECOND_INT" ]; then
+    echo "[SUCCESS] Frequencies match!"
+    exit 0
+else
+    echo "[FAIL] Frequencies do not match!"
+    echo "  Expected: $FIRST_FREQ MHz"
+    echo "  Got:      $SECOND_FREQ MHz"
+    exit 1
+fi
+
+
+
+================================================================================
+FILE: test/test_frequency.cpp
+================================================================================
+
+/**
+ * @file test_frequency.cpp
+ * @brief Test program for RadioController frequency get/set functionality
+ *
+ * This test program:
+ * 1. Uses find_tty_sysfs to identify the radio's serial port
+ * 2. Instantiates a RadioController with that serial port
+ * 3. Calls get_frequency() to find out the current frequency
+ * 4. If -s option is passed, sets the frequency to something different within the same ham band
+ * 5. Prints out the frequency that it set or got
+ */
+
+#include <getopt.h>
+#include <hamlib/rig.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include "RadioController.hpp"
+
+void print_usage(const char *prog_name) {
+  std::cout << "Usage: " << prog_name << " [options]\n"
+            << "Options:\n"
+            << "  -s, --set-freq <MHz>  Set frequency to specified value (MHz)\n"
+            << "  -h, --help            Show this help message\n"
+            << "  -n, --new-freq <MHz>  New frequency to try (for comparison test)\n";
+}
+
+int main(int argc, char *argv[]) {
+  double new_freq_mhz = 0.0;
+  double compare_freq_mhz = 435.0; // Default comparison frequency
+  bool do_set = false;
+
+  const char *const short_opts = "s:h:n:";
+  const option long_opts[] = {
+      {"set-freq", required_argument, nullptr, 's'},
+      {"help", no_argument, nullptr, 'h'},
+      {"new-freq", required_argument, nullptr, 'n'},
+      {nullptr, 0, nullptr, 0}};
+
+  int opt;
+  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) != -1) {
+    switch (opt) {
+    case 's':
+      new_freq_mhz = std::stod(optarg);
+      do_set = true;
+      break;
+    case 'n':
+      compare_freq_mhz = std::stod(optarg);
+      break;
+    case 'h':
+      print_usage(argv[0]);
+      return 0;
+    default:
+      print_usage(argv[0]);
+      return 1;
+    }
+  }
+
+  // Step 1: Find the radio's serial port using find_tty_sysfs
+  std::cout << "[TEST] Step 1: Searching for radio serial port via sysfs..." << std::endl;
+  std::vector<std::string> ports = RadioController::find_tty_sysfs();
+
+  if (ports.empty()) {
+    std::cerr << "[ERROR] No radio serial ports found! Check your USB connection." << std::endl;
+    return 1;
+  }
+
+  std::string radio_port = ports[0];
+  std::cout << "[SUCCESS] Found radio on: " << radio_port << std::endl;
+
+  // Step 2: Instantiate RadioController with that serial port
+  std::cout << "\n[TEST] Step 2: Instantiating RadioController..." << std::endl;
+  RadioController radio(RadioController::DEFAULT_MODEL, radio_port);
+
+  if (!radio.initialize()) {
+    std::cerr << "[ERROR] Failed to initialize RadioController on " << radio_port << std::endl;
+    return 1;
+  }
+  std::cout << "[SUCCESS] RadioController initialized." << std::endl;
+
+  // Step 3: Get current frequency
+  std::cout << "\n[TEST] Step 3: Getting current frequency..." << std::endl;
+  double current_freq_mhz = 0.0;
+  if (!radio.get_frequency(current_freq_mhz)) {
+    std::cerr << "[ERROR] Failed to get frequency from radio." << std::endl;
+    return 1;
+  }
+  std::cout << "[INFO] Current frequency: " << current_freq_mhz << " MHz" << std::endl;
+
+  if (do_set) {
+    // Step 4: Set frequency to a new value
+    std::cout << "\n[TEST] Step 4: Setting frequency to " << new_freq_mhz << " MHz..." << std::endl;
+    if (!radio.set_frequency(new_freq_mhz)) {
+      std::cerr << "[ERROR] Failed to set frequency to " << new_freq_mhz << " MHz" << std::endl;
+      return 1;
+    }
+    std::cout << "[SUCCESS] Successfully set frequency to " << new_freq_mhz << " MHz" << std::endl;
+    std::cout << "\n[OUTPUT] " << new_freq_mhz << std::endl;
+  } else {
+    // Just print the current frequency
+    std::cout << "\n[INFO] No -s option provided, just reporting current frequency." << std::endl;
+    std::cout << "\n[OUTPUT] " << current_freq_mhz << std::endl;
+  }
+
+  return 0;
+}
+
+

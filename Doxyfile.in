@@ -1,0 +1,202 @@
+# Doxyfile for 75fasmod project
+# Configure Doxygen to generate API documentation
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+
+# The PROJECT_NAME tag is a single word (or a sequence of words surrounded by
+# double-quotes, unless you are using Doxywizard) that should identify the
+# project for which the documentation is generated.
+PROJECT_NAME           = "75fasmod"
+
+# The PROJECT_NUMBER tag can be used to enter a project or revision number.
+PROJECT_NUMBER         = "0.1.0"
+
+# Using the PROJECT_BRIEF tag, you can provide an optional one line description
+# for a project that appears at the top of each page and should give viewer a
+# quick idea about the purpose of the project.
+PROJECT_BRIEF          = "High-speed FM modem for Kenwood TH-D75"
+
+# With the PROJECT_LOGO tag, you can specify a logo or an icon that is included
+# in the documentation.
+PROJECT_LOGO           =
+
+# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
+# into which the generated documentation will be written.
+OUTPUT_DIRECTORY       = docs
+
+# If the EXTRACT_ALL tag is set to YES, doxygen will assume all entities in
+# documentation are documented, even if no documentation was available.
+EXTRACT_ALL            = YES
+
+# If the EXTRACT_PRIVATE tag is set to YES, all private members of a class will
+# be included in the documentation.
+EXTRACT_PRIVATE        = YES
+
+# If the EXTRACT_STATIC tag is set to YES, all static members of a file will
+# be included in the documentation.
+EXTRACT_STATIC         = YES
+
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+
+# If the HIDE_UNDOC_MEMBERS tag is set to NO, doxygen will document all
+# documented members inside properly documented classes or files.
+HIDE_UNDOC_MEMBERS     = NO
+
+# This GENERATE_TODOLIST tag can be used to enable (YES) or disable (NO) the
+# todo list. This list is created by putting \todo commands in the
+# documentation.
+GENERATE_TODOLIST      = YES
+
+#---------------------------------------------------------------------------
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+
+# The INPUT tag is used to specify the files and/or directories that contain
+# documented source files.
+INPUT                  = include src
+
+# If the value of the INPUT tag contains directories, you can use the
+# FILE_PATTERNS tag to specify one or more wildcard patterns.
+FILE_PATTERNS          = *.hpp *.h *.cpp *.cxx *.cc *.c
+
+# The RECURSIVE tag can be used to specify whether or not subdirectories
+# should be searched for input files as well.
+RECURSIVE              = YES
+
+#---------------------------------------------------------------------------
+# Configuration options related to source browsing
+#---------------------------------------------------------------------------
+
+# If the SOURCE_BROWSER tag is set to YES then a list of source files will be
+# generated.
+SOURCE_BROWSER         = YES
+
+# Setting the INLINE_SOURCES tag to YES will include the body of functions,
+# classes and enums directly into the documentation.
+INLINE_SOURCES         = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to the OpenGL output
+#---------------------------------------------------------------------------
+
+# The GENERATE_OGL_MOD tag determines if OpenGL should be used for rendering
+# graphs and diagrams.
+
+#---------------------------------------------------------------------------
+# Configuration options related to the HTML output
+#---------------------------------------------------------------------------
+
+# If GENERATE_HTML is set to YES, doxygen will generate HTML output
+GENERATE_HTML          = YES
+
+# The HTML_OUTPUT tag is used to specify where the HTML docs will be put.
+HTML_OUTPUT            = html
+
+# If the GENERATElatex tag is set to YES, doxygen will generate LaTeX output
+GENERATE_LATEX         = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to the preprocessor
+#---------------------------------------------------------------------------
+
+# If the ENABLE_PREPROCESSING tag is set to YES, doxygen will evaluate all
+# C-preprocessor directives found in the sources and include files.
+ENABLE_PREPROCESSING   = YES
+
+# If the MACRO_EXPANSION tag is set to YES, doxygen will expand all macro
+# names in the source code.
+MACRO_EXPANSION        = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to diagram generator tools
+#---------------------------------------------------------------------------
+
+# If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is
+# available from the path.
+HAVE_DOT               = NO
+
+#---------------------------------------------------------------------------
+# Configuration options for the HTML output
+#---------------------------------------------------------------------------
+
+# The GENERATE_TREEVIEW tag is used to enable (YES) or disable (NO) the
+# generation of a side panel that contains a tree-like index structure.
+GENERATE_TREEVIEW      = YES
+
+# The DISABLE_INDEX tag can be used to turn on/off the condensed index at
+# top of each HTML page.
+DISABLE_INDEX          = NO
+
+#---------------------------------------------------------------------------
+# Default page layout
+#---------------------------------------------------------------------------
+
+# By default, Doxygen generates the HTML documentation in a single well-sized
+# HTML file per documented class/interface combination. To generate a single
+# HTML file instead, set the GENERATE_LEGACY_COOKIE tag to YES.
+
+#---------------------------------------------------------------------------
+# Additional styles
+#---------------------------------------------------------------------------
+
+# The EXTRA_STYLESHEET tag can be used to specify one or more HTML style sheets
+# that should be included after the standard style sheets.
+
+#---------------------------------------------------------------------------
+# Search engine
+#---------------------------------------------------------------------------
+
+# The SERVER_BASED_SEARCH tag can be used to enable (YES) or disable (NO) the
+# search engine that uses a PHP enabled web server.
+SERVER_BASED_SEARCH    = NO
+
+#---------------------------------------------------------------------------
+# LaTeX output
+#---------------------------------------------------------------------------
+
+# The GENERATE_LATEX tag can be used to enable (YES) or disable (NO) LaTeX
+# output generation.
+GENERATE_LATEX         = NO
+
+#---------------------------------------------------------------------------
+# Email linking
+#---------------------------------------------------------------------------
+
+# Preifdef this variable if you want to use email links.
+PREDEFINED             = 
+
+#---------------------------------------------------------------------------
+# Tag file
+#---------------------------------------------------------------------------
+
+# The TAGFILES tag can be used to specify one or more tag files.
+TAGFILES               = 
+
+#---------------------------------------------------------------------------
+# HTML dynamic sections
+#---------------------------------------------------------------------------
+
+# The GENERATE_DYNAMICFILES tag controls whether or not dynamic HTML files are
+# generated to enable the insertion of data using JavaScript.
+
+#---------------------------------------------------------------------------
+# Miscellaneous options
+#---------------------------------------------------------------------------
+
+# The QUIET tag can be used to enable or disable the messages generated by
+# doxygen.
+QUIET                  = NO
+
+# The WARN_IF_UNDOCUMENTED tag can be used to enable or disable warnings
+WARN_IF_UNDOCUMENTED   = YES
+
+# The WARN_IF_DOC_ERROR tag can be used to enable or disable warnings
+WARN_IF_DOC_ERROR      = YES
+
+# The WARN_NO_PARAMDOC tag can be used to enable or disable warnings
+WARN_NO_PARAMDOC       = YES
+

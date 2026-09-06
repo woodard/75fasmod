@@ -1,0 +1,25 @@
+======================================
+   75fasmod 0.1.0: ./test-suite.log
+======================================
+
+# TOTAL: 5
+# PASS:  5
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+
+System information (uname -a): Linux 7.1.8-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Aug 10 03:35:23 UTC 2026 x86_64
+Distribution information (/etc/os-release):
+NAME="Fedora Linux"
+VERSION="44 (Workstation Edition)"
+RELEASE_TYPE=stable
+ID=fedora
+VERSION_ID=44
+VERSION_CODENAME=""
+PRETTY_NAME="Fedora Linux 44 (Workstation Edition)"
+ANSI_COLOR="0;38;2;60;110;180"
+
+.. contents:: :depth: 2
+
