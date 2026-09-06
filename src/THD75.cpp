@@ -372,10 +372,16 @@ auto THD75::get_single() -> bool {
 }
 
 auto THD75::set_single(VFO vfo) -> bool {
-  if (!set_current_vfo(vfo)) {
-    return false;
-  }
-  return rig_set_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, 0) == RIG_OK;
+  // Send BC command to set VFO and disable dual-watch
+  int band = (vfo == VFO::B) ? 1 : 0;
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
+
+  char buf[64] = {0};
+  unsigned char term = '\r';
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  return bytes > 0;
 }
 
 auto THD75::get_dual() -> bool {
@@ -388,7 +394,33 @@ auto THD75::get_dual() -> bool {
 }
 
 auto THD75::set_dual() -> bool {
-  return rig_set_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, 1) == RIG_OK;
+  // Query current band to set dual-watch on the current control band
+  char bc_buf[32] = {0};
+  unsigned char term = '\r';
+
+  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
+                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+
+  if (bc_bytes <= 0) {
+    return false;
+  }
+
+  // Parse the response to get the current band
+  std::string bc_resp(bc_buf);
+  int band = 0;
+  if (bc_resp.find("BC 1") != std::string::npos ||
+      bc_resp.find("BC1") != std::string::npos) {
+    band = 1;
+  }
+
+  // Send BC command to enable dual-watch on the current band
+  char cmd[16];
+  snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
+
+  char buf[64] = {0};
+  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
+                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  return bytes > 0;
 }
 
 // Toggle single/dual mode
