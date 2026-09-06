@@ -25,7 +25,12 @@ constexpr size_t BUFFER_SIZE_64 = 64;
 constexpr size_t response_buffer_size = 256;
 constexpr size_t BUFFER_SIZE_16 = 16;
 constexpr unsigned int MENU_ITEM_102 = 102;
-} // namespace
+
+  // Validates that the radio didn't return '?' (syntax error) or 'N' (NACK)
+  bool is_valid_cat_response(int bytes, const char *buf) {
+    return bytes > 0 && buf[0] != '?' && buf[0] != 'N';
+  }
+}// namespace
 
 // #include "absl/strings/match.h"  // Disabled - replaced with
 // std::string::find
@@ -198,118 +203,80 @@ auto THD75::initialize() -> bool {
 
   std::cerr << "[RIG] Backing up current radio state..." << std::endl;
 
-  // 1. Check if in dual mode and save "other" VFO state first
+  // 1. Check if in dual mode and save "other" VFO state
   bool const in_dual = !get_single();
   if (in_dual) {
-    std::cerr << "[RIG] In dual mode - saving 'other' VFO state..."
-              << std::endl;
-
+    std::cerr << "[RIG] In dual mode - saving 'other' VFO state..." << std::endl;
     VFO const current = get_current_vfo();
     VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
 
-    // Switch to other VFO
     if (set_current_vfo(other)) {
-      // Save frequency
       double freq = 0.0;
       if (get_frequency(freq)) {
         orig_other_frequency_ = static_cast<freq_t>(freq * 1e6);
         orig_other_freq_saved_ = true;
-        std::cerr << "[RIG] Saved other VFO frequency: " << freq << " MHz"
-                  << std::endl;
       }
-
-      // Save mode
       Mode mode;
       if (get_mode(mode)) {
         orig_other_mode_ = static_cast<rmode_t>(mode);
         orig_other_mode_saved_ = true;
-        std::cerr << "[RIG] Saved other VFO mode: " << static_cast<int>(mode)
-                  << std::endl;
       }
-
-      // Save power level
       std::string powerStr;
       if (get_power_level(powerStr)) {
-        if (powerStr == "H")
-          orig_other_power_ = PowerLevel::HIGH;
-        else if (powerStr == "M")
-          orig_other_power_ = PowerLevel::MEDIUM;
-        else if (powerStr == "L")
-          orig_other_power_ = PowerLevel::LOW;
-        else if (powerStr == "EL")
-          orig_other_power_ = PowerLevel::EXTRA_LOW;
+        if (powerStr == "H") orig_other_power_ = PowerLevel::HIGH;
+        else if (powerStr == "M") orig_other_power_ = PowerLevel::MEDIUM;
+        else if (powerStr == "L") orig_other_power_ = PowerLevel::LOW;
+        else if (powerStr == "EL") orig_other_power_ = PowerLevel::EXTRA_LOW;
         orig_other_power_saved_ = true;
-        std::cerr << "[RIG] Saved other VFO power: " << powerStr << std::endl;
       }
-
-      // Restore original VFO
       set_current_vfo(current);
     }
   }
 
-  // 2. Save current state (VFO, power, menu 102)
+  // 2. Save current VFO, power, menu 102 state
   rig_get_vfo(rig_, &orig_vfo_);
   orig_power_ = kenwood_power_get();
   orig_power_saved_ = true;
   orig_menu_102_ = kenwood_usb_out_select_get();
 
-  // 3. Call base class to save frequency, mode, power for current VFO
-  if (!RadioController::initialize()) {
-    return false;
+  // Save current frequency & mode directly without calling RadioController::initialize()
+  double cur_freq = 0.0;
+  if (get_frequency(cur_freq)) {
+    orig_frequency_ = static_cast<freq_t>(cur_freq * 1e6);
+    orig_frequency_saved_ = true;
+  }
+  Mode cur_mode;
+  if (get_mode(cur_mode)) {
+    orig_mode_ = static_cast<rmode_t>(cur_mode);
+    orig_mode_saved_ = true;
   }
 
-  // 4. Set to VFO B to allow menu 102 changes when in dual mode
-  std::cerr << "[RIG] Setting radio to VFO B for menu 102 access..."
-            << std::endl;
+  // 3. Set VFO B for Menu 102 access
   rig_set_vfo(rig_, RIG_VFO_B);
 
-  // 5. Configure Kenwood 9600 bps data output path (Menu 102) safely
-  if (orig_menu_102_ != UsbOutSelect::unknown &&
-      orig_menu_102_ != UsbOutSelect::IF) {
-    std::cerr << "[RIG] Changing Menu 102 to IF Output (1). This will cause a "
-                 "USB reset..."
-              << std::endl;
+  // 4. Configure Menu 102 IF mode safely
+  if (orig_menu_102_ != UsbOutSelect::unknown && orig_menu_102_ != UsbOutSelect::IF) {
     if (!kenwood_usb_out_select_set(UsbOutSelect::IF)) {
-      std::cerr << "[RIG] CRITICAL ERROR: Could not switch Menu 102 to IF."
-                << std::endl;
       return false;
     }
-
-    // The radio is rebooting its USB interface. Close handles first.
     rig_close(rig_);
     rig_cleanup(rig_);
     rig_ = nullptr;
 
-    std::cerr << "[RIG] Waiting 4 seconds for USB re-enumeration..."
-              << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(4));
 
-    // Re-initialize Hamlib
-    std::cerr << "[RIG] Reconnecting to Hamlib after USB reset..." << std::endl;
     rig_ = rig_init(model_);
     rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
-
-    int const re_status = rig_open(rig_);
-    if (re_status != RIG_OK) {
-      std::cerr << "[RIG] Error: Failed to reconnect. Code: " << re_status
-                << std::endl;
+    if (rig_open(rig_) != RIG_OK) {
       return false;
     }
-    std::cerr << "[RIG] Successfully reconnected to radio." << std::endl;
-  } else if (orig_menu_102_ == UsbOutSelect::IF) {
-    std::cerr << "[RIG] Menu 102 already set to IF Output. Skipping."
-              << std::endl;
+    flush_serial();
   }
 
-  // 6. Set mode to Packet FM (9600 baud passband)
-  std::cerr << "[RIG] Configuring radio for high-speed modem operation..."
-            << std::endl;
-  int mode_ret =
-      rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, BAUD_RATE_9600);
+  // 5. Set mode to PKTFM
+  int mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, BAUD_RATE_9600);
   if (mode_ret != RIG_OK) {
-    std::cerr << "[RIG] PKTFM mode rejected, falling back to standard FM..."
-              << std::endl;
-    mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
+    rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
   }
 
   return true;
@@ -426,7 +393,7 @@ auto THD75::get_tnc() -> int {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  if (bytes > 0) {
+  if (is_valid_cat_response(bytes, buf)) {
     std::string const resp(buf);
     size_t const space_pos = resp.find(' ');
     size_t const comma = resp.find(',');
@@ -465,7 +432,7 @@ auto THD75::set_tnc(int mode) -> bool {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  return bytes > 0;
+  return is_valid_cat_response(bytes, buf);
 }
 
 // Kenwood helper method implementations
@@ -485,7 +452,7 @@ auto THD75::kenwood_menu_get(int menu_num) -> int {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  if (bytes > 0) {
+  if (is_valid_cat_response(bytes, buf)) {
     std::string const resp(buf);
     size_t const comma = resp.find(',');
 
@@ -525,7 +492,7 @@ auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  return bytes > 0;
+  return is_valid_cat_response(bytes, buf);
 }
 
 auto THD75::kenwood_usb_out_select_get() -> THD75::UsbOutSelect {
@@ -569,7 +536,7 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
       rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
-  if (bc_bytes > 0) {
+  if (is_valid_cat_response(bc_bytes, bc_buf)) {
     std::string const bc_resp(bc_buf);
     if ((bc_resp.find("BC 1") != std::string::npos) ||
         (bc_resp.find("BC1") != std::string::npos)) {
@@ -588,7 +555,7 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  if (bytes > 0) {
+  if (is_valid_cat_response(bytes, buf)) {
     std::string const resp(buf);
     size_t const comma = resp.find(',');
 
@@ -632,7 +599,7 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
       rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
-  if (bc_bytes > 0) {
+  if (is_valid_cat_response(bc_bytes, bc_buf)) {
     std::string const bc_resp(bc_buf);
     if ((bc_resp.find("BC 1") != std::string::npos) ||
         (bc_resp.find("BC1") != std::string::npos)) {
@@ -650,7 +617,7 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
 
-  return bytes > 0;
+  return is_valid_cat_response(bytes, buf);
 }
 
 // VFO control functions
@@ -728,19 +695,35 @@ auto THD75::set_single(VFO vfo) -> bool {
     return false;
   }
 
-  // Send BC command to set VFO and disable dual-watch
   int const band = (vfo == VFO::B) ? 1 : 0;
   char cmd[BUFFER_SIZE_16];
-  snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
+  snprintf(cmd, sizeof(cmd), "BC %d,0;\r", band);
 
   char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
   flush_serial();
-  int const bytes = rig_send_raw(
+  int bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
-  return bytes > 0;
+
+  if (is_valid_cat_response(bytes, buf)) {
+    flush_serial();
+    return true;
+  }
+
+  // Fallback syntax without space: "BC%d,0;\r"
+  snprintf(cmd, sizeof(cmd), "BC%d,0;\r", band);
+  std::memset(buf, 0, sizeof(buf));
+  flush_serial();
+  bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
+
+  bool const success = is_valid_cat_response(bytes, buf);
+  flush_serial();
+  return success;
 }
 
 /**
@@ -771,40 +754,51 @@ auto THD75::set_dual() -> bool {
     return false;
   }
 
-  // Query current band to set dual-watch on the current control band
-  char bc_buf[BUFFER_SIZE_32];
+  char bc_buf[BUFFER_SIZE_32] = {0};
   unsigned char term = '\r';
 
   flush_serial();
   int const bc_bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+      rig_, reinterpret_cast<const unsigned char *>("BC;\r"), 4,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
-  if (bc_bytes <= 0) {
-    return false;
-  }
-
-  // Parse the response to get the current band
-  std::string const bc_resp(bc_buf);
   int band = 0;
-  if ((bc_resp.find("BC 1") != std::string::npos) ||
-      (bc_resp.find("BC1") != std::string::npos)) {
-    band = 1;
+  if (is_valid_cat_response(bc_bytes, bc_buf)) {
+    std::string const bc_resp(bc_buf);
+    if ((bc_resp.find("BC 1") != std::string::npos) ||
+        (bc_resp.find("BC1") != std::string::npos)) {
+      band = 1;
+    }
   }
 
-  // Send BC command to enable dual-watch on the current band
+  // Try semicolon-terminated command: "BC %d,1;\r"
   char cmd[BUFFER_SIZE_16];
-  snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
+  snprintf(cmd, sizeof(cmd), "BC %d,1;\r", band);
 
   char buf[response_buffer_size] = {0};
   flush_serial();
-  int const bytes = rig_send_raw(
+  int bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
-  return bytes > 0;
-  // Flush serial buffer after set_dual to prevent stale data
+
+  if (is_valid_cat_response(bytes, buf)) {
+    flush_serial();
+    return true;
+  }
+
+  // Fallback syntax without space: "BC%d,1;\r"
+  snprintf(cmd, sizeof(cmd), "BC%d,1;\r", band);
+  std::memset(buf, 0, sizeof(buf));
   flush_serial();
+  bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
+
+  bool const success = is_valid_cat_response(bytes, buf);
+  flush_serial();
+  return success;
 }
 
 // Toggle single/dual mode
@@ -969,59 +963,46 @@ auto THD75::get_other_frequency() -> double {
 }
 
 /**
- * @brief Get the current VFO frequency with TH-D75 CAT fallback
- *
- * Attempts generic Hamlib get_frequency first. If Hamlib returns an error due
- * to thd74_pull_fo failing on TH-D75's extended response format, issues a
- * direct Kenwood FQ CAT command.
+ * @brief Get frequency via direct Kenwood FQ CAT command
  */
 auto THD75::get_frequency(double &freq_mhz) -> bool {
   if (rig_ == nullptr) {
     return false;
   }
 
-  // 1. Try standard Hamlib query in base class
-  if (RadioController::get_frequency(freq_mhz)) {
-    return true;
-  }
-
-  // 2. Workaround: Query active band to send target FQ CAT command
   int active_band = 0;
   char bc_buf[BUFFER_SIZE_32] = {0};
   unsigned char term = '\r';
   flush_serial();
-  int const bc_bytes =
-      rig_send_raw(rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
-                   reinterpret_cast<unsigned char *>(bc_buf),
-                   static_cast<int>(sizeof(bc_buf) - 1), &term);
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC;\r"), 4,
+      reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
-  if (bc_bytes > 0) {
+  if (is_valid_cat_response(bc_bytes, bc_buf)) {
     std::string const bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos ||
-        bc_resp.find("BC1") != std::string::npos) {
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
       active_band = 1;
     }
   }
 
-  // 3. Issue direct FQ command ("FQ <band>\r")
   char cmd[BUFFER_SIZE_16];
-  snprintf(cmd, sizeof(cmd), "FQ %d\r", active_band);
+  snprintf(cmd, sizeof(cmd), "FQ %d;\r", active_band);
 
   char buf[response_buffer_size] = {0};
   flush_serial();
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
-      static_cast<int>(sizeof(buf) - 1), &term);
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
-  if (bytes > 0) {
+  if (is_valid_cat_response(bytes, buf)) {
     std::string const resp(buf);
     size_t const comma = resp.find(',');
     if (comma != std::string::npos) {
       try {
         double const freq_hz = std::stod(resp.substr(comma + 1));
         freq_mhz = freq_hz / 1000000.0;
-        flush_serial(); // Flush buffer after reading FO response
+        flush_serial();
         return true;
       } catch (...) {
         return false;
@@ -1030,4 +1011,43 @@ auto THD75::get_frequency(double &freq_mhz) -> bool {
   }
 
   return false;
+}
+
+/**
+ * @brief Set frequency via direct Kenwood FQ CAT command
+ */
+auto THD75::set_frequency(double freq_mhz) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
+  int active_band = 0;
+  char bc_buf[BUFFER_SIZE_32] = {0};
+  unsigned char term = '\r';
+  flush_serial();
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC;\r"), 4,
+      reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
+
+  if (is_valid_cat_response(bc_bytes, bc_buf)) {
+    std::string const bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos || bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  auto freq_hz = static_cast<long long>(freq_mhz * 1e6);
+  char cmd[BUFFER_SIZE_32];
+  snprintf(cmd, sizeof(cmd), "FQ %d,%010lld;\r", active_band, freq_hz);
+
+  char buf[response_buffer_size] = {0};
+  flush_serial();
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
+
+  bool const success = is_valid_cat_response(bytes, buf);
+  flush_serial();
+  return success;
 }

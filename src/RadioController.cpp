@@ -24,7 +24,10 @@ auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
 // Flush the serial port to clear any pending data
 void RadioController::flush_serial() {
   if (rig_ != nullptr) {
-    rig_flush((hamlib_port_t*)rig_data_pointer(rig_, RIG_PTRX_RIGPORT));
+    // give it a little while for any data to show up.
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    rig_flush(static_cast<hamlib_port_t *>(
+        rig_data_pointer(rig_, RIG_PTRX_RIGPORT)));
   }
 }
 
@@ -45,8 +48,6 @@ RadioController::RadioController(rig_model_t model, std::string port,
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (rig_ == nullptr) {
-    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
-              << ". The model ID may not exist in this Hamlib build.\n";
     return;
   }
 
@@ -54,17 +55,15 @@ RadioController::RadioController(rig_model_t model, std::string port,
 
   int status = rig_open(rig_);
   if (status != RIG_OK) {
-    std::cerr << "[RIG] Error: rig_open() failed on " << port_
-              << " | Code: " << status << " (" << rigerror(status) << ")\n";
     rig_close(rig_);
     rig_cleanup(rig_);
     rig_ = nullptr;
     return;
   }
 
-  // Clear serial buffer before use
   flush_serial();
 }
+
 
 RadioController::~RadioController() {
   shutdown();

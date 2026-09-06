@@ -1,4 +1,4 @@
-/**
+ /**
  * @file THD75.hpp
  * @brief Kenwood TH-D75 specific radio controller implementation
  *
@@ -23,8 +23,9 @@ public:
   auto initialize() -> bool override;
   void shutdown() override;
 
-  // auto set_ptt(bool transmit) -> bool override;
-  
+  auto set_frequency(double freq_mhz) -> bool override;
+  auto get_frequency(double &freq_mhz) -> bool override;
+
   auto set_power_level(const std::string &level) -> bool override;
   auto get_power_level(std::string &level) -> bool override;
 
@@ -44,28 +45,20 @@ public:
   auto set_other_mode(Mode mode) -> bool;
   auto get_other_mode() -> Mode;
 
-  // Virtual overrides for device-specific behavior
-  auto get_frequency(double &freq_mhz) -> bool override;
-
   auto set_other_frequency(double freq_mhz) -> bool;
   auto get_other_frequency() -> double;
 
   auto get_tnc() -> int;
   auto set_tnc(int mode) -> bool;
 
-  
-
 private:
   auto kenwood_usb_out_select_get() -> UsbOutSelect;
-
   auto kenwood_usb_out_select_set(UsbOutSelect value) -> bool;
 
   auto kenwood_power_get() -> PowerLevel;
-
   auto kenwood_power_set(PowerLevel val) -> bool;
 
   auto kenwood_menu_get(int menu_num) -> int;
-
   auto kenwood_menu_set(int menu_num, int value) -> bool;
 
   UsbOutSelect orig_menu_102_{UsbOutSelect::unknown};
