@@ -22,6 +22,7 @@ namespace {
 constexpr int BAUD_RATE_9600 = 9600;
 constexpr size_t BUFFER_SIZE_32 = 32;
 constexpr size_t BUFFER_SIZE_64 = 64;
+constexpr size_t response_buffer_size = 256;
 constexpr size_t BUFFER_SIZE_16 = 16;
 constexpr unsigned int MENU_ITEM_102 = 102;
 } // namespace
@@ -416,9 +417,10 @@ auto THD75::get_tnc() -> int {
   }
 
   char cmd[] = "TN\r";
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
 
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -455,8 +457,9 @@ auto THD75::set_tnc(int mode) -> bool {
   char cmd[BUFFER_SIZE_32];
   snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -474,8 +477,9 @@ auto THD75::kenwood_menu_get(int menu_num) -> int {
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -513,8 +517,9 @@ auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
   char cmd[BUFFER_SIZE_32];
   snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -559,6 +564,7 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
+  rig_flush(rig_->rigport_addr);
   int const bc_bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
@@ -575,7 +581,8 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -620,6 +627,7 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
   char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
+  rig_flush(rig_->rigport_addr);
   int const bc_bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
@@ -635,7 +643,8 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
   char cmd[BUFFER_SIZE_32];
   snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -724,8 +733,9 @@ auto THD75::set_single(VFO vfo) -> bool {
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
   unsigned char term = '\r';
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -765,6 +775,7 @@ auto THD75::set_dual() -> bool {
   char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
 
+  rig_flush(rig_->rigport_addr);
   int const bc_bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
       reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
@@ -785,7 +796,8 @@ auto THD75::set_dual() -> bool {
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
@@ -975,6 +987,7 @@ auto THD75::get_frequency(double &freq_mhz) -> bool {
   int active_band = 0;
   char bc_buf[BUFFER_SIZE_32] = {0};
   unsigned char term = '\r';
+  rig_flush(rig_->rigport_addr);
   int const bc_bytes =
       rig_send_raw(rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
                    reinterpret_cast<unsigned char *>(bc_buf),
@@ -992,7 +1005,8 @@ auto THD75::get_frequency(double &freq_mhz) -> bool {
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "FQ %d\r", active_band);
 
-  char buf[BUFFER_SIZE_64] = {0};
+  char buf[response_buffer_size] = {0};
+  rig_flush(rig_->rigport_addr);
   int const bytes = rig_send_raw(
       rig_, reinterpret_cast<const unsigned char *>(cmd),
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
