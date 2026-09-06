@@ -4,14 +4,22 @@
  */
 
 #include "THD75.hpp"
-#include <chrono>
-#include <iostream>
-#include <thread>
+#include "RadioController.hpp"
+#include "hamlib/rig.h"
+#include "hamlib/riglist.h"
+#include <cctype>
+
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
+#include <math.h>
+#include <string>
+
+#include "absl/strings/match.h"
 
 // Constructor
-THD75::THD75(const std::string &port, rig_model_t model, bool hamlib_debug)
-    : RadioController(model, port, hamlib_debug),
-      orig_menu_102_(UsbOutSelect::unknown), orig_vfo_(RIG_VFO_NONE) {}
+THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
+    : RadioController(model, std::move(port), hamlib_debug) {}
 
 // THD75-specific implementations
 auto THD75::set_ptt(bool transmit) -> bool {
@@ -21,8 +29,9 @@ auto THD75::set_ptt(bool transmit) -> bool {
 
 auto THD75::set_power_level(const std::string &level) -> bool {
   std::string lvl = level;
-  for (auto &chr : lvl)
+  for (auto &chr : lvl) {
     chr = std::toupper(chr);
+  }
 
   PowerLevel val = PowerLevel::UNKNOWN;
   if (lvl == "H") {
@@ -44,7 +53,7 @@ auto THD75::set_power_level(const std::string &level) -> bool {
 }
 
 auto THD75::get_power_level(std::string &level) -> bool {
-  PowerLevel pwr = kenwood_power_get();
+  PowerLevel const pwr = kenwood_power_get();
   switch (pwr) {
   case PowerLevel::HIGH:
     level = "H";
@@ -63,7 +72,7 @@ auto THD75::get_power_level(std::string &level) -> bool {
   }
 }
 
-bool THD75::initialize() {
+auto THD75::initialize() -> bool {
   std::cerr << "[RIG] Backing up current radio state...\n";
 
   // 1. Set to VFO B to allow menu 102 changes when in dual mode
@@ -113,7 +122,7 @@ bool THD75::initialize() {
     rig_ = rig_init(model_);
     rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
-    int re_status = rig_open(rig_);
+    int const re_status = rig_open(rig_);
     if (re_status != RIG_OK) {
       std::cerr << "[RIG] Error: Failed to reconnect. Code: " << re_status
                 << "\n";
@@ -128,7 +137,7 @@ bool THD75::initialize() {
 }
 
 void THD75::shutdown() {
-  if (rig_) {
+  if (rig_ != nullptr) {
     std::cerr << "[RIG] Shutting down. Restoring original radio settings...\n";
 
     // Restore original menu 102
@@ -162,16 +171,17 @@ auto THD75::get_tnc() -> int {
   char buf[64] = {0};
   unsigned char term = '\r';
 
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   if (bytes > 0) {
-    std::string resp(buf);
-    size_t space_pos = resp.find(' ');
-    size_t comma = resp.find(',');
+    std::string const resp(buf);
+    size_t const space_pos = resp.find(' ');
+    size_t const comma = resp.find(',');
 
     if (comma != std::string::npos) {
-      size_t start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
+      size_t const start = (space_pos != std::string::npos) ? space_pos + 1 : 2;
       try {
         return std::stoi(resp.substr(start, comma - start));
       } catch (...) {
@@ -188,29 +198,32 @@ auto THD75::set_tnc(int mode) -> bool {
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   return bytes > 0;
 }
 
 // Kenwood helper method implementations
-int THD75::kenwood_menu_get(int menu_num) {
+auto THD75::kenwood_menu_get(int menu_num) -> int {
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   if (bytes > 0) {
-    std::string resp(buf);
-    size_t comma = resp.find(',');
+    std::string const resp(buf);
+    size_t const comma = resp.find(',');
 
     size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos)
+    if (term_pos == std::string::npos) {
       term_pos = resp.find(';');
+    }
 
     if (comma != std::string::npos && term_pos != std::string::npos) {
       try {
@@ -223,23 +236,25 @@ int THD75::kenwood_menu_get(int menu_num) {
   return -1;
 }
 
-bool THD75::kenwood_menu_set(int menu_num, int value) {
-  if (value < 0)
+auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
+  if (value < 0) {
     return false;
+  }
 
   char cmd[32];
   snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   return bytes > 0;
 }
 
-THD75::UsbOutSelect THD75::kenwood_usb_out_select_get() {
-  int value = kenwood_menu_get(102);
+auto THD75::kenwood_usb_out_select_get() -> THD75::UsbOutSelect {
+  int const value = kenwood_menu_get(102);
   switch (value) {
   case 0:
     return UsbOutSelect::AF;
@@ -252,24 +267,24 @@ THD75::UsbOutSelect THD75::kenwood_usb_out_select_get() {
   }
 }
 
-bool THD75::kenwood_usb_out_select_set(UsbOutSelect value) {
+auto THD75::kenwood_usb_out_select_set(UsbOutSelect value) -> bool {
   return kenwood_menu_set(102, static_cast<int>(value));
 }
 
-THD75::PowerLevel THD75::kenwood_power_get() {
+auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
   char bc_buf[32] = {0};
   unsigned char term = '\r';
 
-  int bc_bytes =
-      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+      reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
   if (bc_bytes > 0) {
-    std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos ||
-        bc_resp.find("BC1") != std::string::npos) {
+    std::string const bc_resp(bc_buf);
+    if (absl::StrContains(bc_resp, "BC 1") ||
+        absl::StrContains(bc_resp, "BC1")) {
       active_band = 1;
     }
   }
@@ -279,21 +294,24 @@ THD75::PowerLevel THD75::kenwood_power_get() {
   snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   if (bytes > 0) {
-    std::string resp(buf);
-    size_t comma = resp.find(',');
+    std::string const resp(buf);
+    size_t const comma = resp.find(',');
 
     size_t term_pos = resp.find('\r');
-    if (term_pos == std::string::npos)
+    if (term_pos == std::string::npos) {
       term_pos = resp.find(';');
+    }
 
     if (comma != std::string::npos && term_pos != std::string::npos &&
         term_pos > comma + 1) {
       try {
-        int pwr_int = std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
+        int const pwr_int =
+            std::stoi(resp.substr(comma + 1, term_pos - comma - 1));
         if (pwr_int >= 0 && pwr_int <= 3) {
           return static_cast<PowerLevel>(pwr_int);
         }
@@ -305,23 +323,24 @@ THD75::PowerLevel THD75::kenwood_power_get() {
   return PowerLevel::UNKNOWN;
 }
 
-bool THD75::kenwood_power_set(PowerLevel val) {
-  if (val == PowerLevel::UNKNOWN)
+auto THD75::kenwood_power_set(PowerLevel val) -> bool {
+  if (val == PowerLevel::UNKNOWN) {
     return false;
+  }
 
   // Query active band
   int active_band = 0;
   char bc_buf[32] = {0};
   unsigned char term = '\r';
 
-  int bc_bytes =
-      rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                   (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+      reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
   if (bc_bytes > 0) {
-    std::string bc_resp(bc_buf);
-    if (bc_resp.find("BC 1") != std::string::npos ||
-        bc_resp.find("BC1") != std::string::npos) {
+    std::string const bc_resp(bc_buf);
+    if (absl::StrContains(bc_resp, "BC 1") ||
+        absl::StrContains(bc_resp, "BC1")) {
       active_band = 1;
     }
   }
@@ -330,19 +349,21 @@ bool THD75::kenwood_power_set(PowerLevel val) {
   snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
 
   return bytes > 0;
 }
 
 // VFO control functions
 auto THD75::get_current_vfo() -> VFO {
-  vfo_t vfo;
+  vfo_t vfo = 0;
   if (rig_get_vfo(rig_, &vfo) == RIG_OK) {
     if (vfo == RIG_VFO_A) {
       return VFO::A;
-    } else if (vfo == RIG_VFO_B) {
+    }
+    if (vfo == RIG_VFO_B) {
       return VFO::B;
     }
   }
@@ -350,7 +371,7 @@ auto THD75::get_current_vfo() -> VFO {
 }
 
 auto THD75::set_current_vfo(VFO vfo) -> bool {
-  vfo_t hamlib_vfo;
+  vfo_t hamlib_vfo = 0;
   if (vfo == VFO::A) {
     hamlib_vfo = RIG_VFO_A;
   } else if (vfo == VFO::B) {
@@ -373,14 +394,15 @@ auto THD75::get_single() -> bool {
 
 auto THD75::set_single(VFO vfo) -> bool {
   // Send BC command to set VFO and disable dual-watch
-  int band = (vfo == VFO::B) ? 1 : 0;
+  int const band = (vfo == VFO::B) ? 1 : 0;
   char cmd[16];
   snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
 
   char buf[64] = {0};
   unsigned char term = '\r';
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
   return bytes > 0;
 }
 
@@ -398,18 +420,18 @@ auto THD75::set_dual() -> bool {
   char bc_buf[32] = {0};
   unsigned char term = '\r';
 
-  int bc_bytes = rig_send_raw(rig_, (const unsigned char *)"BC\r", 3,
-                              (unsigned char *)bc_buf, sizeof(bc_buf) - 1, &term);
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+      reinterpret_cast<unsigned char *>(bc_buf), sizeof(bc_buf) - 1, &term);
 
   if (bc_bytes <= 0) {
     return false;
   }
 
   // Parse the response to get the current band
-  std::string bc_resp(bc_buf);
+  std::string const bc_resp(bc_buf);
   int band = 0;
-  if (bc_resp.find("BC 1") != std::string::npos ||
-      bc_resp.find("BC1") != std::string::npos) {
+  if (absl::StrContains(bc_resp, "BC 1") || absl::StrContains(bc_resp, "BC1")) {
     band = 1;
   }
 
@@ -418,8 +440,9 @@ auto THD75::set_dual() -> bool {
   snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
 
   char buf[64] = {0};
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
+      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
   return bytes > 0;
 }
 
@@ -428,10 +451,8 @@ auto THD75::flip_single_dual(VFO vfo) -> bool {
   if (get_single()) {
     // Currently in single mode, switch to dual
     return set_dual();
-  } else {
-    // Currently in dual mode, switch to single
-    return set_single(vfo);
-  }
+  } // Currently in dual mode, switch to single
+  return set_single(vfo);
 }
 
 // Other VFO mode control functions
@@ -440,21 +461,21 @@ auto THD75::set_other_mode(Mode mode) -> bool {
   if (get_single()) {
     return false;
   }
-  
+
   // Get current VFO
-  VFO current = get_current_vfo();
-  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
-  
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
   // Switch to other VFO, set mode, then restore original VFO
   if (!set_current_vfo(other)) {
     return false;
   }
-  
-  bool result = set_mode(mode);
-  
+
+  bool const result = set_mode(mode);
+
   // Restore original VFO
   set_current_vfo(current);
-  
+
   return result;
 }
 
@@ -463,26 +484,26 @@ auto THD75::get_other_mode() -> Mode {
   if (get_single()) {
     return Mode::FM; // Default fallback on error
   }
-  
+
   // Get current VFO
-  VFO current = get_current_vfo();
-  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
-  
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
   // Switch to other VFO, get mode, then restore original VFO
   if (!set_current_vfo(other)) {
     return Mode::FM; // Default fallback on error
   }
-  
+
   Mode mode;
-  bool result = get_mode(mode);
-  
+  bool const result = get_mode(mode);
+
   // Restore original VFO
   set_current_vfo(current);
-  
+
   if (!result) {
     return Mode::FM; // Default fallback on error
   }
-  
+
   return mode;
 }
 
@@ -492,21 +513,21 @@ auto THD75::set_other_frequency(double freq_mhz) -> bool {
   if (get_single()) {
     return false;
   }
-  
+
   // Get current VFO
-  VFO current = get_current_vfo();
-  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
-  
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
   // Switch to other VFO, set frequency, then restore original VFO
   if (!set_current_vfo(other)) {
     return false;
   }
-  
-  bool result = set_frequency(freq_mhz);
-  
+
+  bool const result = set_frequency(freq_mhz);
+
   // Restore original VFO
   set_current_vfo(current);
-  
+
   return result;
 }
 
@@ -515,25 +536,25 @@ auto THD75::get_other_frequency() -> double {
   if (get_single()) {
     return 0.0; // Default fallback on error
   }
-  
+
   // Get current VFO
-  VFO current = get_current_vfo();
-  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
-  
+  VFO const current = get_current_vfo();
+  VFO const other = (current == VFO::A) ? VFO::B : VFO::A;
+
   // Switch to other VFO, get frequency, then restore original VFO
   if (!set_current_vfo(other)) {
     return 0.0; // Default fallback on error
   }
-  
-  double freq;
-  bool result = get_frequency(freq);
-  
+
+  double freq = NAN;
+  bool const result = get_frequency(freq);
+
   // Restore original VFO
   set_current_vfo(current);
-  
+
   if (!result) {
     return 0.0; // Default fallback on error
   }
-  
+
   return freq;
 }

@@ -6,17 +6,24 @@
 #include <iostream>
 #include <thread>
 
-std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
+namespace {
+constexpr double FREQUENCY_MHZ_TO_HZ = 1000000.0;
+constexpr size_t BUFFER_SIZE = 64;
+constexpr unsigned int HEX_BASE = 16;
+} // namespace
+
+auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
   std::ifstream file(filepath);
   std::string value;
-  if (file >> value)
+  if (file >> value) {
     return value;
+  }
   return "";
 }
 
-RadioController::RadioController(rig_model_t model, const std::string &port,
+RadioController::RadioController(rig_model_t model, std::string port,
                                  bool hamlib_debug)
-    : model_(model), port_(port), rig_(nullptr), current_mode_(Mode::FM),
+    : model_(model), port_(std::move(port)), rig_(nullptr), current_mode_(Mode::FM),
       orig_mode_(RIG_MODE_NONE), orig_mode_saved_(false), orig_width_(0),
       orig_power_(PowerLevel::UNKNOWN) {
   // Enable Hamlib internal verbose trace logging only if requested
@@ -28,7 +35,7 @@ RadioController::RadioController(rig_model_t model, const std::string &port,
 
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
-  if (!rig_) {
+  if (rig_ == nullptr) {
     std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
               << ". The model ID may not exist in this Hamlib build.\n";
     return;
@@ -49,14 +56,14 @@ RadioController::RadioController(rig_model_t model, const std::string &port,
 
 RadioController::~RadioController() {
   shutdown();
-  if (rig_) {
+  if (rig_ != nullptr) {
     set_ptt(false);
     rig_close(rig_);
     rig_cleanup(rig_);
   }
 }
 
-bool RadioController::initialize() {
+auto RadioController::initialize() -> bool {
   // Base initialization - just return true since constructor opens rig
   // THD75 should override to add THD75-specific initialization
   return rig_ != nullptr;
@@ -65,45 +72,45 @@ bool RadioController::initialize() {
 void RadioController::shutdown() {
   // Base shutdown - just close the rig
   // THD75 should override to add THD75-specific cleanup
-  if (rig_) {
+  if (rig_ != nullptr) {
     std::cerr << "[RIG] Base shutdown - closing radio connection.\n";
   }
 }
 
 // Virtual method implementations that THD75 can override as needed
 
-bool RadioController::set_frequency(double freq_mhz) {
-  freq_t freq_hz = static_cast<freq_t>(freq_mhz * 1000000.0);
+auto RadioController::set_frequency(double freq_mhz) -> bool {
+  auto freq_hz = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
   return rig_set_freq(rig_, RIG_VFO_CURR, freq_hz) == RIG_OK;
 }
 
-bool RadioController::get_frequency(double &freq_mhz) {
+auto RadioController::get_frequency(double &freq_mhz) -> bool {
   freq_t freq_hz;
   if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) != RIG_OK) {
     return false;
   }
-  freq_mhz = static_cast<double>(freq_hz) / 1000000.0;
+  freq_mhz = static_cast<double>(freq_hz) / FREQUENCY_MHZ_TO_HZ;
   return true;
 }
 
-bool RadioController::get_mode(Mode &mode) {
+auto RadioController::get_mode(Mode &mode) -> bool {
   rmode_t rig_mode = 0;
   int result = rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr);
   if (result == RIG_OK) {
     mode = static_cast<Mode>(rig_mode);
     std::cerr << "[RIG] get_mode succeeded, mode value: "
-              << static_cast<int>(mode) << std::endl;
+              << static_cast<int>(mode) << '\n';
     return true;
   }
 
   // Fallback: return the current mode we've tracked
   std::cerr << "[RIG] get_mode failed (fallback), returning tracked mode: "
-            << static_cast<int>(current_mode_) << std::endl;
+            << static_cast<int>(current_mode_) << '\n';
   mode = current_mode_;
   return true;
 }
 
-bool RadioController::set_mode(Mode mode) {
+auto RadioController::set_mode(Mode mode) -> bool {
   bool result =
       rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
   if (result) {
@@ -111,21 +118,21 @@ bool RadioController::set_mode(Mode mode) {
   }
   return result;
 }
-bool RadioController::set_ptt(bool transmit) {
+
+auto RadioController::set_ptt(bool transmit) -> bool {
   const char *cmd = transmit ? "TX\r" : "RX\r";
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE> buf{};
   unsigned char term = '\r';
 
-  int bytes = rig_send_raw(rig_, (const unsigned char *)cmd, strlen(cmd),
-                           (unsigned char *)buf, sizeof(buf) - 1, &term);
+  int bytes = rig_send_raw(rig_, reinterpret_cast<const unsigned char *>(cmd),
+                           static_cast<int>(strlen(cmd)),
+                           reinterpret_cast<unsigned char *>(buf.data()),
+                           static_cast<int>(sizeof(buf) - 1), &term);
 
-  if (bytes < 0 && bytes != -RIG_ETIMEOUT && bytes != RIG_ETIMEOUT) {
-    return false;
-  }
-  return true;
+  return (bytes >= 0 || bytes == -RIG_ETIMEOUT || bytes == RIG_ETIMEOUT);
 }
 
-bool RadioController::get_dcd(bool &is_squelch_open) {
+auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
   dcd_t dcd_status;
   if (rig_get_dcd(rig_, RIG_VFO_CURR, &dcd_status) == RIG_OK) {
     is_squelch_open = (dcd_status == RIG_DCD_ON);
@@ -134,60 +141,68 @@ bool RadioController::get_dcd(bool &is_squelch_open) {
   return false;
 }
 
-bool RadioController::set_power_level(const std::string &level) {
+auto RadioController::set_power_level(const std::string &level) -> bool {
   std::string lvl = level;
-  for (auto &c : lvl)
-    c = std::toupper(c);
+  for (auto &chr : lvl) {
+    chr = static_cast<char>(std::toupper(chr));
+  }
 
   PowerLevel val = PowerLevel::UNKNOWN;
-  if (lvl == "H")
+  if (lvl == "H") {
     val = PowerLevel::HIGH;
-  else if (lvl == "M")
+  } else if (lvl == "M") {
     val = PowerLevel::MEDIUM;
-  else if (lvl == "L")
+  } else if (lvl == "L") {
     val = PowerLevel::LOW;
-  else if (lvl == "EL")
+  } else if (lvl == "EL") {
     val = PowerLevel::EXTRA_LOW;
-  else {
+  } else {
     std::cerr << "Error: Invalid power level '" << level
               << "'. Use EL, L, M, or H.\n";
     return false;
   }
 
+  // Suppress unused variable warning - this is a placeholder for derived
+  // classes
+  (void)val;
+
   std::cerr << "[RIG] Setting TX power to " << lvl << "...\n";
-  (void)val; // Base implementation - THD75 overrides this method
   return true;
 }
-bool RadioController::get_power_level(std::string &level) {
-  (void)level; // Unused in base implementation - THD75 overrides
+
+auto RadioController::get_power_level(std::string & /*level*/) -> bool {
+  // Base implementation returns false - THD75 should override
   return false;
 }
 
-std::vector<std::string>
-RadioController::find_tty_sysfs(unsigned int target_vid,
-                                unsigned int target_pid) {
+auto RadioController::find_tty_sysfs(unsigned int target_vid,
+                                     unsigned int target_pid)
+    -> std::vector<std::string> {
   std::vector<std::string> found_ports;
   fs::path sys_tty = "/sys/class/tty";
 
-  if (!fs::exists(sys_tty))
+  if (!fs::exists(sys_tty)) {
     return found_ports;
+  }
 
   for (const auto &entry : fs::directory_iterator(sys_tty)) {
     fs::path dev_path = entry.path() / "device";
-    if (!fs::exists(dev_path))
+    if (!fs::exists(dev_path)) {
       continue;
+    }
 
     for (const char *parent_rel : {"..", "../..", "../../.."}) {
       fs::path vid_path = dev_path / parent_rel / "idVendor";
       fs::path pid_path = dev_path / parent_rel / "idProduct";
 
       if (fs::exists(vid_path) && fs::exists(pid_path)) {
-        unsigned int vid = 0, pid = 0;
+        unsigned int vid = 0;
+        unsigned int pid = 0;
         if (auto vid_str = read_sysfs_attr(vid_path); !vid_str.empty()) {
-          vid = std::stoul(vid_str, nullptr, 16);
+          vid = std::stoul(vid_str, nullptr, HEX_BASE);
         }
         if (auto pid_str = read_sysfs_attr(pid_path); !pid_str.empty()) {
-          pid = std::stoul(pid_str, nullptr, 16);
+          pid = std::stoul(pid_str, nullptr, HEX_BASE);
         }
 
         if (vid == target_vid && pid == target_pid) {
@@ -200,12 +215,14 @@ RadioController::find_tty_sysfs(unsigned int target_vid,
   return found_ports;
 }
 
-std::string RadioController::find_alsa_device(const std::string &serial_port) {
+auto RadioController::find_alsa_device(const std::string &serial_port)
+    -> std::string {
   fs::path tty_name = fs::path(serial_port).filename();
   fs::path tty_dev_path = "/sys/class/tty" / tty_name / "device";
 
-  if (!fs::exists(tty_dev_path))
+  if (!fs::exists(tty_dev_path)) {
     return "";
+  }
 
   fs::path usb_dev_path;
   try {
@@ -215,16 +232,18 @@ std::string RadioController::find_alsa_device(const std::string &serial_port) {
   }
 
   fs::path sound_class_path = "/sys/class/sound";
-  if (!fs::exists(sound_class_path))
+  if (!fs::exists(sound_class_path)) {
     return "";
+  }
 
   for (const auto &entry : fs::directory_iterator(sound_class_path)) {
     std::string card_name = entry.path().filename().string();
 
-    if (card_name.find("card") == 0) {
+    if (card_name.starts_with("card")) {
       fs::path card_dev_path = entry.path() / "device";
-      if (!fs::exists(card_dev_path))
+      if (!fs::exists(card_dev_path)) {
         continue;
+      }
 
       try {
         fs::path card_usb_path = fs::canonical(card_dev_path).parent_path();

@@ -36,8 +36,7 @@ public:
    * @param model Hamlib rig model number (default: RIG_MODEL_KENWOOD_TH_D75)
    * @param hamlib_debug Enable Hamlib debug output (default: false)
    */
-  THD75(const std::string &port, rig_model_t model = DEFAULT_MODEL,
-        bool hamlib_debug = false);
+  explicit THD75(std::string port, rig_model_t model, bool hamlib_debug);
 
   /**
    * @brief Initialize the THD75 radio controller
@@ -47,7 +46,7 @@ public:
    *
    * @return true if initialization successful, false otherwise
    */
-  bool initialize() override;
+  auto initialize() -> bool override;
 
   /**
    * @brief Shutdown the THD75 radio controller
@@ -57,9 +56,9 @@ public:
   void shutdown() override;
 
   // THD75-specific implementations
-  bool set_ptt(bool transmit) override;
-  bool set_power_level(const std::string &level) override;
-  bool get_power_level(std::string &level) override;
+  auto set_ptt(bool transmit) -> bool override;
+  auto set_power_level(const std::string &level) -> bool override;
+  auto get_power_level(std::string &level) -> bool override;
 
   /**
    * @brief Get the current VFO that will transmit when PTT is set
@@ -215,8 +214,9 @@ private:
   auto kenwood_menu_set(int menu_num, int value) -> bool;
 
   // THD75-specific state backup variables
-  UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
-  vfo_t orig_vfo_;                 ///< Saved original VFO state
+  UsbOutSelect orig_menu_102_{
+      UsbOutSelect::unknown};    ///< Saved original USB Out Select setting
+  vfo_t orig_vfo_{RIG_VFO_NONE}; ///< Saved original VFO state
 };
 
 #endif // THD75_HPP

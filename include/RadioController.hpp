@@ -97,7 +97,7 @@ public:
    * @param port Serial port device path (e.g., "/dev/ttyUSB0")
    * @param hamlib_debug Enable Hamlib debug output (default: false)
    */
-  RadioController(rig_model_t model, const std::string &port,
+  RadioController(rig_model_t model, std::string port,
                   bool hamlib_debug = false);
 
   /**
@@ -258,7 +258,7 @@ protected:
   std::string port_;  ///< Serial port path
 
 protected:
-  RIG *rig_; ///< Hamlib rig handle
+  RIG *rig_;          ///< Hamlib rig handle
   Mode current_mode_; ///< Current radio mode (tracked for compatibility)
 
   // Backup variables for restoring radio state
