@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 static double get_different_freq_in_band(double current_freq_mhz) {
   if (current_freq_mhz >= 144.0 && current_freq_mhz <= 148.0) {
-    return (current_freq_mhz >= 146.0) ? 146.620 : 146.620;
+    return (current_freq_mhz >= 146.0) ? 144.500 : 146.500;
   } else if (current_freq_mhz >= 222.0 && current_freq_mhz <= 225.0) {
     return (current_freq_mhz >= 223.5) ? 222.500 : 224.500;
   } else if (current_freq_mhz >= 420.0 && current_freq_mhz <= 450.0) {
