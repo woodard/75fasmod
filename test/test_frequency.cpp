@@ -4,10 +4,12 @@
  */
 
 #include "THD75.hpp"
-#include <getopt.h>
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
+
+namespace po = boost::program_options;
 
 // Calculates a distinct valid frequency in the same amateur band
 static double get_different_freq_in_band(double current_freq_mhz) {
@@ -22,29 +24,36 @@ static double get_different_freq_in_band(double current_freq_mhz) {
 }
 
 int main(int argc, char *argv[]) {
-  bool set_flag = false;
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "Show this help message")
+    ("set,s", po::value<std::string>()->implicit_value(""),
+     "Set frequency to specified MHz or a different one in band");
+
+  // Parse the command line
+  po::variables_map vm;
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (const po::error &e) {
+    std::cerr << "Error: " << e.what() << "\n";
+    std::cout << "Usage: " << argv[0] << " [-s [freq_mhz]]\n";
+    return 1;
+  }
+
+  // Handle help
+  if (vm.count("help")) {
+    std::cout << "Usage: " << argv[0] << " [-s [freq_mhz]]\n";
+    return 0;
+  }
+
+  bool set_flag = vm.count("set");
   double explicit_freq = 0.0;
-
-  const char *const short_opts = "s::h";
-  const option long_opts[] = {{"set", optional_argument, nullptr, 's'},
-                              {"help", no_argument, nullptr, 'h'},
-                              {nullptr, 0, nullptr, 0}};
-
-  int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
-         -1) {
-    switch (opt) {
-    case 's':
-      set_flag = true;
-      if (optarg) {
-        explicit_freq = std::stod(optarg);
-      }
-      break;
-    case 'h':
-      std::cout << "Usage: " << argv[0] << " [-s [freq_mhz]]\n";
-      return 0;
-    default:
-      return 1;
+  
+  if (set_flag && vm["set"].as<std::string>().empty() == false) {
+    std::string freq_str = vm["set"].as<std::string>();
+    if (!freq_str.empty() && freq_str != "") {
+      explicit_freq = std::stod(freq_str);
     }
   }
 

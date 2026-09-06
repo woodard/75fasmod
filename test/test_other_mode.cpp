@@ -8,10 +8,12 @@
 
 #include "RadioController.hpp"
 #include "THD75.hpp"
-#include <getopt.h>
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
+
+namespace po = boost::program_options;
 
 // Helper function to convert Mode enum to string
 static std::string mode_to_string(RadioController::Mode mode) {
@@ -42,35 +44,32 @@ static RadioController::Mode string_to_mode(const std::string &str) {
 }
 
 int main(int argc, char *argv[]) {
-  bool set_flag = false;
-  std::string explicit_mode;
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "Show this help message")
+    ("set,s", po::value<std::string>()->implicit_value("USB"),
+     "Set mode to specified value or default to USB");
 
-  const char *const short_opts = "s::h";
-  const option long_opts[] = {{"set", optional_argument, nullptr, 's'},
-                              {"help", no_argument, nullptr, 'h'},
-                              {nullptr, 0, nullptr, 0}};
-
-  int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
-         -1) {
-    switch (opt) {
-    case 's':
-      set_flag = true;
-      if (optarg) {
-        explicit_mode = optarg;
-      } else {
-        // Default to USB if no mode specified
-        explicit_mode = "USB";
-      }
-      break;
-    case 'h':
-      std::cout << "Usage: " << argv[0] << " [-s [mode]]\n";
-      std::cout << "Modes: FM, WFM, AM, USB, LSB, CW, CWR, DD\n";
-      return 0;
-    default:
-      return 1;
-    }
+  // Parse the command line
+  po::variables_map vm;
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (const po::error &e) {
+    std::cerr << "Error: " << e.what() << "\n";
+    std::cout << "Usage: " << argv[0] << " [-s [mode]]\n";
+    return 1;
   }
+
+  // Handle help
+  if (vm.count("help")) {
+    std::cout << "Usage: " << argv[0] << " [-s [mode]]\n";
+    std::cout << "Modes: FM, WFM, AM, USB, LSB, CW, CWR, DD\n";
+    return 0;
+  }
+
+  bool set_flag = vm.count("set");
+  std::string explicit_mode = vm["set"].as<std::string>();
 
   std::vector<std::string> ports = RadioController::find_tty_sysfs();
   if (ports.empty()) {

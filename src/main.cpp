@@ -6,11 +6,13 @@
 #include <csignal>
 #include <cstdlib>
 #include <filesystem>
-#include <getopt.h>
-#include <hamlib/rig.h>
 #include <iostream>
+#include <boost/program_options.hpp>
+#include <hamlib/rig.h>
 #include <string>
 #include <vector>
+
+namespace po = boost::program_options;
 
 namespace {
 constexpr int BURST_LIMIT = 8;
@@ -25,97 +27,65 @@ std::atomic<bool> keep_running{true};
 
 void handle_signal(int /* sig */) { keep_running = false; }
 
-void print_usage(const char *prog_name) {
+void print_usage(const char *prog_name, po::options_description &desc) {
   std::cout
       << "Usage: " << prog_name << " [options]\n"
-      << "Options:\n"
-      << "  -f, --freq <MHz>      Frequency to set in MHz (e.g., 144.390)\n"
-      << "  -w, --power <level>   TX Power level (EL, L, M, H)\n"
-      << "  -p, --port <device>   Serial port (default: auto-discover Kenwood "
-         "TH-D75)\n"
-      << "  -m, --model <id>      Hamlib rig model ID (default: 2 for generic "
-         "Kenwood)\n"
-      << "  -s, --sock <path>     Data socket path (default: "
-         "/tmp/75fasmod_data.sock)\n"
-      << "  -b, --burst <count>   Max frames per TX burst (default: 8)\n"
-      << "  -t, --timeout <ms>    TX queue flush timeout in ms (default: 200)\n"
-      << "  -h, --help            Show this help message\n"
-      << "  -a, --alsa-tx <device>  ALSA transmit device (e.g., hw:5,0)\n"
-      << "  -d, --hamlib-debug   Enable Hamlib debug logging\n";
+      << desc << "\n";
 }
 
 auto main(int argc, char *argv[]) -> int {
-  // Variable Declarations (Correctly scoped for the entire main function)
-  double target_freq_mhz = 0.0;
-  std::string power_level;
-  std::string serial_port;
-  std::string sock_path = "/tmp/75fasmod_data.sock";
-  std::string alsa_tx_device;
-  bool hamlib_debug = false;
+  // Declare the supported options.
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "Show this help message")
+    ("freq,f", po::value<double>()->default_value(0.0),
+     "Frequency to set in MHz (e.g., 144.390)")
+    ("power,w", po::value<std::string>(),
+     "TX Power level (EL, L, M, H)")
+    ("port,p", po::value<std::string>()->default_value(""),
+     "Serial port (default: auto-discover Kenwood TH-D75)")
+    ("model,m", po::value<rig_model_t>()->default_value(THD75::DEFAULT_MODEL),
+     "Hamlib rig model ID (default: 2 for generic Kenwood)")
+    ("sock,s", po::value<std::string>()->default_value("/tmp/75fasmod_data.sock"),
+     "Data socket path (default: /tmp/75fasmod_data.sock)")
+    ("burst,b", po::value<int>()->default_value(BURST_LIMIT),
+     "Max frames per TX burst (default: 8)")
+    ("timeout,t", po::value<int>()->default_value(FLUSH_TIMEOUT_MS),
+     "TX queue flush timeout in ms (default: 200)")
+    ("alsa-tx,a", po::value<std::string>(),
+     "ALSA transmit device (e.g., hw:5,0)")
+    ("hamlib-debug,d", po::bool_switch()->default_value(false),
+     "Enable Hamlib debug logging");
 
-  // Default values
-  rig_model_t rig_model = THD75::DEFAULT_MODEL;
-  int burst_limit = BURST_LIMIT;
-  int flush_timeout_ms = FLUSH_TIMEOUT_MS;
-
-  const char *const short_opts = "f:w:p:m:s:b:t:h:a:d";
-  // NOLINTNEXTLINE(modernize-avoid-c-arrays,
-  // modernize-use-designated-initializers)
-
-  // NOLINTNEXTLINE(miscellaneous-const-variable-initialization,
-  // modernize-avoid-c-arrays, modernize-use-designated-initializers)
-  const option long_opts[] = {
-      {"freq", required_argument, nullptr, 'f'}, // NOLINT
-      {"power", required_argument, nullptr, 'w'},
-      {"port", required_argument, nullptr, 'p'},
-      {"model", required_argument, nullptr, 'm'},
-      {"sock", required_argument, nullptr, 's'},
-      {"burst", required_argument, nullptr, 'b'},
-      {"timeout", required_argument, nullptr, 't'},
-      {"help", no_argument, nullptr, 'h'},
-      {"alsa-tx", required_argument, nullptr, 'a'},
-      {"hamlib-debug", no_argument, nullptr, 'd'},
-      {nullptr, 0, nullptr, 0}};
-
-  int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
-         -1) {
-    switch (opt) {
-    case 'f':
-      target_freq_mhz = std::stod(optarg);
-      break;
-    case 'w':
-      power_level = optarg;
-      break;
-    case 'p':
-      serial_port = optarg;
-      break;
-    case 'm':
-      rig_model = std::stoi(optarg);
-      break;
-    case 's':
-      sock_path = optarg;
-      break;
-    case 'b':
-      burst_limit = std::stoi(optarg);
-      break;
-    case 't':
-      flush_timeout_ms = std::stoi(optarg);
-      break;
-    case 'h':
-      print_usage(argv[0]);
-      return 0;
-    case 'a':
-      alsa_tx_device = optarg;
-      break;
-    case 'd':
-      hamlib_debug = true;
-      break;
-    default:
-      print_usage(argv[0]);
-      return 1;
-    }
+  // Parse the command line
+  po::variables_map vm;
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (const po::error &e) {
+    std::cerr << "Error: " << e.what() << "\n";
+    print_usage(argv[0], desc);
+    return 1;
   }
+
+  // Handle help
+  if (vm.count("help")) {
+    print_usage(argv[0], desc);
+    return 0;
+  }
+
+  // Variable Declarations
+  double target_freq_mhz = vm["freq"].as<double>();
+  std::string power_level = vm["power"].as<std::string>();
+  std::string serial_port = vm["port"].as<std::string>();
+  std::string sock_path = vm["sock"].as<std::string>();
+  std::string alsa_tx_device = vm["alsa-tx"].as<std::string>();
+  bool hamlib_debug = vm["hamlib-debug"].as<bool>();
+
+  // Defaults
+  rig_model_t rig_model = vm["model"].as<rig_model_t>();
+  int burst_limit = vm["burst"].as<int>();
+  int flush_timeout_ms = vm["timeout"].as<int>();
 
   if (target_freq_mhz == 0.0) {
     std::cerr << "Error: You must specify a target frequency in MHz.\n";

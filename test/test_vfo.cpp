@@ -4,26 +4,32 @@
  */
 
 #include "THD75.hpp"
-#include <getopt.h>
+#include <boost/program_options.hpp>
 #include <iostream>
 #include <string>
 
-int main(int argc, char *argv[]) {
-  const char *const short_opts = "h";
-  const option long_opts[] = {{"help", no_argument, nullptr, 'h'},
-                              {nullptr, 0, nullptr, 0}};
+namespace po = boost::program_options;
 
-  int opt;
-  while ((opt = getopt_long(argc, argv, short_opts, long_opts, nullptr)) !=
-         -1) {
-    switch (opt) {
-    case 'h':
-      std::cout << "Usage: " << argv[0] << "\n"
-                << "Tests THD75 get_current_vfo/set_current_vfo functions.\n";
-      return 0;
-    default:
-      return 1;
-    }
+int main(int argc, char *argv[]) {
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "Show this help message");
+
+  // Parse the command line
+  po::variables_map vm;
+  try {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch (const po::error &e) {
+    std::cerr << "Error: " << e.what() << "\n";
+    std::cout << "Usage: " << argv[0] << " [-h]\n";
+    return 1;
+  }
+
+  // Handle help
+  if (vm.count("help")) {
+    std::cout << "Usage: " << argv[0] << " [-h]\n";
+    return 0;
   }
 
   // Find radio port
