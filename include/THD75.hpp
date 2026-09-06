@@ -23,9 +23,6 @@ public:
   auto initialize() -> bool override;
   void shutdown() override;
 
-  auto set_frequency(double freq_mhz) -> bool override;
-  auto get_frequency(double &freq_mhz) -> bool override;
-
   auto set_power_level(const std::string &level) -> bool override;
   auto get_power_level(std::string &level) -> bool override;
 

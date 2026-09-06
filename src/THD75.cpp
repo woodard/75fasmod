@@ -95,15 +95,31 @@ auto THD75::initialize() -> bool {
   if (!RadioController::initialize()) return false;
 
   rig_set_vfo(rig_, RIG_VFO_B);
+  
   if (orig_menu_102_ != UsbOutSelect::unknown && orig_menu_102_ != UsbOutSelect::IF) {
     kenwood_usb_out_select_set(UsbOutSelect::IF);
+    
+    // Radio reboots USB interface. Close handles first.
     rig_close(rig_);
     rig_cleanup(rig_);
     rig_ = nullptr;
     std::this_thread::sleep_for(std::chrono::seconds(4));
+    
     rig_ = rig_init(model_);
     rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+    
+    // Give the connection a moment to settle
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    
     if (rig_open(rig_) != RIG_OK) return false;
+    
+    // MUST be called AFTER rig_open(). 
+    // rig_open() spawns the background thread; this command kills it.
+    rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
+    
+    // Wait for the background thread to safely exit, then flush
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    flush_serial();
   }
 
   if (rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600) != RIG_OK) {

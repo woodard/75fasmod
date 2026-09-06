@@ -77,9 +77,9 @@ RadioController::RadioController(rig_model_t model, std::string port,
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
-  // Disable Hamlib 4.x+ background cache polling thread globally.
-  // Must be called BEFORE rig_open() so the thread is never spawned.
-  rig_set_cache_timeout_ms(rig_, 0, 0);
+  // Give the radio time to finish lingering serial transmissions 
+  // from previous program executions (73-bytes @ 9600 baud = ~76ms)
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   int status = rig_open(rig_);
   if (status != RIG_OK) {
@@ -90,6 +90,13 @@ RadioController::RadioController(rig_model_t model, std::string port,
     rig_ = nullptr;
     return;
   }
+
+  // MUST be called AFTER rig_open(). 
+  // rig_open() spawns the background thread; this command kills it.
+  rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
+  
+  // Wait for the background thread to safely exit
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   // Allow interface to settle and clear initial buffer garbage
   flush_serial();
