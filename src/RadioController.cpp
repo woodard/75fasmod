@@ -71,14 +71,15 @@ auto RadioController::initialize() -> bool {
 }
 
 void RadioController::shutdown() {
-  // Base shutdown - just close the rig
-  // THD75 should override to add THD75-specific cleanup
+  // Base shutdown - close the rig connection
+  // THD75 should override to add THD75-specific cleanup BEFORE calling this
   if (rig_ != nullptr) {
-    std::cerr << "[RIG] Base shutdown - closing radio connection.\n";
+    set_ptt(false);
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
   }
 }
-
-// Virtual method implementations that THD75 can override as needed
 
 auto RadioController::set_frequency(double freq_mhz) -> bool {
   auto freq_hz = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
