@@ -11,7 +11,7 @@
 // Constructor
 THD75::THD75(const std::string &port, rig_model_t model, bool hamlib_debug)
     : RadioController(model, port, hamlib_debug),
-      orig_menu_102_(UsbOutSelect::unknown) {}
+      orig_menu_102_(UsbOutSelect::unknown), orig_vfo_(RIG_VFO_NONE) {}
 
 // THD75-specific implementations
 auto THD75::set_ptt(bool transmit) -> bool {

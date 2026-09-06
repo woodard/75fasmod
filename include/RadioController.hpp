@@ -227,7 +227,6 @@ protected:
   rmode_t orig_mode_;    ///< Saved original radio mode
   bool orig_mode_saved_; ///< Flag indicating if mode was saved
 
-  vfo_t orig_vfo_;        ///< Saved original VFO state
   pbwidth_t orig_width_;  ///< Saved original bandwidth
   PowerLevel orig_power_; ///< Saved original power level
 };

@@ -170,6 +170,7 @@ private:
 
   // THD75-specific state backup variables
   UsbOutSelect orig_menu_102_; ///< Saved original USB Out Select setting
+  vfo_t orig_vfo_;                 ///< Saved original VFO state
 };
 
 #endif // THD75_HPP

@@ -17,7 +17,7 @@ std::string RadioController::read_sysfs_attr(const fs::path &filepath) {
 RadioController::RadioController(rig_model_t model, const std::string &port,
                                  bool hamlib_debug)
     : model_(model), port_(port), rig_(nullptr), orig_mode_(RIG_MODE_NONE),
-      orig_mode_saved_(false), orig_vfo_(RIG_VFO_NONE), orig_width_(0),
+      orig_mode_saved_(false), orig_width_(0),
       orig_power_(PowerLevel::UNKNOWN) {
   // Enable Hamlib internal verbose trace logging only if requested
   // Redirect Hamlib debug output from stdout to stderr before rig_init
