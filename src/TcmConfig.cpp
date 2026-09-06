@@ -31,9 +31,14 @@ auto TcmConfig::get_fsm(ModulationScheme scheme) -> gr::trellis::fsm {
     break;
   }
 
-  int num_input_symbols = 1 << info_bits;       // 2^k input symbols
-  int num_states = FSM_MEMORY_STATES;            // 8 internal memory states
-  int num_output_symbols = 1 << (info_bits + FSM_INFO_BITS_DIVISOR); // 2^(k+1) output constellation indices
+  int num_input_symbols = 1 << info_bits; // 2^k input symbols
+  int num_states = FSM_MEMORY_STATES;     // 8 internal memory states
+  int num_output_symbols =
+      1 << (info_bits +
+            FSM_INFO_BITS_DIVISOR); // 2^(k+1) output constellation indices
+
+  int const I = num_input_symbols; // Number of input symbols
+  int const S = num_states;        // Number of states
 
   std::vector<int> NS(num_input_symbols * num_states);
   std::vector<int> OS(num_input_symbols * num_states);
@@ -53,10 +58,12 @@ auto TcmConfig::get_fsm(ModulationScheme scheme) -> gr::trellis::fsm {
     }
   }
 
-  return gr::trellis::fsm(num_input_symbols, num_states, num_output_symbols, NS, OS);
+  return gr::trellis::fsm(num_input_symbols, num_states, num_output_symbols, NS,
+                          OS);
 }
 
-auto TcmConfig::get_constellation(ModulationScheme scheme) -> gr::digital::constellation_sptr {
+auto TcmConfig::get_constellation(ModulationScheme scheme)
+    -> gr::digital::constellation_sptr {
   std::vector<gr_complex> points;
 
   switch (scheme) {
@@ -126,8 +133,8 @@ auto TcmConfig::get_constellation(ModulationScheme scheme) -> gr::digital::const
       4,          // Rotational symmetry (4-fold for QAM)
       2,          // Real sectors
       2,          // Imaginary sectors
-      1.0,       // Width real sectors (uppercase)
-      1.0,       // Width imaginary sectors (uppercase)
+      1.0,        // Width real sectors (uppercase)
+      1.0,        // Width imaginary sectors (uppercase)
       gr::digital::constellation::NO_NORMALIZATION // Normalization strategy
   );
 }
