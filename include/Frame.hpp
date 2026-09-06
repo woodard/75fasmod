@@ -18,6 +18,11 @@
 #include <cstdint>
 #include <vector>
 
+/// Type alias for sequence number to distinguish from other integer parameters
+using sequence_number_t = uint8_t;
+/// Type alias for payload length to distinguish from other integer parameters
+using payload_length_t = uint16_t;
+
 #pragma pack(push, 1)
 
 /**
@@ -25,7 +30,7 @@
  *
  * Defines the type of data contained in a frame.
  */
-enum class FrameType {
+enum class FrameType : std::uint8_t {
   DATA = 0x01, ///< Data frame containing payload
   ACK = 0x02   ///< Acknowledgment frame
 };
@@ -43,7 +48,10 @@ public:
    * @param seq_num Sequence number (0-255, rolling)
    * @param payload_len Length of the payload in bytes
    */
-  ModemHeader(FrameType frame_type, uint8_t seq_num, uint16_t payload_len)
+  ModemHeader(
+      FrameType frame_type,
+      sequence_number_t seq_num, // NOLINT(bugprone-easily-swappable-parameters)
+      payload_length_t payload_len)
       : frame_type(frame_type), seq_num(seq_num), payload_len(payload_len) {}
 
   FrameType frame_type; // 0x01 = DATA, 0x02 = ACK
@@ -78,13 +86,13 @@ public:
    * @brief Calculates CRC32 checksum
    * @return CRC32 value for the frame
    */
-  uint32_t calc_crc() const;
+  [[nodiscard]] auto calc_crc() const -> uint32_t;
 
   /**
    * @brief Encodes the frame using COBS
    * @return COBS-encoded byte vector
    */
-  std::vector<uint8_t> cobs_encode() const;
+  [[nodiscard]] auto cobs_encode() const -> std::vector<uint8_t>;
 
   std::vector<uint8_t> payload; ///< Data payload
   uint32_t crc = 0;             ///< CRC32 checksum

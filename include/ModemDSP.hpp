@@ -1,3 +1,6 @@
+#ifndef MODEMDSP_HPP
+#define MODEMDSP_HPP
+
 /**
  * @file ModemDSP.hpp
  * @brief Digital Signal Processing for 75fasmod modem
@@ -12,11 +15,7 @@
  */
 
 #pragma once
-#include <cstdint>
 #include <gnuradio/top_block.h>
-#include <memory>
-#include <string>
-#include <vector>
 
 /**
  * @brief Digital Signal Processing manager for 75fasmod
@@ -39,8 +38,7 @@ public:
    * "plughw:0,0")
    * @param alsa_rx_device ALSA device path for reception (e.g., "plughw:0,0")
    */
-  ModemDSP(const std::string &alsa_tx_device,
-           const std::string &alsa_rx_device);
+  ModemDSP(std::string alsa_tx_device, std::string alsa_rx_device);
 
   /**
    * @brief Destructor
@@ -57,7 +55,7 @@ public:
    * @param output_fd File descriptor to write decoded data to
    * @return true if started successfully, false otherwise
    */
-  bool start_rx(int output_fd);
+  auto start_rx(int output_fd) -> bool;
 
   /**
    * @brief Stops receiver processing
@@ -74,7 +72,7 @@ public:
    * @param input_fd File descriptor to read data from
    * @return true if started successfully, false otherwise
    */
-  bool start_tx(int input_fd);
+  auto start_tx(int input_fd) -> bool;
 
   /**
    * @brief Stops transmitter processing
@@ -90,3 +88,5 @@ private:
   gr::top_block_sptr rx_tb_; ///< GNU Radio receiver top block
   gr::top_block_sptr tx_tb_; ///< GNU Radio transmitter top block
 };
+
+#endif

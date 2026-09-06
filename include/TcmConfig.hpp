@@ -1,3 +1,6 @@
+#ifndef TCMCONFIG_HPP
+#define TCMCONFIG_HPP
+
 /**
  * @file TcmConfig.hpp
  * @brief TCM (Trellis Coded Modulation) configuration
@@ -14,7 +17,6 @@
 #pragma once
 #include <gnuradio/digital/constellation.h>
 #include <gnuradio/trellis/fsm.h>
-#include <vector>
 
 /**
  * @brief Enumeration of supported modulation schemes
@@ -50,7 +52,7 @@ public:
    * @param scheme Modulation scheme (QAM16, QAM32, etc.)
    * @return gr::trellis::fsm Finite state machine for the encoder
    */
-  static gr::trellis::fsm get_fsm(ModulationScheme scheme);
+  static auto get_fsm(ModulationScheme scheme) -> gr::trellis::fsm;
 
   /**
    * @brief Generates custom QAM grid points
@@ -62,6 +64,8 @@ public:
    * @param scheme Modulation scheme (QAM16, QAM32, etc.)
    * @return gr::digital::constellation_sptr Constellation object
    */
-  static gr::digital::constellation_sptr
-  get_constellation(ModulationScheme scheme);
+  static auto get_constellation(ModulationScheme scheme)
+      -> gr::digital::constellation_sptr;
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef DATASOCKET_HPP
+#define DATASOCKET_HPP
+
 /**
  * @file DataSocket.hpp
  * @brief IPC socket server for 75fasmod modem data transfer
@@ -10,14 +13,16 @@
 
 #pragma once
 
+// Necessary includes for std:: types used in this header
 #include <chrono>
 #include <cstdint>
 #include <stop_token>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
-// Forward declarations to fix the compiler errors
+// Forward declarations
 class RadioController;
 class ModemDSP;
 
@@ -63,7 +68,7 @@ public:
    *
    * @return true if thread started successfully, false otherwise
    */
-  bool start();
+  auto start() -> bool;
 
   /**
    * @brief Stops the server thread and cleans up
@@ -100,3 +105,5 @@ private:
   std::chrono::steady_clock::time_point tx_resume_time_; // MAC Cooldown
   int frames_sent_in_burst_ = 0;
 };
+
+#endif

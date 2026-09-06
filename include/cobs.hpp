@@ -30,7 +30,7 @@
  *
  * @see cobs_decode_frame() for decoding
  */
-std::vector<uint8_t> cobs_encode(const Frame &frame);
+auto cobs_encode(const Frame &frame) -> std::vector<uint8_t>;
 
 /**
  * @brief Decodes COBS data and returns a Frame
@@ -42,4 +42,4 @@ std::vector<uint8_t> cobs_encode(const Frame &frame);
  *
  * @see cobs_encode() for encoding
  */
-Frame cobs_decode_frame(const std::vector<uint8_t> &input);
+auto cobs_decode_frame(const std::vector<uint8_t> &input) -> Frame;
