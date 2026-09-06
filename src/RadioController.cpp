@@ -20,11 +20,13 @@ RadioController::RadioController(rig_model_t model, const std::string &port,
       orig_mode_saved_(false), orig_vfo_(RIG_VFO_NONE), orig_width_(0),
       orig_power_(PowerLevel::UNKNOWN) {
   // Enable Hamlib internal verbose trace logging only if requested
+  // Redirect Hamlib debug output from stdout to stderr before rig_init
   if (hamlib_debug) {
     rig_set_debug_level(RIG_DEBUG_TRACE);
+    rig_set_debug_file(stderr);
   }
 
-  std::cout << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
+  std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (!rig_) {
     std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
@@ -64,7 +66,7 @@ void RadioController::shutdown() {
   // Base shutdown - just close the rig
   // THD75 should override to add THD75-specific cleanup
   if (rig_) {
-    std::cout << "[RIG] Base shutdown - closing radio connection.\n";
+    std::cerr << "[RIG] Base shutdown - closing radio connection.\n";
   }
 }
 
@@ -127,7 +129,7 @@ bool RadioController::set_power_level(const std::string &level) {
     return false;
   }
 
-  std::cout << "[RIG] Setting TX power to " << lvl << "...\n";
+  std::cerr << "[RIG] Setting TX power to " << lvl << "...\n";
   return true;
 }
 
