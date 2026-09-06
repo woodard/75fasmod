@@ -91,7 +91,7 @@ POST_UNINSTALL = :
 bin_PROGRAMS = 75fasmod$(EXEEXT)
 check_PROGRAMS = test_frequency$(EXEEXT) test_power$(EXEEXT) \
 	test_vfo$(EXEEXT) test_tnc$(EXEEXT) test_single_dual$(EXEEXT) \
-	test_other_mode$(EXEEXT)
+	test_other_mode$(EXEEXT) test_other_frequency$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -124,6 +124,12 @@ am_test_frequency_OBJECTS = test/frequency-test_frequency.$(OBJEXT) \
 	src/test_frequency-THD75.$(OBJEXT)
 test_frequency_OBJECTS = $(am_test_frequency_OBJECTS)
 test_frequency_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_test_other_frequency_OBJECTS =  \
+	test/other_frequency-test_other_frequency.$(OBJEXT) \
+	src/test_other_frequency-RadioController.$(OBJEXT) \
+	src/test_other_frequency-THD75.$(OBJEXT)
+test_other_frequency_OBJECTS = $(am_test_other_frequency_OBJECTS)
+test_other_frequency_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_other_mode_OBJECTS =  \
 	test/other_mode-test_other_mode.$(OBJEXT) \
 	src/test_other_mode-RadioController.$(OBJEXT) \
@@ -175,6 +181,8 @@ am__depfiles_remade = src/$(DEPDIR)/75fasmod-DataSocket.Po \
 	src/$(DEPDIR)/75fasmod-cobs.Po src/$(DEPDIR)/75fasmod-main.Po \
 	src/$(DEPDIR)/test_frequency-RadioController.Po \
 	src/$(DEPDIR)/test_frequency-THD75.Po \
+	src/$(DEPDIR)/test_other_frequency-RadioController.Po \
+	src/$(DEPDIR)/test_other_frequency-THD75.Po \
 	src/$(DEPDIR)/test_other_mode-RadioController.Po \
 	src/$(DEPDIR)/test_other_mode-THD75.Po \
 	src/$(DEPDIR)/test_power-RadioController.Po \
@@ -186,6 +194,7 @@ am__depfiles_remade = src/$(DEPDIR)/75fasmod-DataSocket.Po \
 	src/$(DEPDIR)/test_vfo-RadioController.Po \
 	src/$(DEPDIR)/test_vfo-THD75.Po \
 	test/$(DEPDIR)/frequency-test_frequency.Po \
+	test/$(DEPDIR)/other_frequency-test_other_frequency.Po \
 	test/$(DEPDIR)/other_mode-test_other_mode.Po \
 	test/$(DEPDIR)/power-test_power.Po \
 	test/$(DEPDIR)/single_dual-test_single_dual.Po \
@@ -209,13 +218,13 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(75fasmod_SOURCES) $(test_frequency_SOURCES) \
-	$(test_other_mode_SOURCES) $(test_power_SOURCES) \
-	$(test_single_dual_SOURCES) $(test_tnc_SOURCES) \
-	$(test_vfo_SOURCES)
+	$(test_other_frequency_SOURCES) $(test_other_mode_SOURCES) \
+	$(test_power_SOURCES) $(test_single_dual_SOURCES) \
+	$(test_tnc_SOURCES) $(test_vfo_SOURCES)
 DIST_SOURCES = $(75fasmod_SOURCES) $(test_frequency_SOURCES) \
-	$(test_other_mode_SOURCES) $(test_power_SOURCES) \
-	$(test_single_dual_SOURCES) $(test_tnc_SOURCES) \
-	$(test_vfo_SOURCES)
+	$(test_other_frequency_SOURCES) $(test_other_mode_SOURCES) \
+	$(test_power_SOURCES) $(test_single_dual_SOURCES) \
+	$(test_tnc_SOURCES) $(test_vfo_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -597,6 +606,9 @@ test_single_dual_LDADD = $(HAMLIB_LIBS)
 test_other_mode_SOURCES = test/test_other_mode.cpp src/RadioController.cpp src/THD75.cpp
 test_other_mode_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
 test_other_mode_LDADD = $(HAMLIB_LIBS)
+test_other_frequency_SOURCES = test/test_other_frequency.cpp src/RadioController.cpp src/THD75.cpp
+test_other_frequency_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_other_frequency_LDADD = $(HAMLIB_LIBS)
 
 # Tell the C++ preprocessor where to find the header files
 AM_CPPFLAGS = -I$(top_srcdir)/include
@@ -620,12 +632,14 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 # Test runner
 TESTS = test/run_frequency_test.sh test/run_power_test.sh \
         test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh \
-        test/run_other_mode_test.sh
+        test/run_other_mode_test.sh \
+        test/run_other_frequency_test.sh
 
 EXTRA_DIST = test/run_frequency_test.sh test/run_power_test.sh \
              test/run_vfo_test.sh test/run_tnc_test.sh \
              test/run_single_dual_test.sh \
-             test/run_other_mode_test.sh
+             test/run_other_mode_test.sh \
+             test/run_other_frequency_test.sh
 
 all: all-am
 
@@ -753,6 +767,16 @@ src/test_frequency-THD75.$(OBJEXT): src/$(am__dirstamp) \
 test_frequency$(EXEEXT): $(test_frequency_OBJECTS) $(test_frequency_DEPENDENCIES) $(EXTRA_test_frequency_DEPENDENCIES) 
 	@rm -f test_frequency$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(test_frequency_OBJECTS) $(test_frequency_LDADD) $(LIBS)
+test/other_frequency-test_other_frequency.$(OBJEXT):  \
+	test/$(am__dirstamp) test/$(DEPDIR)/$(am__dirstamp)
+src/test_other_frequency-RadioController.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/test_other_frequency-THD75.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+
+test_other_frequency$(EXEEXT): $(test_other_frequency_OBJECTS) $(test_other_frequency_DEPENDENCIES) $(EXTRA_test_other_frequency_DEPENDENCIES) 
+	@rm -f test_other_frequency$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(test_other_frequency_OBJECTS) $(test_other_frequency_LDADD) $(LIBS)
 test/other_mode-test_other_mode.$(OBJEXT): test/$(am__dirstamp) \
 	test/$(DEPDIR)/$(am__dirstamp)
 src/test_other_mode-RadioController.$(OBJEXT): src/$(am__dirstamp) \
@@ -822,6 +846,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/75fasmod-main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_frequency-RadioController.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_frequency-THD75.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_other_frequency-RadioController.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_other_frequency-THD75.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_other_mode-RadioController.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_other_mode-THD75.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_power-RadioController.Po@am__quote@ # am--include-marker
@@ -833,6 +859,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_vfo-RadioController.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/test_vfo-THD75.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/frequency-test_frequency.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/other_frequency-test_other_frequency.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/other_mode-test_other_mode.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/power-test_power.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/single_dual-test_single_dual.Po@am__quote@ # am--include-marker
@@ -1014,6 +1041,48 @@ src/test_frequency-THD75.obj: src/THD75.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/THD75.cpp' object='src/test_frequency-THD75.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/test_frequency-THD75.obj `if test -f 'src/THD75.cpp'; then $(CYGPATH_W) 'src/THD75.cpp'; else $(CYGPATH_W) '$(srcdir)/src/THD75.cpp'; fi`
+
+test/other_frequency-test_other_frequency.o: test/test_other_frequency.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test/other_frequency-test_other_frequency.o -MD -MP -MF test/$(DEPDIR)/other_frequency-test_other_frequency.Tpo -c -o test/other_frequency-test_other_frequency.o `test -f 'test/test_other_frequency.cpp' || echo '$(srcdir)/'`test/test_other_frequency.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) test/$(DEPDIR)/other_frequency-test_other_frequency.Tpo test/$(DEPDIR)/other_frequency-test_other_frequency.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test/test_other_frequency.cpp' object='test/other_frequency-test_other_frequency.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test/other_frequency-test_other_frequency.o `test -f 'test/test_other_frequency.cpp' || echo '$(srcdir)/'`test/test_other_frequency.cpp
+
+test/other_frequency-test_other_frequency.obj: test/test_other_frequency.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test/other_frequency-test_other_frequency.obj -MD -MP -MF test/$(DEPDIR)/other_frequency-test_other_frequency.Tpo -c -o test/other_frequency-test_other_frequency.obj `if test -f 'test/test_other_frequency.cpp'; then $(CYGPATH_W) 'test/test_other_frequency.cpp'; else $(CYGPATH_W) '$(srcdir)/test/test_other_frequency.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) test/$(DEPDIR)/other_frequency-test_other_frequency.Tpo test/$(DEPDIR)/other_frequency-test_other_frequency.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test/test_other_frequency.cpp' object='test/other_frequency-test_other_frequency.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test/other_frequency-test_other_frequency.obj `if test -f 'test/test_other_frequency.cpp'; then $(CYGPATH_W) 'test/test_other_frequency.cpp'; else $(CYGPATH_W) '$(srcdir)/test/test_other_frequency.cpp'; fi`
+
+src/test_other_frequency-RadioController.o: src/RadioController.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/test_other_frequency-RadioController.o -MD -MP -MF src/$(DEPDIR)/test_other_frequency-RadioController.Tpo -c -o src/test_other_frequency-RadioController.o `test -f 'src/RadioController.cpp' || echo '$(srcdir)/'`src/RadioController.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/test_other_frequency-RadioController.Tpo src/$(DEPDIR)/test_other_frequency-RadioController.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/RadioController.cpp' object='src/test_other_frequency-RadioController.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/test_other_frequency-RadioController.o `test -f 'src/RadioController.cpp' || echo '$(srcdir)/'`src/RadioController.cpp
+
+src/test_other_frequency-RadioController.obj: src/RadioController.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/test_other_frequency-RadioController.obj -MD -MP -MF src/$(DEPDIR)/test_other_frequency-RadioController.Tpo -c -o src/test_other_frequency-RadioController.obj `if test -f 'src/RadioController.cpp'; then $(CYGPATH_W) 'src/RadioController.cpp'; else $(CYGPATH_W) '$(srcdir)/src/RadioController.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/test_other_frequency-RadioController.Tpo src/$(DEPDIR)/test_other_frequency-RadioController.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/RadioController.cpp' object='src/test_other_frequency-RadioController.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/test_other_frequency-RadioController.obj `if test -f 'src/RadioController.cpp'; then $(CYGPATH_W) 'src/RadioController.cpp'; else $(CYGPATH_W) '$(srcdir)/src/RadioController.cpp'; fi`
+
+src/test_other_frequency-THD75.o: src/THD75.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/test_other_frequency-THD75.o -MD -MP -MF src/$(DEPDIR)/test_other_frequency-THD75.Tpo -c -o src/test_other_frequency-THD75.o `test -f 'src/THD75.cpp' || echo '$(srcdir)/'`src/THD75.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/test_other_frequency-THD75.Tpo src/$(DEPDIR)/test_other_frequency-THD75.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/THD75.cpp' object='src/test_other_frequency-THD75.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/test_other_frequency-THD75.o `test -f 'src/THD75.cpp' || echo '$(srcdir)/'`src/THD75.cpp
+
+src/test_other_frequency-THD75.obj: src/THD75.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT src/test_other_frequency-THD75.obj -MD -MP -MF src/$(DEPDIR)/test_other_frequency-THD75.Tpo -c -o src/test_other_frequency-THD75.obj `if test -f 'src/THD75.cpp'; then $(CYGPATH_W) 'src/THD75.cpp'; else $(CYGPATH_W) '$(srcdir)/src/THD75.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/test_other_frequency-THD75.Tpo src/$(DEPDIR)/test_other_frequency-THD75.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/THD75.cpp' object='src/test_other_frequency-THD75.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_frequency_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o src/test_other_frequency-THD75.obj `if test -f 'src/THD75.cpp'; then $(CYGPATH_W) 'src/THD75.cpp'; else $(CYGPATH_W) '$(srcdir)/src/THD75.cpp'; fi`
 
 test/other_mode-test_other_mode.o: test/test_other_mode.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_other_mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test/other_mode-test_other_mode.o -MD -MP -MF test/$(DEPDIR)/other_mode-test_other_mode.Tpo -c -o test/other_mode-test_other_mode.o `test -f 'test/test_other_mode.cpp' || echo '$(srcdir)/'`test/test_other_mode.cpp
@@ -1492,6 +1561,13 @@ test/run_other_mode_test.sh.log: test/run_other_mode_test.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test/run_other_frequency_test.sh.log: test/run_other_frequency_test.sh
+	@p='test/run_other_frequency_test.sh'; \
+	b='test/run_other_frequency_test.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -1748,6 +1824,8 @@ distclean: distclean-am
 	-rm -f src/$(DEPDIR)/75fasmod-main.Po
 	-rm -f src/$(DEPDIR)/test_frequency-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_frequency-THD75.Po
+	-rm -f src/$(DEPDIR)/test_other_frequency-RadioController.Po
+	-rm -f src/$(DEPDIR)/test_other_frequency-THD75.Po
 	-rm -f src/$(DEPDIR)/test_other_mode-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_other_mode-THD75.Po
 	-rm -f src/$(DEPDIR)/test_power-RadioController.Po
@@ -1759,6 +1837,7 @@ distclean: distclean-am
 	-rm -f src/$(DEPDIR)/test_vfo-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_vfo-THD75.Po
 	-rm -f test/$(DEPDIR)/frequency-test_frequency.Po
+	-rm -f test/$(DEPDIR)/other_frequency-test_other_frequency.Po
 	-rm -f test/$(DEPDIR)/other_mode-test_other_mode.Po
 	-rm -f test/$(DEPDIR)/power-test_power.Po
 	-rm -f test/$(DEPDIR)/single_dual-test_single_dual.Po
@@ -1821,6 +1900,8 @@ maintainer-clean: maintainer-clean-am
 	-rm -f src/$(DEPDIR)/75fasmod-main.Po
 	-rm -f src/$(DEPDIR)/test_frequency-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_frequency-THD75.Po
+	-rm -f src/$(DEPDIR)/test_other_frequency-RadioController.Po
+	-rm -f src/$(DEPDIR)/test_other_frequency-THD75.Po
 	-rm -f src/$(DEPDIR)/test_other_mode-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_other_mode-THD75.Po
 	-rm -f src/$(DEPDIR)/test_power-RadioController.Po
@@ -1832,6 +1913,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f src/$(DEPDIR)/test_vfo-RadioController.Po
 	-rm -f src/$(DEPDIR)/test_vfo-THD75.Po
 	-rm -f test/$(DEPDIR)/frequency-test_frequency.Po
+	-rm -f test/$(DEPDIR)/other_frequency-test_other_frequency.Po
 	-rm -f test/$(DEPDIR)/other_mode-test_other_mode.Po
 	-rm -f test/$(DEPDIR)/power-test_power.Po
 	-rm -f test/$(DEPDIR)/single_dual-test_single_dual.Po

@@ -485,3 +485,55 @@ auto THD75::get_other_mode() -> Mode {
   
   return mode;
 }
+
+// Other VFO frequency control functions
+auto THD75::set_other_frequency(double freq_mhz) -> bool {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    return false;
+  }
+  
+  // Get current VFO
+  VFO current = get_current_vfo();
+  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
+  
+  // Switch to other VFO, set frequency, then restore original VFO
+  if (!set_current_vfo(other)) {
+    return false;
+  }
+  
+  bool result = set_frequency(freq_mhz);
+  
+  // Restore original VFO
+  set_current_vfo(current);
+  
+  return result;
+}
+
+auto THD75::get_other_frequency() -> double {
+  // Check if in single mode - there's no "other" VFO in single mode
+  if (get_single()) {
+    return 0.0; // Default fallback on error
+  }
+  
+  // Get current VFO
+  VFO current = get_current_vfo();
+  VFO other = (current == VFO::A) ? VFO::B : VFO::A;
+  
+  // Switch to other VFO, get frequency, then restore original VFO
+  if (!set_current_vfo(other)) {
+    return 0.0; // Default fallback on error
+  }
+  
+  double freq;
+  bool result = get_frequency(freq);
+  
+  // Restore original VFO
+  set_current_vfo(current);
+  
+  if (!result) {
+    return 0.0; // Default fallback on error
+  }
+  
+  return freq;
+}

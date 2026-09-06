@@ -144,6 +144,30 @@ public:
    */
   auto get_other_mode() -> Mode;
 
+  /**
+   * @brief Set the frequency on the other VFO (not currently transmitting)
+   *
+   * Gets the current VFO that will transmit, switches to the opposite VFO,
+   * sets the frequency there, then restores the original VFO.
+   * Returns false if in single mode (no "other" VFO exists).
+   *
+   * @param freq_mhz The frequency in megahertz to set on the other VFO
+   * @return true if successful, false otherwise
+   */
+  auto set_other_frequency(double freq_mhz) -> bool;
+
+  /**
+   * @brief Get the frequency from the other VFO (not currently transmitting)
+   *
+   * Gets the current VFO that will transmit, switches to the opposite VFO,
+   * queries the frequency there, then restores the original VFO.
+   * Returns FM if in single mode (no "other" VFO exists).
+   *
+   * @param freq_mhz Reference to store the frequency from the other VFO
+   * @return true if successful, false otherwise
+   */
+  auto get_other_frequency() -> double;
+
   // TNC control methods (public for external access)
   /**
    * @brief Get the Kenwood TNC mode
