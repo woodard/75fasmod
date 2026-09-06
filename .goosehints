@@ -21,7 +21,7 @@
 4. **Build & Test Loop**:
    - Compile changes using `bear` to generate/update the compilation
      database: `bear -- make -j$(nproc) -C build`
-   - Run unit tests using: `ctest --test-dir build`
+   - Run unit tests using: `make -C build check`
    - If compilation or tests fail, inspect `stderr`, modify the source
      files, and re-run.
 
