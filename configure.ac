@@ -1,4 +1,4 @@
-AC_INIT([75fasmod], [0.1.0], [your.email@example.com])
+AC_INIT([75fasmod], [0.1.0], [kg6fnk@gmail.com])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CXX
 AM_PROG_AR
