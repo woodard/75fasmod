@@ -178,11 +178,17 @@ void RadioController::shutdown() {
 }
 
 auto RadioController::set_frequency(double freq_mhz) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   auto freq_hz = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
   return rig_set_freq(rig_, RIG_VFO_CURR, freq_hz) == RIG_OK;
 }
 
 auto RadioController::get_frequency(double &freq_mhz) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   freq_t freq_hz;
   if (rig_get_freq(rig_, RIG_VFO_CURR, &freq_hz) != RIG_OK) {
     return false;
@@ -192,6 +198,9 @@ auto RadioController::get_frequency(double &freq_mhz) -> bool {
 }
 
 auto RadioController::get_mode(Mode &mode) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   rmode_t rig_mode = 0;
   int result = rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr);
   if (result == RIG_OK) {
@@ -209,6 +218,9 @@ auto RadioController::get_mode(Mode &mode) -> bool {
 }
 
 auto RadioController::set_mode(Mode mode) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   bool result =
       rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
   if (result) {
@@ -218,6 +230,9 @@ auto RadioController::set_mode(Mode mode) -> bool {
 }
 
 auto RadioController::set_ptt(bool transmit) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   const char *cmd = transmit ? "TX\r" : "RX\r";
   std::array<char, BUFFER_SIZE> buf{};
   unsigned char term = '\r';
@@ -231,6 +246,9 @@ auto RadioController::set_ptt(bool transmit) -> bool {
 }
 
 auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
   dcd_t dcd_status;
   if (rig_get_dcd(rig_, RIG_VFO_CURR, &dcd_status) == RIG_OK) {
     is_squelch_open = (dcd_status == RIG_DCD_ON);

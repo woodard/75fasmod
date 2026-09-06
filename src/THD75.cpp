@@ -40,7 +40,8 @@ THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
 //  * Controls the transmit/receive state of the radio.
 //  */
 // auto THD75::set_ptt(bool transmit) -> bool {
-//   return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF) ==
+//   return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF)
+//   ==
 //          RIG_OK;
 // }
 
@@ -51,6 +52,10 @@ THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
  * @return true if successful, false otherwise
  */
 auto THD75::set_power_level(const std::string &level) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   std::string lvl = level;
   for (auto &chr : lvl) {
     chr = static_cast<char>(std::toupper(static_cast<unsigned char>(chr)));
@@ -82,6 +87,10 @@ auto THD75::set_power_level(const std::string &level) -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::get_power_level(std::string &level) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   PowerLevel const pwr = kenwood_power_get();
   switch (pwr) {
   case PowerLevel::HIGH:
@@ -108,6 +117,10 @@ auto THD75::get_power_level(std::string &level) -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::set_other_power_level(const std::string &level) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     return false;
@@ -137,6 +150,10 @@ auto THD75::set_other_power_level(const std::string &level) -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::get_other_power_level(std::string &level) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     level = "H"; // Default fallback to high power on error
@@ -174,6 +191,10 @@ auto THD75::get_other_power_level(std::string &level) -> bool {
  * @return true if initialization successful, false otherwise
  */
 auto THD75::initialize() -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   std::cerr << "[RIG] Backing up current radio state..." << std::endl;
 
   // 1. Check if in dual mode and save "other" VFO state first
@@ -390,6 +411,10 @@ void THD75::shutdown() {
  * @return TNC mode status
  */
 auto THD75::get_tnc() -> int {
+  if (rig_ == nullptr) {
+    return -1;
+  }
+
   char cmd[] = "TN\r";
   char buf[BUFFER_SIZE_64] = {0};
   unsigned char term = '\r';
@@ -423,6 +448,10 @@ auto THD75::get_tnc() -> int {
  * @return true if successful, false otherwise
  */
 auto THD75::set_tnc(int mode) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   char cmd[BUFFER_SIZE_32];
   snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
 
@@ -438,6 +467,10 @@ auto THD75::set_tnc(int mode) -> bool {
 
 // Kenwood helper method implementations
 auto THD75::kenwood_menu_get(int menu_num) -> int {
+  if (rig_ == nullptr) {
+    return -1;
+  }
+
   char cmd[BUFFER_SIZE_16];
   snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
 
@@ -469,6 +502,10 @@ auto THD75::kenwood_menu_get(int menu_num) -> int {
 }
 
 auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   if (value < 0) {
     return false;
   }
@@ -487,6 +524,10 @@ auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
 }
 
 auto THD75::kenwood_usb_out_select_get() -> THD75::UsbOutSelect {
+  if (rig_ == nullptr) {
+    return UsbOutSelect::unknown;
+  }
+
   int const value = kenwood_menu_get(102);
   switch (value) {
   case 0:
@@ -501,10 +542,18 @@ auto THD75::kenwood_usb_out_select_get() -> THD75::UsbOutSelect {
 }
 
 auto THD75::kenwood_usb_out_select_set(UsbOutSelect value) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   return kenwood_menu_set(MENU_ITEM_102, static_cast<int>(value));
 }
 
 auto THD75::kenwood_power_get() -> THD75::PowerLevel {
+  if (rig_ == nullptr) {
+    return PowerLevel::UNKNOWN;
+  }
+
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
   char bc_buf[BUFFER_SIZE_32];
@@ -558,6 +607,10 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
 }
 
 auto THD75::kenwood_power_set(PowerLevel val) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   if (val == PowerLevel::UNKNOWN) {
     return false;
   }
@@ -598,6 +651,10 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
  * @return VFO::A if VFO A will transmit, VFO::B if VFO B will transmit
  */
 auto THD75::get_current_vfo() -> VFO {
+  if (rig_ == nullptr) {
+    return VFO::A; // Default fallback
+  }
+
   vfo_t vfo = 0;
   if (rig_get_vfo(rig_, &vfo) == RIG_OK) {
     if (vfo == RIG_VFO_A) {
@@ -617,6 +674,10 @@ auto THD75::get_current_vfo() -> VFO {
  * @return true if successful, false otherwise
  */
 auto THD75::set_current_vfo(VFO vfo) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   vfo_t hamlib_vfo = 0;
   if (vfo == VFO::A) {
     hamlib_vfo = RIG_VFO_A;
@@ -635,6 +696,10 @@ auto THD75::set_current_vfo(VFO vfo) -> bool {
  * @return true if in Single Band mode, false if in Dual Band mode
  */
 auto THD75::get_single() -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   int status = 0;
   if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
       RIG_OK) {
@@ -650,6 +715,10 @@ auto THD75::get_single() -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::set_single(VFO vfo) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Send BC command to set VFO and disable dual-watch
   int const band = (vfo == VFO::B) ? 1 : 0;
   char cmd[BUFFER_SIZE_16];
@@ -670,6 +739,10 @@ auto THD75::set_single(VFO vfo) -> bool {
  * @return true if in Dual Band mode, false if in Single Band mode
  */
 auto THD75::get_dual() -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   int status = 0;
   if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
       RIG_OK) {
@@ -684,6 +757,10 @@ auto THD75::get_dual() -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::set_dual() -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Query current band to set dual-watch on the current control band
   char bc_buf[BUFFER_SIZE_32];
   unsigned char term = '\r';
@@ -724,6 +801,10 @@ auto THD75::set_dual() -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::flip_single_dual(VFO vfo) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   if (get_single()) {
     // Currently in single mode, switch to dual
     return set_dual();
@@ -739,6 +820,10 @@ auto THD75::flip_single_dual(VFO vfo) -> bool {
  * @return true if successful, false otherwise
  */
 auto THD75::set_other_mode(Mode mode) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     return false;
@@ -767,6 +852,10 @@ auto THD75::set_other_mode(Mode mode) -> bool {
  * @return Mode from the other VFO
  */
 auto THD75::get_other_mode() -> Mode {
+  if (rig_ == nullptr) {
+    return Mode::FM; // Default fallback
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     return Mode::FM; // Default fallback on error
@@ -802,6 +891,10 @@ auto THD75::get_other_mode() -> Mode {
  * @return true if successful, false otherwise
  */
 auto THD75::set_other_frequency(double freq_mhz) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     return false;
@@ -830,6 +923,10 @@ auto THD75::set_other_frequency(double freq_mhz) -> bool {
  * @return Frequency in megahertz from the other VFO
  */
 auto THD75::get_other_frequency() -> double {
+  if (rig_ == nullptr) {
+    return 0.0;
+  }
+
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
     return 0.0; // Default fallback on error
@@ -861,10 +958,14 @@ auto THD75::get_other_frequency() -> double {
  * @brief Get the current VFO frequency with TH-D75 CAT fallback
  *
  * Attempts generic Hamlib get_frequency first. If Hamlib returns an error due
- * to thd74_pull_fo failing on TH-D75's extended response format, issues a 
+ * to thd74_pull_fo failing on TH-D75's extended response format, issues a
  * direct Kenwood FQ CAT command.
  */
 auto THD75::get_frequency(double &freq_mhz) -> bool {
+  if (rig_ == nullptr) {
+    return false;
+  }
+
   // 1. Try standard Hamlib query in base class
   if (RadioController::get_frequency(freq_mhz)) {
     return true;
@@ -874,10 +975,10 @@ auto THD75::get_frequency(double &freq_mhz) -> bool {
   int active_band = 0;
   char bc_buf[BUFFER_SIZE_32] = {0};
   unsigned char term = '\r';
-  int const bc_bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
-      reinterpret_cast<unsigned char *>(bc_buf),
-      static_cast<int>(sizeof(bc_buf) - 1), &term);
+  int const bc_bytes =
+      rig_send_raw(rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+                   reinterpret_cast<unsigned char *>(bc_buf),
+                   static_cast<int>(sizeof(bc_buf) - 1), &term);
 
   if (bc_bytes > 0) {
     std::string const bc_resp(bc_buf);
