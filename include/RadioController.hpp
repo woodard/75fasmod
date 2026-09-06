@@ -263,10 +263,13 @@ protected:
 
   // Backup variables for restoring radio state
   rmode_t orig_mode_;    ///< Saved original radio mode
-  bool orig_mode_saved_; ///< Flag indicating if mode was saved
+  bool orig_mode_saved_;    ///< Flag indicating if mode was saved
+  freq_t orig_frequency_;   ///< Saved original frequency (Hz)
+  bool orig_frequency_saved_; ///< Flag indicating if frequency was saved
 
   pbwidth_t orig_width_;  ///< Saved original bandwidth
-  PowerLevel orig_power_; ///< Saved original power level
+  PowerLevel orig_power_;     ///< Saved original power level
+  bool orig_power_saved_;     ///< Flag indicating if power level was saved
 };
 
 #endif // RADIOCONTROLLER_HPP
