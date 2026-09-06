@@ -74,6 +74,23 @@ public:
   };
 
   /**
+   * @brief Radio mode enumeration
+   *
+   * Radio modes mapped to Hamlib RIG_MODE_* constants.
+   * Note: These are Hamlib mode flags (bit flags), not simple enums.
+   */
+  enum class Mode : rmode_t {
+    FM = RIG_MODE_FM,   ///< FM mode
+    WFM = RIG_MODE_WFM, ///< Wide FM mode
+    AM = RIG_MODE_AM,   ///< AM mode
+    USB = RIG_MODE_USB, ///< Upper Sideband
+    LSB = RIG_MODE_LSB, ///< Lower Sideband
+    CW = RIG_MODE_CW,   ///< Morse code
+    CWR = RIG_MODE_CWR, ///< CW reverse
+    DD = RIG_MODE_DD    ///< Digital voice
+  };
+
+  /**
    * @brief Construct a new Radio Controller object
    *
    * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
@@ -127,6 +144,26 @@ public:
    * @return true if query successful, false on error
    */
   virtual bool get_frequency(double &freq_mhz);
+
+  /**
+   * @brief Get the current radio mode
+   *
+   * Queries the radio for the current operating mode for the current VFO.
+   *
+   * @param mode Reference to store the current mode
+   * @return true if query successful, false on error
+   */
+  virtual bool get_mode(Mode &mode);
+
+  /**
+   * @brief Set the radio mode
+   *
+   * Sets the operating mode for the current VFO.
+   *
+   * @param mode The mode to set
+   * @return true if set successfully, false otherwise
+   */
+  virtual bool set_mode(Mode mode);
 
   /**
    * @brief Set the TX power level

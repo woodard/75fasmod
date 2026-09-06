@@ -86,6 +86,18 @@ bool RadioController::get_frequency(double &freq_mhz) {
   return true;
 }
 
+bool RadioController::get_mode(Mode &mode) {
+  rmode_t rig_mode;
+  if (rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr) != RIG_OK) {
+    return false;
+  }
+  mode = static_cast<Mode>(rig_mode);
+  return true;
+}
+
+bool RadioController::set_mode(Mode mode) {
+  return rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
+}
 bool RadioController::set_ptt(bool transmit) {
   const char *cmd = transmit ? "TX\r" : "RX\r";
   char buf[64] = {0};
