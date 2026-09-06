@@ -34,15 +34,26 @@ THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
     : RadioController(model, std::move(port), hamlib_debug) {}
 
 // THD75-specific implementations
+/**
+ * @brief Set the PTT (Push-To-Talk) state on the radio
+ *
+ * Controls the transmit/receive state of the radio.
+ */
 auto THD75::set_ptt(bool transmit) -> bool {
   return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF) ==
          RIG_OK;
 }
 
+/**
+ * @brief Set the power level on the radio
+ *
+ * @param level Power level string ("EL", "L", "M", or "H")
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_power_level(const std::string &level) -> bool {
   std::string lvl = level;
   for (auto &chr : lvl) {
-    chr = std::toupper(chr);
+    chr = static_cast<char>(std::toupper(static_cast<unsigned char>(chr)));
   }
 
   PowerLevel val = PowerLevel::UNKNOWN;
@@ -64,6 +75,12 @@ auto THD75::set_power_level(const std::string &level) -> bool {
   return kenwood_power_set(val);
 }
 
+/**
+ * @brief Get the current power level from the radio
+ *
+ * @param level Reference to store the power level string ("EL", "L", "M", "H")
+ * @return true if successful, false otherwise
+ */
 auto THD75::get_power_level(std::string &level) -> bool {
   PowerLevel const pwr = kenwood_power_get();
   switch (pwr) {
@@ -84,6 +101,12 @@ auto THD75::get_power_level(std::string &level) -> bool {
   }
 }
 
+/**
+ * @brief Set the power level on the other VFO (not currently transmitting)
+ *
+ * @param level Power level string ("EL", "L", "M", or "H")
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_other_power_level(const std::string &level) -> bool {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
@@ -107,6 +130,12 @@ auto THD75::set_other_power_level(const std::string &level) -> bool {
   return result;
 }
 
+/**
+ * @brief Get the power level from the other VFO (not currently transmitting)
+ *
+ * @param level Reference to store the power level string ("EL", "L", "M", "H")
+ * @return true if successful, false otherwise
+ */
 auto THD75::get_other_power_level(std::string &level) -> bool {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
@@ -136,6 +165,14 @@ auto THD75::get_other_power_level(std::string &level) -> bool {
   return result;
 }
 
+/**
+ * @brief Initialize the THD75 radio controller
+ *
+ * Saves current radio settings and configures the radio for
+ * high-speed modem operation by setting USB Out Select to IF.
+ *
+ * @return true if initialization successful, false otherwise
+ */
 auto THD75::initialize() -> bool {
   std::cerr << "[RIG] Backing up current radio state..." << std::endl;
 
@@ -256,6 +293,11 @@ auto THD75::initialize() -> bool {
   return true;
 }
 
+/**
+ * @brief Shutdown the THD75 radio controller
+ *
+ * Restores the radio to its original state after modifications.
+ */
 void THD75::shutdown() {
   if (rig_ != nullptr) {
     std::cerr << "[RIG] Shutting down. Restoring original radio settings..."
@@ -342,6 +384,11 @@ void THD75::shutdown() {
 
 // Call base shutdown (restores frequency, mode, power level, closes rig)
 // TNC control functions (public interface)
+/**
+ * @brief Get the Kenwood TNC mode
+ *
+ * @return TNC mode status
+ */
 auto THD75::get_tnc() -> int {
   char cmd[] = "TN\r";
   char buf[BUFFER_SIZE_64] = {0};
@@ -369,6 +416,12 @@ auto THD75::get_tnc() -> int {
   return -1;
 }
 
+/**
+ * @brief Set the Kenwood TNC mode
+ *
+ * @param mode The TNC mode to set
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_tnc(int mode) -> bool {
   char cmd[BUFFER_SIZE_32];
   snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
@@ -539,6 +592,11 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
 }
 
 // VFO control functions
+/**
+ * @brief Get the current VFO that will transmit when PTT is set
+ *
+ * @return VFO::A if VFO A will transmit, VFO::B if VFO B will transmit
+ */
 auto THD75::get_current_vfo() -> VFO {
   vfo_t vfo = 0;
   if (rig_get_vfo(rig_, &vfo) == RIG_OK) {
@@ -552,6 +610,12 @@ auto THD75::get_current_vfo() -> VFO {
   return VFO::A; // Default fallback
 }
 
+/**
+ * @brief Set the VFO that will transmit when PTT is set
+ *
+ * @param vfo The VFO to set (VFO::A or VFO::B)
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_current_vfo(VFO vfo) -> bool {
   vfo_t hamlib_vfo = 0;
   if (vfo == VFO::A) {
@@ -565,6 +629,11 @@ auto THD75::set_current_vfo(VFO vfo) -> bool {
 }
 
 // Single/Dual Band control functions
+/**
+ * @brief Check if the radio is in Single Band mode
+ *
+ * @return true if in Single Band mode, false if in Dual Band mode
+ */
 auto THD75::get_single() -> bool {
   int status = 0;
   if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
@@ -574,6 +643,12 @@ auto THD75::get_single() -> bool {
   return true; // Default to single on error
 }
 
+/**
+ * @brief Set the radio to Single Band mode
+ *
+ * @param vfo The VFO to use (VFO::A or VFO::B)
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_single(VFO vfo) -> bool {
   // Send BC command to set VFO and disable dual-watch
   int const band = (vfo == VFO::B) ? 1 : 0;
@@ -589,6 +664,11 @@ auto THD75::set_single(VFO vfo) -> bool {
   return bytes > 0;
 }
 
+/**
+ * @brief Check if the radio is in Dual Band mode
+ *
+ * @return true if in Dual Band mode, false if in Single Band mode
+ */
 auto THD75::get_dual() -> bool {
   int status = 0;
   if (rig_get_func(rig_, RIG_VFO_CURR, RIG_FUNC_DUAL_WATCH, &status) ==
@@ -598,6 +678,11 @@ auto THD75::get_dual() -> bool {
   return false; // Default to dual off on error
 }
 
+/**
+ * @brief Set the radio to Dual Band mode
+ *
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_dual() -> bool {
   // Query current band to set dual-watch on the current control band
   char bc_buf[BUFFER_SIZE_32];
@@ -632,6 +717,12 @@ auto THD75::set_dual() -> bool {
 }
 
 // Toggle single/dual mode
+/**
+ * @brief Set single or dual mode based on current state
+ *
+ * @param vfo The VFO to set if switching to single mode
+ * @return true if successful, false otherwise
+ */
 auto THD75::flip_single_dual(VFO vfo) -> bool {
   if (get_single()) {
     // Currently in single mode, switch to dual
@@ -641,6 +732,12 @@ auto THD75::flip_single_dual(VFO vfo) -> bool {
 }
 
 // Other VFO mode control functions
+/**
+ * @brief Set the mode on the other VFO (not currently transmitting)
+ *
+ * @param mode The mode to set on the other VFO
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_other_mode(Mode mode) -> bool {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
@@ -664,6 +761,11 @@ auto THD75::set_other_mode(Mode mode) -> bool {
   return result;
 }
 
+/**
+ * @brief Get the mode from the other VFO (not currently transmitting)
+ *
+ * @return Mode from the other VFO
+ */
 auto THD75::get_other_mode() -> Mode {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
@@ -693,6 +795,12 @@ auto THD75::get_other_mode() -> Mode {
 }
 
 // Other VFO frequency control functions
+/**
+ * @brief Set the frequency on the other VFO (not currently transmitting)
+ *
+ * @param freq_mhz The frequency in megahertz to set on the other VFO
+ * @return true if successful, false otherwise
+ */
 auto THD75::set_other_frequency(double freq_mhz) -> bool {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
@@ -716,6 +824,11 @@ auto THD75::set_other_frequency(double freq_mhz) -> bool {
   return result;
 }
 
+/**
+ * @brief Get the frequency from the other VFO (not currently transmitting)
+ *
+ * @return Frequency in megahertz from the other VFO
+ */
 auto THD75::get_other_frequency() -> double {
   // Check if in single mode - there's no "other" VFO in single mode
   if (get_single()) {
