@@ -91,20 +91,23 @@ bool RadioController::get_mode(Mode &mode) {
   int result = rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr);
   if (result == RIG_OK) {
     mode = static_cast<Mode>(rig_mode);
-    std::cerr << "[RIG] get_mode succeeded, mode value: " << static_cast<int>(mode) << std::endl;
+    std::cerr << "[RIG] get_mode succeeded, mode value: "
+              << static_cast<int>(mode) << std::endl;
     return true;
   }
-  
+
   // Fallback: return the current mode we've tracked
-  std::cerr << "[RIG] get_mode failed (fallback), returning tracked mode: " << static_cast<int>(current_mode_) << std::endl;
+  std::cerr << "[RIG] get_mode failed (fallback), returning tracked mode: "
+            << static_cast<int>(current_mode_) << std::endl;
   mode = current_mode_;
   return true;
 }
 
 bool RadioController::set_mode(Mode mode) {
-  bool result = rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
+  bool result =
+      rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
   if (result) {
-    current_mode_ = mode;  // Save the mode we just set
+    current_mode_ = mode; // Save the mode we just set
   }
   return result;
 }
@@ -152,11 +155,11 @@ bool RadioController::set_power_level(const std::string &level) {
   }
 
   std::cerr << "[RIG] Setting TX power to " << lvl << "...\n";
+  (void)val; // Base implementation - THD75 overrides this method
   return true;
 }
-
 bool RadioController::get_power_level(std::string &level) {
-  // Base implementation returns false - THD75 should override
+  (void)level; // Unused in base implementation - THD75 overrides
   return false;
 }
 
