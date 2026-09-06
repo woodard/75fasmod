@@ -9,11 +9,20 @@
 #include "hamlib/riglist.h"
 #include <cctype>
 
+#include <array>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
-#include <cmath>
 #include <string>
+
+namespace {
+constexpr int BAUD_RATE_9600 = 9600;
+constexpr size_t BUFFER_SIZE_32 = 32;
+constexpr size_t BUFFER_SIZE_64 = 64;
+constexpr size_t BUFFER_SIZE_16 = 16;
+constexpr unsigned int MENU_ITEM_102 = 102;
+} // namespace
 
 #include "absl/strings/match.h"
 
@@ -93,7 +102,8 @@ auto THD75::initialize() -> bool {
   std::cerr << "[RIG] Configuring radio for high-speed modem operation...\n";
 
   // 3. Set mode to Packet FM (9600 baud passband)
-  int mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, 9600);
+  int mode_ret =
+      rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_PKTFM, BAUD_RATE_9600);
   if (mode_ret != RIG_OK) {
     std::cerr << "[RIG] PKTFM mode rejected, falling back to standard FM...\n";
     mode_ret = rig_set_mode(rig_, RIG_VFO_CURR, RIG_MODE_FM, 0);
@@ -136,7 +146,7 @@ auto THD75::initialize() -> bool {
   return true;
 }
 
-void THD75::shutdown() {
+auto THD75::shutdown->void() {
   if (rig_ != nullptr) {
     std::cerr << "[RIG] Shutting down. Restoring original radio settings...\n";
 
@@ -167,13 +177,14 @@ void THD75::shutdown() {
 
 // TNC control functions (public interface)
 auto THD75::get_tnc() -> int {
-  char cmd[] = "TN\r";
-  char buf[64] = {0};
+  const char *tn_cmd = "TN\r";
+  std::array<char, BUFFER_SIZE_64> buf{};
   unsigned char term = '\r';
 
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   if (bytes > 0) {
     std::string const resp(buf);
@@ -193,28 +204,30 @@ auto THD75::get_tnc() -> int {
 }
 
 auto THD75::set_tnc(int mode) -> bool {
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "TN %d,0\r", mode);
+  std::array<char, BUFFER_SIZE_32> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "TN %d,0\r", mode);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   return bytes > 0;
 }
 
 // Kenwood helper method implementations
 auto THD75::kenwood_menu_get(int menu_num) -> int {
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "EX%03d\r", menu_num);
+  std::array<char, BUFFER_SIZE_16> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "EX%03d\r", menu_num);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   if (bytes > 0) {
     std::string const resp(buf);
@@ -241,14 +254,15 @@ auto THD75::kenwood_menu_set(int menu_num, int value) -> bool {
     return false;
   }
 
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "EX%03d,%d\r", menu_num, value);
+  std::array<char, BUFFER_SIZE_32> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "EX%03d,%d\r", menu_num, value);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   return bytes > 0;
 }
@@ -268,13 +282,13 @@ auto THD75::kenwood_usb_out_select_get() -> THD75::UsbOutSelect {
 }
 
 auto THD75::kenwood_usb_out_select_set(UsbOutSelect value) -> bool {
-  return kenwood_menu_set(102, static_cast<int>(value));
+  return kenwood_menu_set(MENU_ITEM_102, static_cast<int>(value));
 }
 
 auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   // Query active band (0 = Band A, 1 = Band B)
   int active_band = 0;
-  char bc_buf[32] = {0};
+  std::array<char, BUFFER_SIZE_32> bc_buf{};
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -290,13 +304,14 @@ auto THD75::kenwood_power_get() -> THD75::PowerLevel {
   }
 
   // Fetch power for the active band
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "PC %d\r", active_band);
+  std::array<char, BUFFER_SIZE_16> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "PC %d\r", active_band);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   if (bytes > 0) {
     std::string const resp(buf);
@@ -330,7 +345,7 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
 
   // Query active band
   int active_band = 0;
-  char bc_buf[32] = {0};
+  std::array<char, BUFFER_SIZE_32> bc_buf{};
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -345,13 +360,15 @@ auto THD75::kenwood_power_set(PowerLevel val) -> bool {
     }
   }
 
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "PC %d,%d\r", active_band, static_cast<int>(val));
+  std::array<char, BUFFER_SIZE_32> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "PC %d,%d\r", active_band,
+           static_cast<int>(val));
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
 
   return bytes > 0;
 }
@@ -395,14 +412,15 @@ auto THD75::get_single() -> bool {
 auto THD75::set_single(VFO vfo) -> bool {
   // Send BC command to set VFO and disable dual-watch
   int const band = (vfo == VFO::B) ? 1 : 0;
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "BC %d,0\r", band);
+  std::array<char, BUFFER_SIZE_16> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "BC %d,0\r", band);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   unsigned char term = '\r';
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
   return bytes > 0;
 }
 
@@ -417,7 +435,7 @@ auto THD75::get_dual() -> bool {
 
 auto THD75::set_dual() -> bool {
   // Query current band to set dual-watch on the current control band
-  char bc_buf[32] = {0};
+  std::array<char, BUFFER_SIZE_32> bc_buf{};
   unsigned char term = '\r';
 
   int const bc_bytes = rig_send_raw(
@@ -436,13 +454,14 @@ auto THD75::set_dual() -> bool {
   }
 
   // Send BC command to enable dual-watch on the current band
-  char cmd[16];
-  snprintf(cmd, sizeof(cmd), "BC %d,1\r", band);
+  std::array<char, BUFFER_SIZE_16> cmd;
+  snprintf(cmd, static_cast<int>(sizeof(cmd)), "BC %d,1\r", band);
 
-  char buf[64] = {0};
+  std::array<char, BUFFER_SIZE_64> buf{};
   int const bytes = rig_send_raw(
-      rig_, reinterpret_cast<const unsigned char *>(cmd), strlen(cmd),
-      reinterpret_cast<unsigned char *>(buf), sizeof(buf) - 1, &term);
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf)) - 1, &term);
   return bytes > 0;
 }
 
