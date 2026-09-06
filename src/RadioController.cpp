@@ -21,6 +21,13 @@ auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
   return "";
 }
 
+// Flush the serial port to clear any pending data
+void RadioController::flush_serial() {
+  if (rig_ != nullptr) {
+    rig_flush((hamlib_port_t*)rig_data_pointer(rig_, RIG_PTRX_RIGPORT));
+  }
+}
+
 RadioController::RadioController(rig_model_t model, std::string port,
                                  bool hamlib_debug)
     : model_(model), port_(std::move(port)), rig_(nullptr),

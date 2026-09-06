@@ -207,6 +207,14 @@ public:
   virtual bool get_dcd(bool &is_squelch_open);
 
   /**
+   * @brief Flush the serial port buffer
+   *
+   * Clears any pending data from the serial port. Useful for ensuring
+   * a clean communication channel before sending new commands.
+   */
+  void flush_serial();
+
+  /**
    * @brief Find available serial tty devices in sysfs
    *
    * Searches /sys/class/tty for serial devices matching the TH-D75 USB PID/VID.
