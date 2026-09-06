@@ -1,7 +1,7 @@
 bin_PROGRAMS = 75fasmod
 
 # Test programs
-check_PROGRAMS = test_frequency test_power test_vfo test_tnc test_single_dual
+check_PROGRAMS = test_frequency test_power test_vfo test_tnc test_single_dual test_other_mode
 
 test_frequency_SOURCES = test/test_frequency.cpp src/RadioController.cpp src/THD75.cpp
 test_frequency_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
@@ -23,6 +23,10 @@ test_single_dual_SOURCES = test/test_single_dual.cpp src/RadioController.cpp src
 test_single_dual_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
 test_single_dual_LDADD = $(HAMLIB_LIBS)
 
+test_other_mode_SOURCES = test/test_other_mode.cpp src/RadioController.cpp src/THD75.cpp
+test_other_mode_CPPFLAGS = -I$(top_srcdir)/include $(HAMLIB_CFLAGS) -std=c++20
+test_other_mode_LDADD = $(HAMLIB_LIBS)
+
 # Tell the C++ preprocessor where to find the header files
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
@@ -43,10 +47,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 
 # Test runner
 TESTS = test/run_frequency_test.sh test/run_power_test.sh \
-        test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh
+        test/run_vfo_test.sh test/run_tnc_test.sh test/run_single_dual_test.sh \
+        test/run_other_mode_test.sh
 EXTRA_DIST = test/run_frequency_test.sh test/run_power_test.sh \
              test/run_vfo_test.sh test/run_tnc_test.sh \
-             test/run_single_dual_test.sh
+             test/run_single_dual_test.sh \
+             test/run_other_mode_test.sh
 
 # Documentation targets
 .PHONY: docs

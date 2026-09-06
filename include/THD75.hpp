@@ -122,6 +122,28 @@ public:
    */
   auto flip_single_dual(VFO vfo) -> bool;
 
+  /**
+   * @brief Set the mode on the other VFO (not currently transmitting)
+   *
+   * Gets the current VFO that will transmit, switches to the opposite VFO,
+   * sets the mode there, then restores the original VFO.
+   *
+   * @param mode The mode to set on the other VFO
+   * @return true if successful, false otherwise
+   */
+  auto set_other_mode(Mode mode) -> bool;
+
+  /**
+   * @brief Get the mode from the other VFO (not currently transmitting)
+   *
+   * Gets the current VFO that will transmit, switches to the opposite VFO,
+   * queries the mode there, then restores the original VFO.
+   *
+   * @param mode Reference to store the mode from the other VFO
+   * @return true if successful, false otherwise
+   */
+  auto get_other_mode() -> Mode;
+
   // TNC control methods (public for external access)
   /**
    * @brief Get the Kenwood TNC mode
