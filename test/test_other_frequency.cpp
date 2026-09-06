@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 
 static double get_different_freq_in_band(double current_freq_mhz) {
   if (current_freq_mhz >= 144.0 && current_freq_mhz <= 148.0) {
-    return (current_freq_mhz >= 146.0) ? 144.500 : 146.500;
+    return (current_freq_mhz >= 146.0) ? 146.620 : 146.620;
   } else if (current_freq_mhz >= 222.0 && current_freq_mhz <= 225.0) {
     return (current_freq_mhz >= 223.5) ? 222.500 : 224.500;
   } else if (current_freq_mhz >= 420.0 && current_freq_mhz <= 450.0) {
@@ -71,9 +71,16 @@ int main(int argc, char *argv[]) {
     std::cerr << "[INFO] Dual mode enabled\n";
   }
 
+  // Get current frequency for the "different frequency in band" calculation
+  double current_freq_mhz = 0.0;
+  if (!radio.get_frequency(current_freq_mhz)) {
+    std::cerr << "[ERROR] Failed to query current frequency.\n";
+    return 1;
+  }
+
   if (set_flag) {
     double target_freq =
-        (explicit_freq > 0.0) ? explicit_freq : get_different_freq_in_band(0.0);
+        (explicit_freq > 0.0) ? explicit_freq : get_different_freq_in_band(current_freq_mhz);
     if (!radio.set_other_frequency(target_freq)) {
       std::cerr << "[ERROR] Failed to set other frequency to " << target_freq
                 << " MHz\n";
