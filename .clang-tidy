@@ -1,8 +1,9 @@
 ---
-Checks: 'bugprone-*,modernize-*,performance-*,readability-*'
+Checks: '-llvm-*,bugprone-*,modernize-*,performance-*,readability-*'
 WarningsAsErrors: ''
-HeaderFilterRegex: '^((?!.*\.local/include).)*$'
+HeaderFilterRegex: '^((?!.*\.local).)*$'
+ExcludeHeaderFilterRegex: '.*(\.local|/usr/).*'
+SystemHeaders: true
 CheckOptions:
   - key: modernize-use-nullptr.NullMacros
     value: 'NULL'
-...

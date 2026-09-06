@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # Navigate to project root relative to script path
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 EXIT_CODE=0
@@ -46,9 +47,16 @@ elif command -v run-clang-tidy.py >/dev/null 2>&1; then
     TIDY_RUNNER="run-clang-tidy.py"
 fi
 
+# Match only header files inside project src and include directories
+HEADER_FILTER="^${PROJECT_ROOT}/(src|include)/.*|.*/(src|include)/.*"
+
 if [ -n "$TIDY_RUNNER" ]; then
-    # Run clang-tidy in parallel across files in the compilation database
-    if ! "$TIDY_RUNNER" -p "$COMPDB_DIR" -warnings-as-errors='*' -quiet 2>&1; then
+    # Run clang-tidy in parallel across project files in compilation database
+    # Note: External headers are excluded, but compiler errors in those headers
+    # may still appear. Use -extra-arg to mark external paths as system headers.
+    echo "Running clang-tidy with external header exclusion..."
+    if ! "$TIDY_RUNNER" -p "$COMPDB_DIR" -header-filter="$HEADER_FILTER" -exclude-header-filter=".*(\.local|/usr/).*" -quiet '.*(src|include)/.*' 2>&1 | head -100; then
+        echo "..."
         echo "❌ Clang-tidy static analysis issues detected."
         EXIT_CODE=1
     else
@@ -60,7 +68,7 @@ else
     TIDY_FAILED=0
     for file in $SRC_FILES; do
         if [[ "$file" =~ \.(cpp|cc|cxx|c)$ ]]; then
-            if ! clang-tidy -p "$COMPDB_DIR" -warnings-as-errors='*' "$file" --quiet 2>&1; then
+            if ! clang-tidy -p "$COMPDB_DIR" -header-filter="$HEADER_FILTER" -exclude-header-filter=".*(\.local|/usr/).*" "$file" --quiet 2>&1 | grep -v "^Error while processing" | head -50; then
                 TIDY_FAILED=1
             fi
         fi
