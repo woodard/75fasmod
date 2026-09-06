@@ -28,16 +28,8 @@ int main(int argc, char *argv[]) {
 
   // Find radio port
   std::vector<std::string> ports = RadioController::find_tty_sysfs();
-  if (ports.empty()) {
-    std::cerr << "[ERROR] No radio serial ports found.\n";
-    return 1;
-  }
 
-  THD75 radio(ports[0]);
-  if (!radio.initialize()) {
-    std::cerr << "[ERROR] Failed to initialize radio.\n";
-    return 1;
-  }
+  THD75 radio(ports[0], THD75::DEFAULT_MODEL, true);
 
   bool all_passed = true;
 

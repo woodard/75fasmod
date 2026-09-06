@@ -56,13 +56,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  THD75 radio(ports[0]);
-  if (!radio.initialize()) {
-    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0]
-              << "\n";
-    return 1;
-  }
-
+  THD75 radio(ports[0], THD75::DEFAULT_MODEL, true);
   std::string current_level;
   if (!radio.get_power_level(current_level)) {
     std::cerr << "[ERROR] Failed to query current power level.\n";

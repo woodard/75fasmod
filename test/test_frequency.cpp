@@ -54,12 +54,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  THD75 radio(ports[0]);
-  if (!radio.initialize()) {
-    std::cerr << "[ERROR] Failed to initialize RadioController on " << ports[0]
-              << "\n";
-    return 1;
-  }
+  THD75 radio(ports[0], THD75::DEFAULT_MODEL, true);
 
   double current_freq_mhz = 0.0;
   if (!radio.get_frequency(current_freq_mhz)) {
