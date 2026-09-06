@@ -14,49 +14,46 @@
 
 class THD75 : public RadioController {
 public:
-  static constexpr rig_model_t DEFAULT_MODEL = 2042;
+  static constexpr rig_model_t DEFAULT_MODEL = RIG_MODEL_THD75;
 
   enum class VFO : int8_t { A = RIG_VFO_A, B = RIG_VFO_B };
 
   explicit THD75(std::string port, rig_model_t model, bool hamlib_debug);
 
   auto initialize() -> bool override;
-
   void shutdown() override;
 
-  auto set_ptt(bool transmit) -> bool override;
+  // auto set_ptt(bool transmit) -> bool override;
+  
   auto set_power_level(const std::string &level) -> bool override;
   auto get_power_level(std::string &level) -> bool override;
 
   auto set_other_power_level(const std::string &level) -> bool;
-
   auto get_other_power_level(std::string &level) -> bool;
 
   auto get_current_vfo() -> VFO;
-
   auto set_current_vfo(VFO vfo) -> bool;
 
   auto get_single() -> bool;
-
   auto set_single(VFO vfo) -> bool;
 
   auto get_dual() -> bool;
-
   auto set_dual() -> bool;
-
   auto flip_single_dual(VFO vfo) -> bool;
 
   auto set_other_mode(Mode mode) -> bool;
-
   auto get_other_mode() -> Mode;
 
-  auto set_other_frequency(double freq_mhz) -> bool;
+  // Virtual overrides for device-specific behavior
+  auto get_frequency(double &freq_mhz) -> bool override;
 
+  auto set_other_frequency(double freq_mhz) -> bool;
   auto get_other_frequency() -> double;
 
   auto get_tnc() -> int;
-
   auto set_tnc(int mode) -> bool;
+
+  
 
 private:
   auto kenwood_usb_out_select_get() -> UsbOutSelect;

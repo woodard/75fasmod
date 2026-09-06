@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-TEST_BIN="./test/test_single_dual"
+TEST_BIN="./test_single_dual"
 if [ ! -x "$TEST_BIN" ]; then
     TEST_BIN="./test/test_single_dual"
 fi

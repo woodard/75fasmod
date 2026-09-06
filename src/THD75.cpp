@@ -34,15 +34,15 @@ THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
     : RadioController(model, std::move(port), hamlib_debug) {}
 
 // THD75-specific implementations
-/**
- * @brief Set the PTT (Push-To-Talk) state on the radio
- *
- * Controls the transmit/receive state of the radio.
- */
-auto THD75::set_ptt(bool transmit) -> bool {
-  return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF) ==
-         RIG_OK;
-}
+// /**
+//  * @brief Set the PTT (Push-To-Talk) state on the radio
+//  *
+//  * Controls the transmit/receive state of the radio.
+//  */
+// auto THD75::set_ptt(bool transmit) -> bool {
+//   return rig_set_ptt(rig_, RIG_VFO_CURR, transmit ? RIG_PTT_ON : RIG_PTT_OFF) ==
+//          RIG_OK;
+// }
 
 /**
  * @brief Set the power level on the radio
@@ -855,4 +855,61 @@ auto THD75::get_other_frequency() -> double {
   }
 
   return freq;
+}
+
+/**
+ * @brief Get the current VFO frequency with TH-D75 CAT fallback
+ *
+ * Attempts generic Hamlib get_frequency first. If Hamlib returns an error due
+ * to thd74_pull_fo failing on TH-D75's extended response format, issues a 
+ * direct Kenwood FQ CAT command.
+ */
+auto THD75::get_frequency(double &freq_mhz) -> bool {
+  // 1. Try standard Hamlib query in base class
+  if (RadioController::get_frequency(freq_mhz)) {
+    return true;
+  }
+
+  // 2. Workaround: Query active band to send target FQ CAT command
+  int active_band = 0;
+  char bc_buf[BUFFER_SIZE_32] = {0};
+  unsigned char term = '\r';
+  int const bc_bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>("BC\r"), 3,
+      reinterpret_cast<unsigned char *>(bc_buf),
+      static_cast<int>(sizeof(bc_buf) - 1), &term);
+
+  if (bc_bytes > 0) {
+    std::string const bc_resp(bc_buf);
+    if (bc_resp.find("BC 1") != std::string::npos ||
+        bc_resp.find("BC1") != std::string::npos) {
+      active_band = 1;
+    }
+  }
+
+  // 3. Issue direct FQ command ("FQ <band>\r")
+  char cmd[BUFFER_SIZE_16];
+  snprintf(cmd, sizeof(cmd), "FQ %d\r", active_band);
+
+  char buf[BUFFER_SIZE_64] = {0};
+  int const bytes = rig_send_raw(
+      rig_, reinterpret_cast<const unsigned char *>(cmd),
+      static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
+      static_cast<int>(sizeof(buf) - 1), &term);
+
+  if (bytes > 0) {
+    std::string const resp(buf);
+    size_t const comma = resp.find(',');
+    if (comma != std::string::npos) {
+      try {
+        double const freq_hz = std::stod(resp.substr(comma + 1));
+        freq_mhz = freq_hz / 1000000.0;
+        return true;
+      } catch (...) {
+        return false;
+      }
+    }
+  }
+
+  return false;
 }

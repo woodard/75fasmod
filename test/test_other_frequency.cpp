@@ -14,7 +14,6 @@
 
 namespace po = boost::program_options;
 
-// Calculates a distinct valid frequency in the same amateur band
 static double get_different_freq_in_band(double current_freq_mhz) {
   if (current_freq_mhz >= 144.0 && current_freq_mhz <= 148.0) {
     return (current_freq_mhz >= 146.0) ? 144.500 : 146.500;
@@ -32,31 +31,26 @@ int main(int argc, char *argv[]) {
       "set,s", po::value<std::string>()->implicit_value(""),
       "Set frequency to specified MHz or a different one in band");
 
-  // Parse the command line
   po::variables_map vm;
   try {
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
   } catch (const po::error &e) {
     std::cerr << "Error: " << e.what() << "\n";
-    std::cout << "Usage: " << argv[0] << " [-s [freq_mhz]]\n";
     return 1;
   }
 
-  // Handle help
   if (vm.count("help")) {
     std::cout << "Usage: " << argv[0] << " [-s [freq_mhz]]\n";
     return 0;
   }
 
   bool set_flag = vm.count("set");
+  std::string freq_str = vm["set"].as<std::string>();
   double explicit_freq = 0.0;
 
-  if (set_flag) {
-    std::string freq_str = vm["set"].as<std::string>();
-    if (!freq_str.empty()) {
-      explicit_freq = std::stod(freq_str);
-    }
+  if (set_flag && !freq_str.empty()) {
+    explicit_freq = std::stod(freq_str);
   }
 
   std::vector<std::string> ports = RadioController::find_tty_sysfs();
@@ -66,6 +60,16 @@ int main(int argc, char *argv[]) {
   }
 
   THD75 radio(ports[0], THD75::DEFAULT_MODEL, true);
+
+  // Put radio in dual mode for other VFO operations
+  if (radio.get_single()) {
+    std::cerr << "[INFO] Radio in single mode - enabling dual mode\n";
+    if (!radio.set_dual()) {
+      std::cerr << "[ERROR] Failed to enable dual mode\n";
+      return 1;
+    }
+    std::cerr << "[INFO] Dual mode enabled\n";
+  }
 
   if (set_flag) {
     double target_freq =
