@@ -803,6 +803,8 @@ auto THD75::set_dual() -> bool {
       static_cast<int>(strlen(cmd)), reinterpret_cast<unsigned char *>(buf),
       static_cast<int>(sizeof(buf)) - 1, &term);
   return bytes > 0;
+  // Flush serial buffer after set_dual to prevent stale data
+  flush_serial();
 }
 
 // Toggle single/dual mode
@@ -1019,6 +1021,7 @@ auto THD75::get_frequency(double &freq_mhz) -> bool {
       try {
         double const freq_hz = std::stod(resp.substr(comma + 1));
         freq_mhz = freq_hz / 1000000.0;
+        flush_serial(); // Flush buffer after reading FO response
         return true;
       } catch (...) {
         return false;
