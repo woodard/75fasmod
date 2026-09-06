@@ -12,11 +12,9 @@ PKG_CHECK_MODULES([GNURADIO], [gnuradio-runtime gnuradio-audio gnuradio-blocks g
 PKG_CHECK_MODULES([FMT], [fmt >= 8.0.0])
 PKG_CHECK_MODULES([VOLK], [volk])
 
-# Check for boost_program_options
-BOOST_CFLAGS="-I/usr/include"
-BOOST_LIBS="-L/usr/lib64 -lboost_program_options"
-AC_SUBST([BOOST_CFLAGS])
-AC_SUBST([BOOST_LIBS])
+# Check for boost using autoconf macros
+AX_BOOST_BASE
+AX_BOOST_PROGRAM_OPTIONS
 
 AC_CONFIG_FILES([Makefile Doxyfile])
 AC_OUTPUT
