@@ -42,6 +42,9 @@ class ModemDSP;
  */
 class DataSocket {
 public:
+  static constexpr int DEFAULT_BURST_LIMIT = 8;
+  static constexpr int DEFAULT_FLUSH_TIMEOUT_MS = 200;
+
   /**
    * @brief Constructs a new DataSocket object
    *
@@ -51,8 +54,9 @@ public:
    * @param burst_limit Maximum frames to transmit in a single burst
    * @param flush_timeout_ms Timeout in milliseconds to flush the transmit queue
    */
-  DataSocket(const std::string &socket_path, RadioController &radio,
-             ModemDSP &dsp, int burst_limit, int flush_timeout_ms);
+  DataSocket(std::string socket_path, RadioController &radio,
+             ModemDSP &dsp, int burst_limit = DEFAULT_BURST_LIMIT,
+             int flush_timeout_ms = DEFAULT_FLUSH_TIMEOUT_MS);
 
   /**
    * @brief Destructor
