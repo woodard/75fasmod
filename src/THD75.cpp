@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
-#include <math.h>
+#include <cmath>
 #include <string>
 
 #include "absl/strings/match.h"
