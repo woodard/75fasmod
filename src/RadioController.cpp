@@ -10,6 +10,9 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 
 namespace {
 constexpr double FREQUENCY_MHZ_TO_HZ = 1000000.0;
@@ -157,69 +160,49 @@ auto RadioController::initialize() -> bool {
 /**
  * @brief Shutdown the radio controller and restore backup state
  */
-void RadioController::shutdown() {
-  if (rig_ == nullptr) {
+RadioController::RadioController(rig_model_t model, std::string port,
+                                 bool hamlib_debug)
+    : model_(model), port_(std::move(port)), rig_(nullptr),
+      current_mode_(Mode::FM), orig_mode_(RIG_MODE_NONE),
+      orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false),
+      orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
+      orig_power_saved_(false) {
+  
+  if (hamlib_debug) {
+    rig_set_debug_level(RIG_DEBUG_TRACE);
+    rig_set_debug_file(stderr);
+  }
+
+  // --- NEW: Force drain OS serial buffers before Hamlib connects ---
+  int fd = open(port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+  if (fd >= 0) {
+    tcflush(fd, TCIOFLUSH);
+    char junk[256];
+    while (read(fd, junk, sizeof(junk)) > 0) {} // Drain completely
+    close(fd);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  // -----------------------------------------------------------------
+
+  std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
+  rig_ = rig_init(model_);
+  if (rig_ == nullptr) return;
+
+  rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
+
+  int status = rig_open(rig_);
+  if (status != RIG_OK) {
+    std::cerr << "[RIG] Error: rig_open() failed on " << port_
+              << " | Code: " << status << " (" << rigerror(status) << ")\n";
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
     return;
   }
 
-  std::cerr << "[RIG] Restoring radio state..." << std::endl;
-
-  // Restore original frequency using virtual override
-  if (orig_frequency_saved_) {
-    double freq_mhz = static_cast<double>(orig_frequency_) / FREQUENCY_MHZ_TO_HZ;
-    if (this->set_frequency(freq_mhz)) {
-      std::cerr << "[RIG] Restored frequency: " << freq_mhz << " MHz" << std::endl;
-    } else {
-      std::cerr << "[RIG] Warning: Failed to restore frequency" << std::endl;
-    }
-  }
-
-  // Restore original mode using virtual override
-  if (orig_mode_saved_) {
-    if (this->set_mode(static_cast<Mode>(orig_mode_))) {
-      std::cerr << "[RIG] Restored mode and bandwidth" << std::endl;
-    } else {
-      std::cerr << "[RIG] Warning: Failed to restore mode" << std::endl;
-    }
-  }
-
-  // Restore original power level using virtual override
-  if (orig_power_saved_) {
-    std::string level;
-    switch (orig_power_) {
-    case PowerLevel::HIGH:
-      level = "H";
-      break;
-    case PowerLevel::MEDIUM:
-      level = "M";
-      break;
-    case PowerLevel::LOW:
-      level = "L";
-      break;
-    case PowerLevel::EXTRA_LOW:
-      level = "EL";
-      break;
-    default:
-      std::cerr << "[RIG] Note: Unknown power level, skipping restoration"
-                << std::endl;
-      level = "UNKNOWN";
-    }
-    if (level != "UNKNOWN") {
-      if (this->set_power_level(level)) {
-        std::cerr << "[RIG] Restored power level" << std::endl;
-      } else {
-        std::cerr << "[RIG] Warning: Failed to restore power level"
-                  << std::endl;
-      }
-    }
-  }
-
-  std::cerr << "[RIG] Closing radio connection..." << std::endl;
-
-  set_ptt(false);
-  rig_close(rig_);
-  rig_cleanup(rig_);
-  rig_ = nullptr;
+  rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  flush_serial();
 }
 
 /**
