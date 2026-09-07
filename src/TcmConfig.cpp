@@ -1,5 +1,4 @@
 #include "TcmConfig.hpp"
-
 /**
  * @file TcmConfig.hpp
  * @brief TCM (Trellis Coded Modulation) configuration

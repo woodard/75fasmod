@@ -1,5 +1,4 @@
 #include "ModemDSP.hpp"
-
 /**
  * @file ModemDSP.hpp
  * @brief Digital Signal Processing for 75fasmod modem

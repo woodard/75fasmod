@@ -1,3 +1,4 @@
+#include "RadioController.hpp"
 /**
  * @file RadioController.cpp
  * @brief Base radio controller for Hamlib interface
@@ -6,8 +7,6 @@
  * radio transceivers. Handles initialization, state backup/restoration, and
  * safe serial port management.
  */
-
-#include "RadioController.hpp"
 
 /**
  * @file RadioController.hpp

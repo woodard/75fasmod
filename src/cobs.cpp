@@ -1,5 +1,4 @@
 #include "cobs.hpp"
-
 /**
  * @file cobs.hpp
  * @brief COBS (Consistent Overhead Byte Stuffing) encoding and decoding

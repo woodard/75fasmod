@@ -1,5 +1,4 @@
 #include "THD75.hpp"
-
 /**
  * @file THD75.hpp
  * @brief Kenwood TH-D75 specific radio controller implementation

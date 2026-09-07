@@ -1,5 +1,4 @@
 #include "Frame.hpp"
-
 /**
  * @file Frame.hpp
  * @brief Frame structure for 75fasmod data transmission

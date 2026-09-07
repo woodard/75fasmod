@@ -1,5 +1,4 @@
 #include "DataSocket.hpp"
-
 /**
  * @file DataSocket.hpp
  * @brief IPC socket server for 75fasmod modem data transfer
@@ -174,6 +173,15 @@ void DataSocket::stop() {
   }
 }
 
+/**
+ * @brief Main accept loop for handling incoming connections
+ *
+ * Runs in a background thread and listens for incoming Unix domain socket
+ * connections. Accepts connections and delegates handling to worker threads.
+ *
+ * @param stoken Stop token for graceful shutdown
+ */
+
 void DataSocket::accept_loop(std::stop_token stoken) {
   struct pollfd pfd{};
   pfd.fd = server_fd_;
@@ -189,6 +197,17 @@ void DataSocket::accept_loop(std::stop_token stoken) {
     }
   }
 }
+
+/**
+ * @brief Handle communication with a connected client
+ *
+ * Manages the bidirectional data flow between the client and the modem DSP.
+ * Handles both receiving data from clients for transmission and sending
+ * decoded frames to the client.
+ *
+ * @param client_fd File descriptor for the connected client socket
+ * @param stoken Stop token for graceful shutdown
+ */
 
 void DataSocket::handle_client(int client_fd, std::stop_token &stoken) {
   active_client_fd_ = client_fd;
