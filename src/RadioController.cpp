@@ -1,17 +1,21 @@
 /**
  * @file RadioController.cpp
- * @brief Base radio controller for hamlib interface
+ * @brief Base radio controller for Hamlib interface
+ *
+ * Provides a high-level C++ abstraction over the Hamlib C API for controlling
+ * radio transceivers. Handles initialization, state backup/restoration, and
+ * safe serial port management.
  */
 
 #include "RadioController.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
-#include <thread>
-#include <fcntl.h>
 #include <termios.h>
+#include <thread>
 #include <unistd.h>
 
 namespace {
@@ -52,6 +56,10 @@ void RadioController::flush_serial() {
 /**
  * @brief Construct a new Radio Controller object
  *
+ * Initializes the Hamlib rig instance, forcibly drains lingering OS serial 
+ * buffers to prevent protocol desynchronization, and safely kills Hamlib's 
+ * internal background cache polling thread to avoid collisions.
+ *
  * @param model Hamlib rig model number
  * @param port Serial port device path
  * @param hamlib_debug Enable Hamlib debug output
@@ -70,19 +78,27 @@ RadioController::RadioController(rig_model_t model, std::string port,
     rig_set_debug_file(stderr);
   }
 
+  // --- Force drain OS serial buffers before Hamlib connects ---
+  // This clears any 73-byte FO command echoes left on the wire from 
+  // previous aborted test runs, ensuring a clean slate.
+  int fd = open(port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+  if (fd >= 0) {
+    tcflush(fd, TCIOFLUSH);
+    char junk[256];
+    while (read(fd, junk, sizeof(junk)) > 0) {} // Drain completely
+    close(fd);
+  }
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  // ------------------------------------------------------------
+
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (rig_ == nullptr) {
-    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
-              << ". The model ID may not exist in this Hamlib build.\n";
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_ << "\n";
     return;
   }
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
-
-  // Give the radio time to finish lingering serial transmissions 
-  // from previous program executions (73-bytes @ 9600 baud = ~76ms)
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   int status = rig_open(rig_);
   if (status != RIG_OK) {
@@ -95,13 +111,13 @@ RadioController::RadioController(rig_model_t model, std::string port,
   }
 
   // MUST be called AFTER rig_open(). 
-  // rig_open() spawns the background thread; this command kills it.
+  // rig_open() spawns the background caching thread; this command kills it
+  // to ensure strict single-threaded access to the serial port.
   rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
   
   // Wait for the background thread to safely exit
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  // Allow interface to settle and clear initial buffer garbage
   flush_serial();
 }
 
@@ -109,11 +125,20 @@ RadioController::RadioController(rig_model_t model, std::string port,
  * @brief Destroy the Radio Controller object
  */
 RadioController::~RadioController() {
-  shutdown();
+  if (rig_ != nullptr) {
+    std::cerr << "[RIG] Closing connection..." << std::endl;
+    set_ptt(false);
+    rig_close(rig_);
+    rig_cleanup(rig_);
+    rig_ = nullptr;
+  }
 }
 
 /**
  * @brief Initialize the radio controller and backup state
+ *
+ * Backs up the original frequency and mode so they can be seamlessly
+ * restored on shutdown.
  *
  * @return true if initialization successful, false otherwise
  */
@@ -124,14 +149,12 @@ auto RadioController::initialize() -> bool {
 
   std::cerr << "[RIG] Saving original radio state..." << std::endl;
 
-  // Save original frequency using virtual override (invokes THD75 CAT fallback)
+  // Save original frequency using virtual override (invokes THD75 CAT fallback if applicable)
   double freq_mhz = 0.0;
   if (this->get_frequency(freq_mhz)) {
     orig_frequency_ = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
     orig_frequency_saved_ = true;
     std::cerr << "[RIG] Saved frequency: " << freq_mhz << " MHz" << std::endl;
-  } else {
-    std::cerr << "[RIG] Warning: Could not get current frequency" << std::endl;
   }
 
   // Save original mode and bandwidth using virtual override
@@ -140,73 +163,70 @@ auto RadioController::initialize() -> bool {
     orig_mode_ = static_cast<rmode_t>(mode);
     orig_mode_saved_ = true;
     std::cerr << "[RIG] Saved mode: " << static_cast<int>(mode) << std::endl;
-  } else {
-    std::cerr << "[RIG] Warning: Could not get current mode" << std::endl;
   }
 
-  if (orig_power_ != PowerLevel::UNKNOWN) {
-    orig_power_saved_ = true;
-    std::cerr << "[RIG] Power level already saved by derived class"
-              << std::endl;
-  } else {
-    std::cerr << "[RIG] Note: Power level save not supported by this radio"
-              << std::endl;
-  }
-
-  std::cerr << "[RIG] Radio state saved successfully" << std::endl;
   return true;
 }
 
 /**
  * @brief Shutdown the radio controller and restore backup state
  */
-RadioController::RadioController(rig_model_t model, std::string port,
-                                 bool hamlib_debug)
-    : model_(model), port_(std::move(port)), rig_(nullptr),
-      current_mode_(Mode::FM), orig_mode_(RIG_MODE_NONE),
-      orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false),
-      orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
-      orig_power_saved_(false) {
-  
-  if (hamlib_debug) {
-    rig_set_debug_level(RIG_DEBUG_TRACE);
-    rig_set_debug_file(stderr);
-  }
+RadioController::~RadioController() {
+  if (rig_ != nullptr) {
+    std::cerr << "[RIG] Quieting radio and draining serial buffers..." << std::endl;
+    
+    // 1. Send \r and AI 0 to terminate any ongoing commands and stop 
+    //    Kenwood's Auto-Information telemetry.
+    const char* stop_cmd = "\rAI 0\r";
+    std::array<char, 256> dummy_buf{};
+    unsigned char term = '\r';
+    rig_send_raw(rig_, reinterpret_cast<const unsigned char *>(stop_cmd),
+                 strlen(stop_cmd), reinterpret_cast<unsigned char *>(dummy_buf.data()),
+                 dummy_buf.size() - 1, &term);
 
-  // --- NEW: Force drain OS serial buffers before Hamlib connects ---
-  int fd = open(port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-  if (fd >= 0) {
-    tcflush(fd, TCIOFLUSH);
-    char junk[256];
-    while (read(fd, junk, sizeof(junk)) > 0) {} // Drain completely
-    close(fd);
-  }
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  // -----------------------------------------------------------------
+    // 2. Spend time waiting for the radio to finish sending any long responses.
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    
+    // 3. Consume and discard everything that accumulated
+    flush_serial();
 
-  std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
-  rig_ = rig_init(model_);
-  if (rig_ == nullptr) return;
-
-  rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
-
-  int status = rig_open(rig_);
-  if (status != RIG_OK) {
-    std::cerr << "[RIG] Error: rig_open() failed on " << port_
-              << " | Code: " << status << " (" << rigerror(status) << ")\n";
+    std::cerr << "[RIG] Closing connection..." << std::endl;
+    set_ptt(false);
     rig_close(rig_);
     rig_cleanup(rig_);
     rig_ = nullptr;
+  }
+}
+
+void RadioController::shutdown() {
+  if (rig_ == nullptr) {
     return;
   }
 
-  rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  flush_serial();
+  std::cerr << "[RIG] Restoring radio state..." << std::endl;
+
+  // Restore original frequency using virtual override
+  if (orig_frequency_saved_) {
+    double freq_mhz = static_cast<double>(orig_frequency_) / FREQUENCY_MHZ_TO_HZ;
+    this->set_frequency(freq_mhz);
+  }
+
+  // Restore original mode using virtual override
+  if (orig_mode_saved_) {
+    this->set_mode(static_cast<Mode>(orig_mode_));
+  }
+
+  set_ptt(false);
+  rig_close(rig_);
+  rig_cleanup(rig_);
+  rig_ = nullptr;
 }
 
 /**
  * @brief Set the radio frequency via Hamlib
+ *
+ * @param freq_mhz Frequency in megahertz
+ * @return true if set successfully, false otherwise
  */
 auto RadioController::set_frequency(double freq_mhz) -> bool {
   if (rig_ == nullptr) {
@@ -218,6 +238,9 @@ auto RadioController::set_frequency(double freq_mhz) -> bool {
 
 /**
  * @brief Get the current VFO frequency via Hamlib
+ *
+ * @param freq_mhz Reference to store the frequency in megahertz
+ * @return true if query successful, false on error
  */
 auto RadioController::get_frequency(double &freq_mhz) -> bool {
   if (rig_ == nullptr) {
@@ -233,6 +256,9 @@ auto RadioController::get_frequency(double &freq_mhz) -> bool {
 
 /**
  * @brief Get the current radio mode via Hamlib
+ *
+ * @param mode Reference to store the current mode
+ * @return true if query successful, false on error
  */
 auto RadioController::get_mode(Mode &mode) -> bool {
   if (rig_ == nullptr) {
@@ -242,20 +268,17 @@ auto RadioController::get_mode(Mode &mode) -> bool {
   int result = rig_get_mode(rig_, RIG_VFO_CURR, &rig_mode, nullptr);
   if (result == RIG_OK) {
     mode = static_cast<Mode>(rig_mode);
-    std::cerr << "[RIG] get_mode succeeded, mode value: "
-              << static_cast<int>(mode) << '\n';
     return true;
   }
-
-  // Fallback: return the current mode we've tracked
-  std::cerr << "[RIG] get_mode failed (fallback), returning tracked mode: "
-            << static_cast<int>(current_mode_) << '\n';
   mode = current_mode_;
   return true;
 }
 
 /**
  * @brief Set the radio mode via Hamlib
+ *
+ * @param mode The mode to set
+ * @return true if set successfully, false otherwise
  */
 auto RadioController::set_mode(Mode mode) -> bool {
   if (rig_ == nullptr) {
@@ -264,13 +287,16 @@ auto RadioController::set_mode(Mode mode) -> bool {
   bool result =
       rig_set_mode(rig_, RIG_VFO_CURR, static_cast<rmode_t>(mode), 0) == RIG_OK;
   if (result) {
-    current_mode_ = mode; // Save the mode we just set
+    current_mode_ = mode;
   }
   return result;
 }
 
 /**
  * @brief Set PTT (Push-to-Talk) state via Hamlib raw write
+ *
+ * @param transmit true for transmit, false for receive
+ * @return true if command successful, false otherwise
  */
 auto RadioController::set_ptt(bool transmit) -> bool {
   if (rig_ == nullptr) {
@@ -290,6 +316,9 @@ auto RadioController::set_ptt(bool transmit) -> bool {
 
 /**
  * @brief Get the DCD (Digital Carrier Detect) status
+ *
+ * @param is_squelch_open Reference to store the DCD status
+ * @return true if query successful, false on error
  */
 auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
   if (rig_ == nullptr) {
@@ -306,41 +335,21 @@ auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
 /**
  * @brief Set the TX power level (Base class placeholder)
  */
-auto RadioController::set_power_level(const std::string &level) -> bool {
-  std::string lvl = level;
-  for (auto &chr : lvl) {
-    chr = static_cast<char>(std::toupper(chr));
-  }
-
-  PowerLevel val = PowerLevel::UNKNOWN;
-  if (lvl == "H") {
-    val = PowerLevel::HIGH;
-  } else if (lvl == "M") {
-    val = PowerLevel::MEDIUM;
-  } else if (lvl == "L") {
-    val = PowerLevel::LOW;
-  } else if (lvl == "EL") {
-    val = PowerLevel::EXTRA_LOW;
-  } else {
-    std::cerr << "Error: Invalid power level '" << level
-              << "'. Use EL, L, M, or H.\n";
-    return false;
-  }
-
-  (void)val;
-  std::cerr << "[RIG] Setting TX power to " << lvl << "...\n";
-  return true;
-}
+auto RadioController::set_power_level(const std::string &) -> bool { return false; }
 
 /**
  * @brief Get the current TX power level (Base class placeholder)
  */
-auto RadioController::get_power_level(std::string & /*level*/) -> bool {
-  return false;
-}
+auto RadioController::get_power_level(std::string &) -> bool { return false; }
 
 /**
  * @brief Find tty sysfs devices for a specific USB device PID/VID
+ *
+ * Searches for serial devices matching the given USB Vendor ID and Product ID.
+ *
+ * @param target_vid USB Vendor ID
+ * @param target_pid USB Product ID
+ * @return Vector of device paths
  */
 auto RadioController::find_tty_sysfs(unsigned int target_vid,
                                      unsigned int target_pid)
@@ -384,6 +393,11 @@ auto RadioController::find_tty_sysfs(unsigned int target_vid,
 
 /**
  * @brief Find ALSA device mapped to the serial port's parent USB hub
+ *
+ * Searches for an ALSA sound device associated with the radio's USB serial port.
+ *
+ * @param serial_port Serial port path
+ * @return ALSA device name
  */
 auto RadioController::find_alsa_device(const std::string &serial_port)
     -> std::string {

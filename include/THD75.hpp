@@ -19,7 +19,8 @@ public:
   enum class VFO : int8_t { A = RIG_VFO_A, B = RIG_VFO_B };
 
   explicit THD75(std::string port, rig_model_t model, bool hamlib_debug);
-
+  ~THD75() override;
+  
   auto initialize() -> bool override;
   void shutdown() override;
 
