@@ -1,1416 +1,0 @@
-Script started on 2026-08-30 21:50:28-07:00 [TERM="xterm-256color" TTY="/dev/pts/2" COLUMNS="189" LINES="79"]
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\build/75fasmod --freq 223.520 --power EL -a hw:5,0[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[13P./75fasmod --freq 223.520 --power EL [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cbuild/75fasmod --freq 223.520 --power EL -a hw:5,0
-[?2004l]133;C\]666;vte.shell.preexec!\Auto-discovered Kenwood TH-D75 at /dev/ttyACM0
-[RIG] Initializing Hamlib model ID 2042...
-rig_test_2038: enter _TIME_BITS=64, __TIMESIZE=64 testing enabled for GLIBC 2.39
-rig_init: 2038 time test passed
-rig_check_rig_caps: p1=0x7fb4f7982700, p2=0x7fb4f7988c88, rig_model=0x7fb4f7982700, macro_name=0x7fb4f7988c88
-rig_init: rig_model=Kenwood TH-D74 20250515.3
-Requesting 160 bytes for rig_struct
-Requesting 27128 bytes for rig_state
-Requesting 632 bytes for each port
-Requesting 728 bytes for rig_cache
-rig_init: rx_range_list1 is empty, using rx_range_list2
-rig_init: rig has VFO_A
-rig_init: rig has VFO_B
-kenwood_init called, version 20250515/20250515.3
-kenwood_init: if_len = 37
-kenwood.c(952):kenwood_init returning2(0) 
-rig_token_lookup called for rig_pathname
-rig_confparam_lookup called for rig_pathname
-rig_set_conf called
-rig_confparam_lookup called for rig_pathname
-rig_set_conf: rig_pathname='/dev/ttyACM0'
-rig.c(1063):rig_open entered
-rig_settings_get_path: path=/home/ben/.config/hamlib_settings
-rig_open: async_data_enable=0, async_data_supported=0
-serial_open: /dev/ttyACM0
-serial_setup: tcgetattr
-serial_setup: cfmakeraw
-serial_setup: cfsetispeed=9600,0x000d
-serial_setup: cfsetospeed=9600,0x000d
-serial_setup: data_bits=8
-serial_setup: stopbits=1
-serial_setup: parity=0
-serial_setup: Handshake=Xon/Xoff
-serial_setup: tcsetattr TCSANOW
-rig_open: 0x3121c544 rs->comm_state==1?=1
-*1:kenwood.c(974):kenwood_open entered
-**2:kenwood.c(1260):kenwood_get_id entered
-kenwood_transaction called cmd=ID
-kenwood_transaction: cmdstr = ID
-write_block(): TX 3 bytes
-0000    49 44 0d                                            ID.             
-read_string_generic(): RX 10 characters, direct=1
-0000    49 44 20 54 48 2d 44 37 35 0d                       ID TH-D75.      
-kenwood_transaction: read_string len=10 'ID TH-D75'
-kenwood_transaction: returning RIG_OK, retval was 10
-kenwood.c(725):kenwood_transaction returning2(0) 
-**2:kenwood.c(1267):kenwood_get_id returning(0) 
-kenwood_open: got ID so try PS
-**2:rig.c(6956):rig_get_powerstat entered
-**2:rig.c(6966):rig_get_powerstat returning(0) 
-kenwood_open: found match TH-D75
-**2:rig.c(3538):rig_get_vfo entered
-rig_get_vfo: cache miss age=1000000ms
-**rig.c(3572) trace
-rig_lock: client lock engaged
-thd74_get_vfo: called
-kenwood_transaction called cmd=BC
-kenwood_transaction: cmdstr = BC
-write_block(): TX 3 bytes
-0000    42 43 0d                                            BC.             
-read_string_generic(): RX 5 characters, direct=1
-0000    42 43 20 31 0d                                      BC 1.           
-kenwood_transaction: read_string len=5 'BC 1'
-kenwood_transaction: returning RIG_OK, retval was 5
-kenwood.c(725):kenwood_transaction returning2(0) 
-**2:rig_get_vfo: elapsed=1ms
-rig_lock: client lock disengaged
-**2:rig.c(3607):rig_get_vfo returning(0) 
-kenwood_open: your rig (ID TH-D75) did not match but we will continue anyways
-*1:kenwood.c(1223):kenwood_open returning(0) 
-*1:rig.c(3538):rig_get_vfo entered
-rig_get_vfo: cache hit age=0ms, vfo=VFOB
-*1:rig_get_vfo: elapsed=0ms
-*1:rig.c(3565):rig_get_vfo returning(0) 
-*1:rig.c(8473):async_data_handler_start entered
-async_data_handler_start: async data support disabled since async_data_enabled=0
-*1:rig.c(8480):async_data_handler_start returning(0) 
-*1:rig.c(2533):rig_get_freq entered
-rig_get_freq called vfo=VFOA
-rig_get_freq(2551) called vfo=VFOA
-vfo_fixup:(from rig_get_freq:2558) vfo=VFOA, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOA
-rig.c(2560) vfo=VFOA, curr_vfo=VFOB
-rig_lock: client lock engaged
-rig_get_freq: cache miss age=1000000ms, cached_vfo=VFOA, asked_vfo=VFOA, use_cached_freq=0
-rig_get_freq(2670): vfo_opt=0, model=2042
-thd74_get_freq: called
-kenwood_transaction called cmd=FO 0
-kenwood_transaction: cmdstr = FO 0
-write_block(): TX 5 bytes
-0000    46 4f 20 30 0d                                      FO 0.           
-read_string_generic(): RX 73 characters, direct=1
-0000    46 4f 20 30 2c 30 31 34 34 33 39 30 30 30 30 2c     FO 0,0144390000,
-0010    30 30 30 30 36 30 30 30 30 30 2c 30 2c 30 2c 30     0000600000,0,0,0
-0020    2c 30 2c 30 2c 30 2c 31 2c 30 2c 30 2c 30 2c 30     ,0,0,0,1,0,0,0,0
-0030    2c 31 32 2c 30 38 2c 30 30 30 2c 30 2c 43 51 43     ,12,08,000,0,CQC
-0040    51 43 51 2c 30 2c 30 30 0d                          QCQ,0,00.       
-kenwood_transaction: read_string len=73 'FO 0,0144390000,0000600000,0,0,0,0,0,0,1,0,0,0,0,12,08,000,0,CQCQCQ,0,00'
-kenwood_transaction: returning RIG_OK, retval was 73
-kenwood.c(725):kenwood_transaction returning2(0) 
-*1:rig_get_freq: elapsed=1ms
-rig_lock: client lock disengaged
-*1:rig.c(2803):rig_get_freq returning(0) 
-*1:network.c(1587):network_multicast_publisher_start entered
-network.c(1598): multicast publisher address=0.0.0.0, port=4532
-network.c(1615): not starting multicast publisher
-*1:network.c(1616):network_multicast_publisher_start returning(0) 
-*1:network.c(1798):network_multicast_receiver_start entered
-network.c(1810): multicast receiver address=0.0.0.0, port=4532
-network.c(1816): not starting multicast receiver
-*1:network.c(1817):network_multicast_receiver_start returning(0) 
-*1:event.c(269):rig_poll_routine_start entered
-*1:event.c(309):rig_poll_routine_start returning(0) 
-rig.c(311):add_opened_rig entered
-rig.c(323):add_opened_rig returning2(0) 
-rig.c(1731):rig_open returning2(0) 
-[RIG] Backing up current radio state...
-event.c(83): Starting rig poll routine thread
-*1:rig.c(3071):rig_get_mode entered
-vfo_fixup:(from rig_get_mode:3090) vfo=currVFO, vfo_curr=VFOB, split=0
-rig_set_cache_timeout_ms: called selection=0, ms=1000
-vfo_fixup: Leaving currVFO alone
-rig_get_mode: VFOB cache check age=1000000ms
-rig_get_mode: cache miss age mode=1000000ms, width=1000000ms
-rig_lock: client lock engaged
-*rig.c(3137) trace
-thd74_get_mode: called
-kenwood_transaction called cmd=MD 1
-kenwood_transaction: cmdstr = MD 1
-write_block(): TX 5 bytes
-0000    4d 44 20 31 0d                                      MD 1.           
-read_string_generic(): RX 7 characters, direct=1
-0000    4d 44 20 31 2c 30 0d                                MD 1,0.         
-kenwood_transaction: read_string len=7 'MD 1,0'
-kenwood_transaction: returning RIG_OK, retval was 7
-kenwood.c(725):kenwood_transaction returning2(0) 
-rig_get_mode: retcode after get_mode=0
-rig_get_mode(3183): debug
-**2:cache.c(41):rig_set_cache_mode entered
-**2:cache.c(157):rig_set_cache_mode returning(0) 
-rig_lock: client lock disengaged
-*1:rig_get_mode: elapsed=1ms
-*1:rig.c(3200):rig_get_mode returning(0) 
-[RIG] Saved original mode: FM
-*1:rig.c(3538):rig_get_vfo entered
-rig_get_vfo: cache hit age=2ms, vfo=VFOB
-*1:rig_get_vfo: elapsed=0ms
-*1:rig.c(3565):rig_get_vfo returning(0) 
-[RIG] Saved VFO state: VFOB
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 3 bytes
-write_block(): TX 3 bytes
-0000    54 4e 0d                                            TN.             
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    54 4e 20 31 2c 30 0d                                TN 1,0.         
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-[RIG] Saved TNC state: 1
-[RIG] Turning off TNC to allow dual mode changes...
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 7 bytes
-write_block(): TX 7 bytes
-0000    54 4e 20 30 2c 30 0d                                TN 0,0.         
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    54 4e 20 30 2c 30 0d                                TN 0,0.         
-*1:rig_send_raw: elapsed=29ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 3 bytes
-write_block(): TX 3 bytes
-0000    54 4e 0d                                            TN.             
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    54 4e 20 30 2c 30 0d                                TN 0,0.         
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-[RIG] Setting radio to VFO B for menu 102 access...
-*1:rig.c(3396):rig_set_vfo entered
-rig_set_vfo called vfo=VFOB
-rig_set_vfo called vfo=VFOB
-vfo_fixup:(from rig_set_vfo:3410) vfo=VFOB, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOB
-**2:rig.c(3538):rig_get_vfo entered
-rig_get_vfo: cache hit age=132ms, vfo=VFOB
-**2:rig_get_vfo: elapsed=0ms
-**2:rig.c(3565):rig_get_vfo returning(0) 
-*1:rig.c(3428):rig_set_vfo returning(0) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 3 bytes
-write_block(): TX 3 bytes
-0000    42 43 0d                                            BC.             
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 5 characters, direct=1
-0000    42 43 20 31 0d                                      BC 1.           
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(5) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 5 bytes
-write_block(): TX 5 bytes
-0000    50 43 20 31 0d                                      PC 1.           
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    50 43 20 31 2c 33 0d                                PC 1,3.         
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 6 bytes
-write_block(): TX 6 bytes
-0000    45 58 31 30 32 0d                                   EX102.          
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 2 characters, direct=1
-0000    3f 0d                                               ?.              
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(2) 
-
-[RIG] WARNING: Could not query Menu 102 via CAT.
-      Kenwood locks this menu over USB. Please manually ensure
-      Menu 102 (USB Out Select) is set to IF Output (1).
-
-[RIG] Configuring radio for high-speed modem operation...
-*1:rig.c(2867):rig_set_mode entered
-rig_lock: client lock engaged
-rig_set_mode called, vfo=currVFO, mode=FM-D, width=9600, curr_vfo=VFOB
-vfo_fixup:(from rig_set_mode:2915) vfo=VFOB, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOB
-*rig.c(2947) trace
-thd74_set_mode: called
-rmode2kenwood called, mode=FM-D
-thd74_set_mode: Unsupported Mode value 'FM-D'
-rig_set_mode: targetable retcode after set_mode(FM-D)=-1
-rig_set_mode: failed set_mode(FM-D)=write_block(): TX 6 bytes
-0000    45 58 31 30 32 0d                                   EX102.          
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic called, rxmax=200 direct=1, expected_len=1
-read_string_generic(): RX 2 characters, direct=1
-0000    3f 0d                                               ?.              
-read_string_generic called, rxmax=4095 direct=1, expected_len=1
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(2) 
-*1:rig.c(2867):rig_set_mode entered
-rig_lock: client lock engaged
-rig_set_mode called, vfo=currVFO, mode=FM-D, width=9600, curr_vfo=VFOB
-vfo_fixup:(from rig_set_mode:2915) vfo=VFOB, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOB
-*rig.c(2947) trace
-thd74_set_mode: called
-rmode2kenwood called, mode=FM-D
-thd74_set_mode: Unsupported Mode value 'FM-D'
-rig_set_mode: targetable retcode after set_mode(FM-D)=-1
-Invalid parameter
-
-*1:rig_set_mode: elapsed=0ms
-rig_lock: client lock disengaged
-*1:rig.c(3019):rig_set_mode returning(-1) Invalid parameter
-
-[RIG] PKTFM mode rejected, falling back to standard FM...
-*1:rig.c(2867):rig_set_mode entered
-rig_lock: client lock engaged
-rig_set_mode called, vfo=currVFO, mode=FM, width=0, curr_vfo=VFOB
-vfo_fixup:(from rig_set_mode:2915) vfo=VFOB, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOB
-*rig.c(2947) trace
-thd74_set_mode: called
-rmode2kenwood called, mode=FM
-rmode2kenwood: returning 0
-thd74_set_mode: mdbuf: MD 1,0
-kenwood_transaction called cmd=MD 1,0
-kenwood_transaction: cmdstr = MD 1,0
-write_block(): TX 7 bytes
-0000    4d 44 20 31 2c 30 0d                                MD 1,0.         
-read_string_generic(): RX 7 characters, direct=1
-0000    4d 44 20 31 2c 30 0d                                MD 1,0.         
-kenwood_transaction: read_string len=7 'MD 1,0'
-kenwood_transaction: returning RIG_OK, retval was 7
-kenwood.c(725):kenwood_transaction returning2(0) 
-thd74_set_mode: retval: 0
-rig_set_mode: targetable retcode after set_mode(FM)=0
-**2:cache.c(41):rig_set_cache_mode entered
-**2:cache.c(157):rig_set_cache_mode returning(0) 
-*1:rig_set_mode: elapsed=22ms
-rig_lock: client lock disengaged
-*1:rig.c(3026):rig_set_mode returning(0) 
-*1:rig.c(3071):rig_get_mode entered
-vfo_fixup:(from rig_get_mode:3090) vfo=currVFO, vfo_curr=VFOB, split=0
-vfo_fixup: Leaving currVFO alone
-rig_get_mode: VFOB cache check age=0ms
-rig_get_mode: cache hit age mode=0ms, width=0ms
-*1:rig_get_mode: elapsed=0ms
-*1:rig.c(3123):rig_get_mode returning(0) 
-[RIG] Verified active mode: FM
-Setting frequency to 223.52 MHz...
-rig_get_band called
-*1:rig.c(2192):rig_set_freq entered
-rig_lock: client lock engaged
-rig_set_freq called vfo=currVFO, freq=223520000
-vfo_fixup:(from rig_set_freq:2269) vfo=currVFO, vfo_curr=VFOB, split=0
-vfo_fixup: Leaving currVFO alone
-skip_freq: not skipping set_freq on vfo VFOB
-rig_set_freq: TARGETABLE_FREQ vfo=VFOB
-thd74_set_freq: called
-kenwood_transaction called cmd=FO 1
-kenwood_transaction: cmdstr = FO 1
-write_block(): TX 5 bytes
-0000    46 4f 20 31 0d                                      FO 1.           
-read_string_generic(): RX 73 characters, direct=1
-0000    46 4f 20 31 2c 30 32 32 33 35 32 35 30 30 30 2c     FO 1,0223525000,
-0010    30 30 30 31 36 30 30 30 30 30 2c 35 2c 37 2c 30     0001600000,5,7,0
-0020    2c 30 2c 31 2c 30 2c 30 2c 30 2c 30 2c 30 2c 30     ,0,1,0,0,0,0,0,0
-0030    2c 30 38 2c 30 38 2c 30 30 30 2c 30 2c 43 51 43     ,08,08,000,0,CQC
-0040    51 43 51 2c 30 2c 30 30 0d                          QCQ,0,00.       
-kenwood_transaction: read_string len=73 'FO 1,0223525000,0001600000,5,7,0,0,1,0,0,0,0,0,0,08,08,000,0,CQCQCQ,0,00'
-kenwood_transaction: returning RIG_OK, retval was 73
-kenwood.c(725):kenwood_transaction returning2(0) 
-kenwood_transaction called cmd=FO 1,0223525000,0001600000,5,7,0,0,1,0,0,0,0,0,0,08,08,000,0,CQCQCQ,0,00
-kenwood_transaction: cmdstr = FO 1,0223525000,0001600000,5,7,0,0,1,0,0,0,0,0,0,08,08,000,0,CQCQCQ,0,00
-write_block(): TX 73 bytes
-0000    46 4f 20 31 2c 30 32 32 33 35 32 35 30 30 30 2c     FO 1,0223525000,
-0010    30 30 30 31 36 30 30 30 30 30 2c 35 2c 37 2c 30     0001600000,5,7,0
-0020    2c 30 2c 31 2c 30 2c 30 2c 30 2c 30 2c 30 2c 30     ,0,1,0,0,0,0,0,0
-0030    2c 30 38 2c 30 38 2c 30 30 30 2c 30 2c 43 51 43     ,08,08,000,0,CQC
-0040    51 43 51 2c 30 2c 30 30 0d                          QCQ,0,00.       
-read_string_generic(): RX 73 characters, direct=1
-0000    46 4f 20 31 2c 30 32 32 33 35 32 35 30 30 30 2c     FO 1,0223525000,
-0010    30 30 30 31 36 30 30 30 30 30 2c 35 2c 37 2c 30     0001600000,5,7,0
-0020    2c 30 2c 31 2c 30 2c 30 2c 30 2c 30 2c 30 2c 30     ,0,1,0,0,0,0,0,0
-0030    2c 30 38 2c 30 38 2c 30 30 30 2c 30 2c 43 51 43     ,08,08,000,0,CQC
-0040    51 43 51 2c 30 2c 30 30 0d                          QCQ,0,00.       
-kenwood_transaction: read_string len=73 'FO 1,0223525000,0001600000,5,7,0,0,1,0,0,0,0,0,0,08,08,000,0,CQCQCQ,0,00'
-kenwood_transaction: returning RIG_OK, retval was 73
-kenwood.c(725):kenwood_transaction returning2(0) 
-*rig.c(2450) trace
-**2:rig.c(2533):rig_get_freq entered
-rig_get_freq called vfo=VFOB
-rig_get_freq(2551) called vfo=VFOB
-vfo_fixup:(from rig_get_freq:2558) vfo=VFOB, vfo_curr=VFOB, split=0
-vfo_fixup: final vfo=VFOB
-rig.c(2560) vfo=VFOB, curr_vfo=VFOB
-rig_lock: client lock engaged
-rig_get_freq: cache miss age=10000ms, cached_vfo=VFOB, asked_vfo=VFOB, use_cached_freq=0
-rig_get_freq(2670): vfo_opt=0, model=2042
-thd74_get_freq: called
-kenwood_transaction called cmd=FO 1
-kenwood_transaction: cmdstr = FO 1
-write_block(): TX 5 bytes
-0000    46 4f 20 31 0d                                      FO 1.           
-read_string_generic(): RX 73 characters, direct=1
-0000    46 4f 20 31 2c 30 32 32 33 35 32 35 30 30 30 2c     FO 1,0223525000,
-0010    30 30 30 31 36 30 30 30 30 30 2c 35 2c 37 2c 30     0001600000,5,7,0
-0020    2c 30 2c 31 2c 30 2c 30 2c 30 2c 30 2c 30 2c 30     ,0,1,0,0,0,0,0,0
-0030    2c 30 38 2c 30 38 2c 30 30 30 2c 30 2c 43 51 43     ,08,08,000,0,CQC
-0040    51 43 51 2c 30 2c 30 30 0d                          QCQ,0,00.       
-kenwood_transaction: read_string len=73 'FO 1,0223525000,0001600000,5,7,0,0,1,0,0,0,0,0,0,08,08,000,0,CQCQCQ,0,00'
-kenwood_transaction: returning RIG_OK, retval was 73
-kenwood.c(725):kenwood_transaction returning2(0) 
-**2:rig_get_freq: elapsed=13ms
-rig_lock: client lock disengaged
-**2:rig.c(2803):rig_get_freq returning(0) 
-rig_set_freq: Asked freq=223520000, got freq=223525000
-rig_set_freq: vfo=VFOB, save=VFOB
-*1:rig_set_freq: elapsed=48ms
-rig_lock: client lock disengaged
-*1:rig.c(2485):rig_set_freq returning(0) 
-[RIG] Setting TX power to EL...
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 3 bytes
-write_block(): TX 3 bytes
-0000    42 43 0d                                            BC.             
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 5 characters, direct=1
-0000    42 43 20 31 0d                                      BC 1.           
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(5) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 7 bytes
-write_block(): TX 7 bytes
-0000    50 43 20 31 2c 33 0d                                PC 1,3.         
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    50 43 20 31 2c 33 0d                                PC 1,3.         
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 3 bytes
-write_block(): TX 3 bytes
-0000    42 43 0d                                            BC.             
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 5 characters, direct=1
-0000    42 43 20 31 0d                                      BC 1.           
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(5) 
-*1:rig.c(8924):rig_send_raw entered
-rig_send_raw: writing 5 bytes
-write_block(): TX 5 bytes
-0000    50 43 20 31 0d                                      PC 1.           
-rig_send_raw: reading frame terminated by 0xd
-read_string_generic(): RX 7 characters, direct=1
-0000    50 43 20 31 2c 33 0d                                PC 1,3.         
-*1:rig_send_raw: elapsed=1ms
-*1:rig.c(9027):rig_send_raw returning(7) 
-Mapped serial port /dev/ttyACM0 to ALSA audio device hw:4,0
-[DSP] Continuous RX Flowgraph started.
-[DSP] Continuous TX Flowgraph started.
-Data socket listening on /tmp/75fasmod_data.sock
-Daemon is running. Press Ctrl+C to stop.
-^C
-Shutting down daemon...
-^C^C^Z
-[1]+  Stopped                 build/75fasmod --freq 223.520 --power EL -a hw:5,0
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;148\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\kill %d[K1
-[?2004l]133;C\]666;vte.shell.preexec!\]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\kill -9 %1
-[?2004l]133;C\]666;vte.shell.preexec!\]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\fg
-[?2004l]133;C\]666;vte.shell.preexec!\bash: fg: job has terminated
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[1]+  Killed                  build/75fasmod --freq 223.520 --power EL -a hw:5,0
-[?2004h]133;D;1\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\git push[Kgit branch
-[?2004l]133;C\]666;vte.shell.preexec!\[?1h=* [32mfix-mode-switch[m[m
-  main[m[m
-  send_to_radio[m[m
-[K[?1l>]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\giut[K[Kt status -uno
-[?2004l]133;C\]666;vte.shell.preexec!\On branch fix-mode-switch
-Your branch is ahead of 'origin/main' by 21 commits.
-  (use "git push" to publish your local commits)
-
-nothing to commit (use -u to show untracked files)
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\git switch main
-[?2004l]133;C\]666;vte.shell.preexec!\Switched to branch 'main'
-Your branch is ahead of 'origin/main' by 1 commit.
-  (use "git push" to publish your local commits)
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\git merge fix-mode-switch 
-[?2004l]133;C\]666;vte.shell.preexec!\Updating 445fd5b..f90bb2b
-Fast-forward
- include/ModemDSP.hpp        |  11 [32m++[m[31m--[m
- include/RadioController.hpp |  28 [32m+++++++[m[31m--[m
- radio-notes.md              | 526 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
- src/DataSocket.cpp          |   6 [32m+[m[31m-[m
- src/ModemDSP.cpp            |  39 [32m+++++[m[31m-------[m
- src/RadioController.cpp     | 373 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m-----------------------------[m
- src/main.cpp                |  33 [32m+++++++[m[31m---[m
- tools/bundle_project.sh     |   8 [32m++[m[31m-[m
- 8 files changed, 878 insertions(+), 146 deletions(-)
- create mode 100644 radio-notes.md
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\git push
-[?2004l]133;C\]666;vte.shell.preexec!\Enumerating objects: 121, done.
-Counting objects:   0% (1/121)Counting objects:   1% (2/121)Counting objects:   2% (3/121)Counting objects:   3% (4/121)Counting objects:   4% (5/121)Counting objects:   5% (7/121)Counting objects:   6% (8/121)Counting objects:   7% (9/121)Counting objects:   8% (10/121)Counting objects:   9% (11/121)Counting objects:  10% (13/121)Counting objects:  11% (14/121)Counting objects:  12% (15/121)Counting objects:  13% (16/121)Counting objects:  14% (17/121)Counting objects:  15% (19/121)Counting objects:  16% (20/121)Counting objects:  17% (21/121)Counting objects:  18% (22/121)Counting objects:  19% (23/121)Counting objects:  20% (25/121)Counting objects:  21% (26/121)Counting objects:  22% (27/121)Counting objects:  23% (28/121)Counting objects:  24% (30/121)Counting objects:  25% (31/121)Counting objects:  26% (32/121)Counting objects:  27% (33/121)Counting objects:  28% (34/121)Counting objects:  29% (36/121)Counting objects:  30% (37/121)Counting objects:  31% (38/121)Counting objects:  32% (39/121)Counting objects:  33% (40/121)Counting objects:  34% (42/121)Counting objects:  35% (43/121)Counting objects:  36% (44/121)Counting objects:  37% (45/121)Counting objects:  38% (46/121)Counting objects:  39% (48/121)Counting objects:  40% (49/121)Counting objects:  41% (50/121)Counting objects:  42% (51/121)Counting objects:  43% (53/121)Counting objects:  44% (54/121)Counting objects:  45% (55/121)Counting objects:  46% (56/121)Counting objects:  47% (57/121)Counting objects:  48% (59/121)Counting objects:  49% (60/121)Counting objects:  50% (61/121)Counting objects:  51% (62/121)Counting objects:  52% (63/121)Counting objects:  53% (65/121)Counting objects:  54% (66/121)Counting objects:  55% (67/121)Counting objects:  56% (68/121)Counting objects:  57% (69/121)Counting objects:  58% (71/121)Counting objects:  59% (72/121)Counting objects:  60% (73/121)Counting objects:  61% (74/121)Counting objects:  62% (76/121)Counting objects:  63% (77/121)Counting objects:  64% (78/121)Counting objects:  65% (79/121)Counting objects:  66% (80/121)Counting objects:  67% (82/121)Counting objects:  68% (83/121)Counting objects:  69% (84/121)Counting objects:  70% (85/121)Counting objects:  71% (86/121)Counting objects:  72% (88/121)Counting objects:  73% (89/121)Counting objects:  74% (90/121)Counting objects:  75% (91/121)Counting objects:  76% (92/121)Counting objects:  77% (94/121)Counting objects:  78% (95/121)Counting objects:  79% (96/121)Counting objects:  80% (97/121)Counting objects:  81% (99/121)Counting objects:  82% (100/121)Counting objects:  83% (101/121)Counting objects:  84% (102/121)Counting objects:  85% (103/121)Counting objects:  86% (105/121)Counting objects:  87% (106/121)Counting objects:  88% (107/121)Counting objects:  89% (108/121)Counting objects:  90% (109/121)Counting objects:  91% (111/121)Counting objects:  92% (112/121)Counting objects:  93% (113/121)Counting objects:  94% (114/121)Counting objects:  95% (115/121)Counting objects:  96% (117/121)Counting objects:  97% (118/121)Counting objects:  98% (119/121)Counting objects:  99% (120/121)Counting objects: 100% (121/121)Counting objects: 100% (121/121), done.
-Delta compression using up to 24 threads
-Compressing objects:   0% (1/109)Compressing objects:   1% (2/109)Compressing objects:   2% (3/109)Compressing objects:   3% (4/109)Compressing objects:   4% (5/109)Compressing objects:   5% (6/109)Compressing objects:   6% (7/109)Compressing objects:   7% (8/109)Compressing objects:   8% (9/109)Compressing objects:   9% (10/109)Compressing objects:  10% (11/109)Compressing objects:  11% (12/109)Compressing objects:  12% (14/109)Compressing objects:  13% (15/109)Compressing objects:  14% (16/109)Compressing objects:  15% (17/109)Compressing objects:  16% (18/109)Compressing objects:  17% (19/109)Compressing objects:  18% (20/109)Compressing objects:  19% (21/109)Compressing objects:  20% (22/109)Compressing objects:  21% (23/109)Compressing objects:  22% (24/109)Compressing objects:  23% (26/109)Compressing objects:  24% (27/109)Compressing objects:  25% (28/109)Compressing objects:  26% (29/109)Compressing objects:  27% (30/109)Compressing objects:  28% (31/109)Compressing objects:  29% (32/109)Compressing objects:  30% (33/109)Compressing objects:  31% (34/109)Compressing objects:  32% (35/109)Compressing objects:  33% (36/109)Compressing objects:  34% (38/109)Compressing objects:  35% (39/109)Compressing objects:  36% (40/109)Compressing objects:  37% (41/109)Compressing objects:  38% (42/109)Compressing objects:  39% (43/109)Compressing objects:  40% (44/109)Compressing objects:  41% (45/109)Compressing objects:  42% (46/109)Compressing objects:  43% (47/109)Compressing objects:  44% (48/109)Compressing objects:  45% (50/109)Compressing objects:  46% (51/109)Compressing objects:  47% (52/109)Compressing objects:  48% (53/109)Compressing objects:  49% (54/109)Compressing objects:  50% (55/109)Compressing objects:  51% (56/109)Compressing objects:  52% (57/109)Compressing objects:  53% (58/109)Compressing objects:  54% (59/109)Compressing objects:  55% (60/109)Compressing objects:  56% (62/109)Compressing objects:  57% (63/109)Compressing objects:  58% (64/109)Compressing objects:  59% (65/109)Compressing objects:  60% (66/109)Compressing objects:  61% (67/109)Compressing objects:  62% (68/109)Compressing objects:  63% (69/109)Compressing objects:  64% (70/109)Compressing objects:  65% (71/109)Compressing objects:  66% (72/109)Compressing objects:  67% (74/109)Compressing objects:  68% (75/109)Compressing objects:  69% (76/109)Compressing objects:  70% (77/109)Compressing objects:  71% (78/109)Compressing objects:  72% (79/109)Compressing objects:  73% (80/109)Compressing objects:  74% (81/109)Compressing objects:  75% (82/109)Compressing objects:  76% (83/109)Compressing objects:  77% (84/109)Compressing objects:  78% (86/109)Compressing objects:  79% (87/109)Compressing objects:  80% (88/109)Compressing objects:  81% (89/109)Compressing objects:  82% (90/109)Compressing objects:  83% (91/109)Compressing objects:  84% (92/109)Compressing objects:  85% (93/109)Compressing objects:  86% (94/109)Compressing objects:  87% (95/109)Compressing objects:  88% (96/109)Compressing objects:  89% (98/109)Compressing objects:  90% (99/109)Compressing objects:  91% (100/109)Compressing objects:  92% (101/109)Compressing objects:  93% (102/109)Compressing objects:  94% (103/109)Compressing objects:  95% (104/109)Compressing objects:  96% (105/109)Compressing objects:  97% (106/109)Compressing objects:  98% (107/109)Compressing objects:  99% (108/109)Compressing objects: 100% (109/109)Compressing objects: 100% (109/109), done.
-Writing objects:   0% (1/110)Writing objects:   1% (2/110)Writing objects:   2% (3/110)Writing objects:   3% (4/110)Writing objects:   4% (5/110)Writing objects:   5% (6/110)Writing objects:   6% (7/110)Writing objects:   7% (8/110)Writing objects:   8% (9/110)Writing objects:   9% (10/110)Writing objects:  10% (11/110)Writing objects:  11% (13/110)Writing objects:  12% (14/110)Writing objects:  13% (15/110)Writing objects:  14% (16/110)Writing objects:  15% (17/110)Writing objects:  16% (18/110)Writing objects:  17% (19/110)Writing objects:  18% (20/110)Writing objects:  19% (21/110)Writing objects:  20% (22/110)Writing objects:  21% (24/110)Writing objects:  23% (26/110)Writing objects:  24% (27/110)Writing objects:  25% (28/110)Writing objects:  26% (29/110)Writing objects:  27% (30/110)Writing objects:  30% (33/110)Writing objects:  31% (35/110)Writing objects:  32% (36/110)Writing objects:  33% (37/110)Writing objects:  34% (38/110)Writing objects:  35% (39/110)Writing objects:  36% (40/110)Writing objects:  37% (41/110)Writing objects:  38% (42/110)Writing objects:  39% (43/110)Writing objects:  40% (44/110)Writing objects:  41% (46/110)Writing objects:  42% (47/110)Writing objects:  43% (48/110)Writing objects:  44% (49/110)Writing objects:  45% (50/110)Writing objects:  46% (51/110)Writing objects:  47% (52/110)Writing objects:  48% (53/110)Writing objects:  49% (54/110)Writing objects:  50% (55/110)Writing objects:  51% (57/110)Writing objects:  52% (58/110)Writing objects:  53% (59/110)Writing objects:  54% (60/110)Writing objects:  55% (61/110)Writing objects:  56% (62/110)Writing objects:  57% (63/110)Writing objects:  58% (64/110)Writing objects:  59% (65/110)Writing objects:  60% (66/110)Writing objects:  61% (68/110)Writing objects:  62% (69/110)Writing objects:  63% (70/110)Writing objects:  64% (71/110)Writing objects:  65% (72/110)Writing objects:  66% (73/110)Writing objects:  67% (74/110)Writing objects:  68% (75/110)Writing objects:  69% (76/110)Writing objects:  70% (77/110)Writing objects:  71% (79/110)Writing objects:  72% (80/110)Writing objects:  73% (81/110)Writing objects:  74% (82/110)Writing objects:  75% (83/110)Writing objects:  76% (84/110)Writing objects:  77% (85/110)Writing objects:  78% (86/110)Writing objects:  79% (87/110)Writing objects:  80% (88/110)Writing objects:  81% (90/110)Writing objects:  82% (91/110)Writing objects:  83% (92/110)Writing objects:  84% (93/110)Writing objects:  85% (94/110)Writing objects:  86% (95/110)Writing objects:  87% (96/110)Writing objects:  88% (97/110)Writing objects:  89% (98/110)Writing objects:  90% (99/110)Writing objects:  91% (101/110)Writing objects:  92% (102/110)Writing objects:  93% (103/110)Writing objects:  94% (104/110)Writing objects:  95% (105/110)Writing objects:  96% (106/110)Writing objects:  97% (107/110)Writing objects:  98% (108/110)Writing objects:  99% (109/110)Writing objects: 100% (110/110)Writing objects: 100% (110/110), 29.97 KiB | 9.99 MiB/s, done.
-Total 110 (delta 86), reused 0 (delta 0), pack-reused 0 (from 0)
-remote: Resolving deltas:   0% (0/86)[Kremote: Resolving deltas:   1% (1/86)[Kremote: Resolving deltas:   2% (2/86)[Kremote: Resolving deltas:   3% (3/86)[Kremote: Resolving deltas:   4% (4/86)[Kremote: Resolving deltas:   5% (5/86)[Kremote: Resolving deltas:   6% (6/86)[Kremote: Resolving deltas:   8% (7/86)[Kremote: Resolving deltas:   9% (8/86)[Kremote: Resolving deltas:  10% (9/86)[Kremote: Resolving deltas:  11% (10/86)[Kremote: Resolving deltas:  12% (11/86)[Kremote: Resolving deltas:  13% (12/86)[Kremote: Resolving deltas:  15% (13/86)[Kremote: Resolving deltas:  16% (14/86)[Kremote: Resolving deltas:  17% (15/86)[Kremote: Resolving deltas:  18% (16/86)[Kremote: Resolving deltas:  19% (17/86)[Kremote: Resolving deltas:  20% (18/86)[Kremote: Resolving deltas:  22% (19/86)[Kremote: Resolving deltas:  23% (20/86)[Kremote: Resolving deltas:  24% (21/86)[Kremote: Resolving deltas:  25% (22/86)[Kremote: Resolving deltas:  26% (23/86)[Kremote: Resolving deltas:  27% (24/86)[Kremote: Resolving deltas:  29% (25/86)[Kremote: Resolving deltas:  30% (26/86)[Kremote: Resolving deltas:  31% (27/86)[Kremote: Resolving deltas:  32% (28/86)[Kremote: Resolving deltas:  33% (29/86)[Kremote: Resolving deltas:  34% (30/86)[Kremote: Resolving deltas:  36% (31/86)[Kremote: Resolving deltas:  37% (32/86)[Kremote: Resolving deltas:  38% (33/86)[Kremote: Resolving deltas:  39% (34/86)[Kremote: Resolving deltas:  40% (35/86)[Kremote: Resolving deltas:  41% (36/86)[Kremote: Resolving deltas:  43% (37/86)[Kremote: Resolving deltas:  44% (38/86)[Kremote: Resolving deltas:  45% (39/86)[Kremote: Resolving deltas:  46% (40/86)[Kremote: Resolving deltas:  47% (41/86)[Kremote: Resolving deltas:  48% (42/86)[Kremote: Resolving deltas:  50% (43/86)[Kremote: Resolving deltas:  51% (44/86)[Kremote: Resolving deltas:  52% (45/86)[Kremote: Resolving deltas:  53% (46/86)[Kremote: Resolving deltas:  54% (47/86)[Kremote: Resolving deltas:  55% (48/86)[Kremote: Resolving deltas:  56% (49/86)[Kremote: Resolving deltas:  58% (50/86)[Kremote: Resolving deltas:  59% (51/86)[Kremote: Resolving deltas:  60% (52/86)[Kremote: Resolving deltas:  61% (53/86)[Kremote: Resolving deltas:  62% (54/86)[Kremote: Resolving deltas:  63% (55/86)[Kremote: Resolving deltas:  65% (56/86)[Kremote: Resolving deltas:  66% (57/86)[Kremote: Resolving deltas:  67% (58/86)[Kremote: Resolving deltas:  68% (59/86)[Kremote: Resolving deltas:  69% (60/86)[Kremote: Resolving deltas:  70% (61/86)[Kremote: Resolving deltas:  72% (62/86)[Kremote: Resolving deltas:  73% (63/86)[Kremote: Resolving deltas:  74% (64/86)[Kremote: Resolving deltas:  75% (65/86)[Kremote: Resolving deltas:  76% (66/86)[Kremote: Resolving deltas:  77% (67/86)[Kremote: Resolving deltas:  79% (68/86)[Kremote: Resolving deltas:  80% (69/86)[Kremote: Resolving deltas:  81% (70/86)[Kremote: Resolving deltas:  82% (71/86)[Kremote: Resolving deltas:  83% (72/86)[Kremote: Resolving deltas:  84% (73/86)[Kremote: Resolving deltas:  86% (74/86)[Kremote: Resolving deltas:  87% (75/86)[Kremote: Resolving deltas:  88% (76/86)[Kremote: Resolving deltas:  89% (77/86)[Kremote: Resolving deltas:  90% (78/86)[Kremote: Resolving deltas:  91% (79/86)[Kremote: Resolving deltas:  93% (80/86)[Kremote: Resolving deltas:  94% (81/86)[Kremote: Resolving deltas:  95% (82/86)[Kremote: Resolving deltas:  96% (83/86)[Kremote: Resolving deltas:  97% (84/86)[Kremote: Resolving deltas:  98% (85/86)[Kremote: Resolving deltas: 100% (86/86)[Kremote: Resolving deltas: 100% (86/86), completed with 9 local objects.[K
-To github.com:woodard/75fasmod.git
-   0b01c4f..f90bb2b  main -> main
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\man tar
-[?2004l]133;C\]666;vte.shell.preexec!\[?1049h[22;0;0t[79;1H[?1h=[4mTAR[24m(1)                                                                               GNU TAR Manual                                                                               [4mTAR[24m(1)[m
-[m
-[1mNAME[0m[m
-       tar - an archiving utility[m
-[m
-[1mSYNOPSIS[0m[m
-   [1mTraditional usage[0m[m
-       [1mtar [22m{[1mA[22m|[1mc[22m|[1md[22m|[1mr[22m|[1mt[22m|[1mu[22m|[1mx[22m}[[1mGnSkUWOmpsMBiajJzZhPlRvwo[22m] [[4mARG[24m...][m
-[m
-   [1mUNIX-style usage[0m[m
-       [1mtar -A [22m[[4mOPTIONS[24m] [1m-f [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[m
-       [1mtar -c [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar -d [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar -r [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar -t [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[m
-       [1mtar -u [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar -x [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[m
-   [1mGNU-style usage[0m[m
-       [1mtar [22m{[1m--catenate[22m|[1m--concatenate[22m} [[4mOPTIONS[24m] [1m--file [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[m
-       [1mtar --create [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar [22m{[1m--diff[22m|[1m--compare[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar --delete [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[m
-       [1mtar --append [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar --list [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[m
-       [1mtar --test-label [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mLABEL[24m...][m
-[m
-       [1mtar --update [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[m
-       [1mtar [22m{[1m--extract[22m|[1m--get[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[m
-[1mNOTE[0m[m
-       This  manpage  is a short description of GNU [1mtar[22m.  For a detailed discussion, including examples and usage recommendations, refer to the [1mGNU Tar Manual [22mavailable in texinfo for‐[m
-       mat.  If the [1minfo [22mreader and the tar documentation are properly installed on your system, the command[m
-[m
-           [1minfo tar[0m[m
-[m
-       should give you access to the complete manual.[m
-[m
-       You can also view the manual using the info mode in [1memacs[22m(1), or find it in various formats online at[m
-[m
-           [1mhttps://www.gnu.org/software/tar/manual[0m[m
-[m
-       If any discrepancies occur between this manpage and the [1mGNU Tar Manual[22m, the later shall be considered the authoritative source.[m
-[m
-[1mDESCRIPTION[0m[m
-       GNU [1mtar [22mis an archiving program designed to store multiple files in a single file (an [1marchive[22m), and to manipulate such archives.  The archive can be either a regular file  or  a[m
-       device (e.g. a tape drive, hence the name of the program, which stands for [1mt[22mape [1mar[22mchiver), which can be located either on the local or on a remote machine.[m
-[m
-   [1mOption styles[0m[m
-       Options to GNU [1mtar [22mcan be given in three different styles.  In [1mtraditional style[22m, the first argument is a cluster of option letters and all subsequent arguments supply arguments[m
-       to  those  options  that require them.  The arguments are read in the same order as the option letters.  Any command line words that remain after all options have been processed[m
-       are treated as non-option arguments: file or archive member names.[m
-[m
-       For example, the [1mc [22moption requires creating the archive, the [1mv [22moption requests the verbose operation, and the [1mf [22moption takes an argument that sets the name of the archive to op‐[m
-       erate upon.  The following command, written in the traditional style, instructs tar to store all files from the directory [1m/etc [22minto the archive file [1metc.tar[22m,  verbosely  listing[m
-       the files being archived:[m
-[m
-       tar cfv etc.tar /etc[m
-[m
-       In  [1mUNIX  [22mor [1mshort-option style[22m, each option letter is prefixed with a single dash, as in other command line utilities.  If an option takes an argument, the argument follows it,[m
-       either as a separate command line word, or immediately following the option.  However, if the option takes an [1moptional [22margument, the argument must follow the option letter with‐[m
-       out any intervening whitespace, as in [1m-g/tmp/snar.db[22m.[m
-[m
-       Any number of options not taking arguments can be clustered together after a single dash, e.g. [1m-vkp[22m.  An option that takes an argument (whether mandatory or optional) can appear[m
-       at the end of such a cluster, e.g. [1m-vkpf a.tar[22m.[m
-[7m Manual page tar(1) line 1 (press h for help or q to quit)[27m[K[K/[Kmm[Koo[Kuu[Knn[Ktt[K[1;1H[K[4mTAR[24m(1)                                                                               GNU TAR Manual                                                                               [4mTAR[24m(1)[m
-[2;1H[K[m
-[3;1H[K[1mNAME[0m[m
-[4;1H[K       tar - an archiving utility[m
-[5;1H[K[m
-[6;1H[K[1mSYNOPSIS[0m[m
-[7;1H[K   [1mTraditional usage[0m[m
-[8;1H[K       [1mtar [22m{[1mA[22m|[1mc[22m|[1md[22m|[1mr[22m|[1mt[22m|[1mu[22m|[1mx[22m}[[1mGnSkUWOmpsMBiajJzZhPlRvwo[22m] [[4mARG[24m...][m
-[9;1H[K[m
-[10;1H[K   [1mUNIX-style usage[0m[m
-[11;1H[K       [1mtar -A [22m[[4mOPTIONS[24m] [1m-f [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[12;1H[K[m
-[13;1H[K       [1mtar -c [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[14;1H[K[m
-[15;1H[K       [1mtar -d [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[16;1H[K[m
-[17;1H[K       [1mtar -r [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[18;1H[K[m
-[19;1H[K       [1mtar -t [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[20;1H[K[m
-[21;1H[K       [1mtar -u [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[22;1H[K[m
-[23;1H[K       [1mtar -x [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[24;1H[K[m
-[25;1H[K   [1mGNU-style usage[0m[m
-[26;1H[K       [1mtar [22m{[1m--catenate[22m|[1m--concatenate[22m} [[4mOPTIONS[24m] [1m--file [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[27;1H[K[m
-[28;1H[K       [1mtar --create [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[29;1H[K[m
-[30;1H[K       [1mtar [22m{[1m--diff[22m|[1m--compare[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[31;1H[K[m
-[32;1H[K       [1mtar --delete [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[33;1H[K[m
-[34;1H[K       [1mtar --append [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[35;1H[K[m
-[36;1H[K       [1mtar --list [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[37;1H[K[m
-[38;1H[K       [1mtar --test-label [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mLABEL[24m...][m
-[39;1H[K[m
-[40;1H[K       [1mtar --update [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[41;1H[K[m
-[42;1H[K       [1mtar [22m{[1m--extract[22m|[1m--get[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[43;1H[K[m
-[44;1H[K[1mNOTE[0m[m
-[45;1H[K       This  manpage  is a short description of GNU [1mtar[22m.  For a detailed discussion, including examples and usage recommendations, refer to the [1mGNU Tar Manual [22mavailable in texinfo for‐[m
-[46;1H[K       mat.  If the [1minfo [22mreader and the tar documentation are properly installed on your system, the command[m
-[47;1H[K[m
-[48;1H[K           [1minfo tar[0m[m
-[49;1H[K[m
-[50;1H[K       should give you access to the complete manual.[m
-[51;1H[K[m
-[52;1H[K       You can also view the manual using the info mode in [1memacs[22m(1), or find it in various formats online at[m
-[53;1H[K[m
-[54;1H[K           [1mhttps://www.gnu.org/software/tar/manual[0m[m
-[55;1H[K[m
-[56;1H[K       If any discrepancies occur between this manpage and the [1mGNU Tar Manual[22m, the later shall be considered the authoritative source.[m
-[57;1H[K[m
-[58;1H[K[1mDESCRIPTION[0m[m
-[59;1H[K       GNU [1mtar [22mis an archiving program designed to store multiple files in a single file (an [1marchive[22m), and to manipulate such archives.  The archive can be either a regular file  or  a[m
-[60;1H[K       device (e.g. a tape drive, hence the name of the program, which stands for [1mt[22mape [1mar[22mchiver), which can be located either on the local or on a remote machine.[m
-[61;1H[K[m
-[62;1H[K   [1mOption styles[0m[m
-[63;1H[K       Options to GNU [1mtar [22mcan be given in three different styles.  In [1mtraditional style[22m, the first argument is a cluster of option letters and all subsequent arguments supply arguments[m
-[64;1H[K       to  those  options  that require them.  The arguments are read in the same order as the option letters.  Any command line words that remain after all options have been processed[m
-[65;1H[K       are treated as non-option arguments: file or archive member names.[m
-[66;1H[K[m
-[67;1H[K       For example, the [1mc [22moption requires creating the archive, the [1mv [22moption requests the verbose operation, and the [1mf [22moption takes an argument that sets the name of the archive to op‐[m
-[68;1H[K       erate upon.  The following command, written in the traditional style, instructs tar to store all files from the directory [1m/etc [22minto the archive file [1metc.tar[22m,  verbosely  listing[m
-[69;1H[K       the files being archived:[m
-[70;1H[K[m
-[71;1H[K       tar cfv etc.tar /etc[m
-[72;1H[K[m
-[73;1H[K       In  [1mUNIX  [22mor [1mshort-option style[22m, each option letter is prefixed with a single dash, as in other command line utilities.  If an option takes an argument, the argument follows it,[m
-[74;1H[K       either as a separate command line word, or immediately following the option.  However, if the option takes an [1moptional [22margument, the argument must follow the option letter with‐[m
-[75;1H[K       out any intervening whitespace, as in [1m-g/tmp/snar.db[22m.[m
-[76;1H[K[m
-[77;1H[K       Any number of options not taking arguments can be clustered together after a single dash, e.g. [1m-vkp[22m.  An option that takes an argument (whether mandatory or optional) can appear[m
-[78;1H[K       at the end of such a cluster, e.g. [1m-vkpf a.tar[22m.[m
-[79;1H[1;1H[K[4mTAR[24m(1)                                                                               GNU TAR Manual                                                                               [4mTAR[24m(1)[m
-[2;1H[K[m
-[3;1H[K[1mNAME[0m[m
-[4;1H[K       tar - an archiving utility[m
-[5;1H[K[m
-[6;1H[K[1mSYNOPSIS[0m[m
-[7;1H[K   [1mTraditional usage[0m[m
-[8;1H[K       [1mtar [22m{[1mA[22m|[1mc[22m|[1md[22m|[1mr[22m|[1mt[22m|[1mu[22m|[1mx[22m}[[1mGnSkUWOmpsMBiajJzZhPlRvwo[22m] [[4mARG[24m...][m
-[9;1H[K[m
-[10;1H[K   [1mUNIX-style usage[0m[m
-[11;1H[K       [1mtar -A [22m[[4mOPTIONS[24m] [1m-f [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[12;1H[K[m
-[13;1H[K       [1mtar -c [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[14;1H[K[m
-[15;1H[K       [1mtar -d [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[16;1H[K[m
-[17;1H[K       [1mtar -r [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[18;1H[K[m
-[19;1H[K       [1mtar -t [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[20;1H[K[m
-[21;1H[K       [1mtar -u [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[22;1H[K[m
-[23;1H[K       [1mtar -x [22m[[1m-f [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[24;1H[K[m
-[25;1H[K   [1mGNU-style usage[0m[m
-[26;1H[K       [1mtar [22m{[1m--catenate[22m|[1m--concatenate[22m} [[4mOPTIONS[24m] [1m--file [4m[22mARCHIVE[24m [4mARCHIVE[24m...[m
-[27;1H[K[m
-[28;1H[K       [1mtar --create [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[29;1H[K[m
-[30;1H[K       [1mtar [22m{[1m--diff[22m|[1m--compare[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[31;1H[K[m
-[32;1H[K       [1mtar --delete [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[33;1H[K[m
-[34;1H[K       [1mtar --append [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[35;1H[K[m
-[36;1H[K       [1mtar --list [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[37;1H[K[m
-[38;1H[K       [1mtar --test-label [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mLABEL[24m...][m
-[39;1H[K[m
-[40;1H[K       [1mtar --update [22m[[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mFILE[24m...][m
-[41;1H[K[m
-[42;1H[K       [1mtar [22m{[1m--extract[22m|[1m--get[22m} [[1m--file [4m[22mARCHIVE[24m] [[4mOPTIONS[24m] [[4mMEMBER[24m...][m
-[43;1H[K[m
-[44;1H[K[1mNOTE[0m[m
-[45;1H[K       This  manpage  is a short description of GNU [1mtar[22m.  For a detailed discussion, including examples and usage recommendations, refer to the [1mGNU Tar Manual [22mavailable in texinfo for‐[m
-[46;1H[K       mat.  If the [1minfo [22mreader and the tar documentation are properly installed on your system, the command[m
-[47;1H[K[m
-[48;1H[K           [1minfo tar[0m[m
-[49;1H[K[m
-[50;1H[K       should give you access to the complete manual.[m
-[51;1H[K[m
-[52;1H[K       You can also view the manual using the info mode in [1memacs[22m(1), or find it in various formats online at[m
-[53;1H[K[m
-[54;1H[K           [1mhttps://www.gnu.org/software/tar/manual[0m[m
-[55;1H[K[m
-[56;1H[K       If any discrepancies occur between this manpage and the [1mGNU Tar Manual[22m, the later shall be considered the authoritative source.[m
-[57;1H[K[m
-[58;1H[K[1mDESCRIPTION[0m[m
-[59;1H[K       GNU [1mtar [22mis an archiving program designed to store multiple files in a single file (an [1marchive[22m), and to manipulate such archives.  The archive can be either a regular file  or  a[m
-[60;1H[K       device (e.g. a tape drive, hence the name of the program, which stands for [1mt[22mape [1mar[22mchiver), which can be located either on the local or on a remote machine.[m
-[61;1H[K[m
-[62;1H[K   [1mOption styles[0m[m
-[63;1H[K       Options to GNU [1mtar [22mcan be given in three different styles.  In [1mtraditional style[22m, the first argument is a cluster of option letters and all subsequent arguments supply arguments[m
-[64;1H[K       to  those  options  that require them.  The arguments are read in the same order as the option letters.  Any command line words that remain after all options have been processed[m
-[65;1H[K       are treated as non-option arguments: file or archive member names.[m
-[66;1H[K[m
-[67;1H[K       For example, the [1mc [22moption requires creating the archive, the [1mv [22moption requests the verbose operation, and the [1mf [22moption takes an argument that sets the name of the archive to op‐[m
-[68;1H[K       erate upon.  The following command, written in the traditional style, instructs tar to store all files from the directory [1m/etc [22minto the archive file [1metc.tar[22m,  verbosely  listing[m
-[69;1H[K       the files being archived:[m
-[70;1H[K[m
-[71;1H[K       tar cfv etc.tar /etc[m
-[72;1H[K[m
-[73;1H[K       In  [1mUNIX  [22mor [1mshort-option style[22m, each option letter is prefixed with a single dash, as in other command line utilities.  If an option takes an argument, the argument follows it,[m
-[74;1H[K       either as a separate command line word, or immediately following the option.  However, if the option takes an [1moptional [22margument, the argument must follow the option letter with‐[m
-[75;1H[K       out any intervening whitespace, as in [1m-g/tmp/snar.db[22m.[m
-[76;1H[K[m
-[77;1H[K       Any number of options not taking arguments can be clustered together after a single dash, e.g. [1m-vkp[22m.  An option that takes an argument (whether mandatory or optional) can appear[m
-[78;1H[K       at the end of such a cluster, e.g. [1m-vkpf a.tar[22m.[m
-[79;1H...skipping...
-              translation for a single group.  It must consist of two fields, delimited by any a[7mmount[27m of whitespace:[m
-[m
-              [4mOLDGRP[24m [4mNEWGRP[24m[[1m:[4m[22mNEWGID[24m][m
-[m
-              [4mOLDGRP[24m is either a valid group name or a GID prefixed with [1m+[22m.  Unless [4mNEWGID[24m is supplied, [4mNEWGRP[24m must also be either a valid group name or a [1m+[4m[22mGID[24m.  Otherwise, both [4mNEWGRP[0m[m
-              and [4mNEWGID[24m need not be listed in the system group database.[m
-[m
-              As a result, each input file with owner group [4mOLDGRP[24m will be stored in archive with owner group [4mNEWGRP[24m and GID [4mNEWGID[24m.[m
-[m
-       [1m--mode[22m=[4mCHANGES[0m[m
-              Force symbolic mode [4mCHANGES[24m for added files.[m
-[m
-       [1m--mtime[22m=[4mDATE-OR-FILE[0m[m
-              Set  mtime  for  added  files.  [4mDATE-OR-FILE[24m is either a date/time in almost arbitrary format, or the name of an existing file.  In the latter case the mtime of that file[m
-              will be used.[m
-[m
-       [1m-m[22m, [1m--touch[0m[m
-              Don't extract file modified time.[m
-[m
-       [1m--no-delay-directory-restore[0m[m
-              Cancel the effect of the prior [1m--delay-directory-restore [22moption.[m
-[m
-       [1m--no-same-owner[0m[m
-              Extract files as yourself (default for ordinary users).[m
-[m
-       [1m--no-same-permissions[0m[m
-              Apply the user's umask when extracting permissions from the archive (default for ordinary users).[m
-[m
-       [1m--numeric-owner[0m[m
-              Always use numbers for user/group names.[m
-[m
-       [1m--owner[22m=[4mNAME[24m[:[4mUID[24m][m
-              Force [4mNAME[24m as owner for added files.  If [4mUID[24m is not supplied, [4mNAME[24m can be either a user name or numeric UID.  In this case the missing part (UID or name) will be inferred[m
-              from the current host's user database.[m
-[m
-              When used with [1m--owner-map[22m=[4mFILE[24m, affects only those files whose owner is not listed in [4mFILE[24m.[m
-[m
-       [1m--owner-map[22m=[4mFILE[0m[m
-              Read owner translation map from [4mFILE[24m.  Empty lines are ignored.  Comments are introduced with [1m# [22msign and extend to the end of line.  Each non-empty line in  [4mFILE[24m  defines[m
-              translation for a single UID.  It must consist of two fields, delimited by any a[7mmount[27m of whitespace:[m
-[m
-              [4mOLDUSR[24m [4mNEWUSR[24m[[1m:[4m[22mNEWUID[24m][m
-[m
-              [4mOLDUSR[24m  is  either a valid user name or a UID prefixed with [1m+[22m.  Unless [4mNEWUID[24m is supplied, [4mNEWUSR[24m must also be either a valid user name or a [1m+[4m[22mUID[24m.  Otherwise, both [4mNEWUSR[0m[m
-              and [4mNEWUID[24m need not be listed in the system user database.[m
-[m
-              As a result, each input file owned by [4mOLDUSR[24m will be stored in archive with owner name [4mNEWUSR[24m and UID [4mNEWUID[24m.[m
-[m
-       [1m-p[22m, [1m--preserve-permissions[22m, [1m--same-permissions[0m[m
-              Set permissions of extracted files to those recorded in the archive (default for superuser).[m
-[m
-       [1m--same-owner[0m[m
-              Try extracting files with the same ownership as exists in the archive (default for superuser).[m
-[m
-       [1m-s[22m, [1m--preserve-order[22m, [1m--same-order[0m[m
-              Tell [1mtar [22mthat the list of file names to process is sorted in the same order as the files in the archive.[m
-[m
-       [1m--sort=[4m[22mORDER[0m[m
-              When creating an archive, sort directory entries according to [4mORDER[24m, which is one of [1mnone[22m, [1mname[22m, or [1minode[22m.[m
-[m
-              The default is [1m--sort=none[22m, which stores archive members in the same order as returned by the operating system.[m
-[m
-              Using [1m--sort=name [22mensures the member ordering in the created archive is uniform and reproducible.[m
-[m
-              Using [1m--sort=inode [22mreduces the number of disk seeks made when creating the archive and thus can considerably speed up archivation.  This sorting order is  supported  only[m
-              if the underlying system provides the necessary information.[m
-[m
-   [1mExtended file attributes[0m[m
-       [1m--acls [22mEnable POSIX ACLs support.[m
-[m
-       [1m--no-acls[0m[m
-              Disable POSIX ACLs support.[m
-[m
-       [1m--selinux[0m[m
-              Enable SELinux context support.[m
-[m
-       [1m--no-selinux[0m[m
-              Disable SELinux context support.[m
-[7m Manual page tar(1) line 345 (press h for help or q to quit)[27m[K[K/[K[m
-       [1m--xattrs[0m[m
-              Enable extended attributes support.[m
-[m
-       [1m--no-xattrs[0m[m
-              Disable extended attributes support.[m
-[m
-       [1m--xattrs-exclude=[4m[22mPATTERN[0m[m
-              Specify the exclude pattern for xattr keys.  [4mPATTERN[24m is a globbing pattern, e.g. [1m--xattrs-exclude='user.*' [22mto include only attributes from the user namespace.[m
-[m
-       [1m--xattrs-include=[4m[22mPATTERN[0m[m
-              Specify the include pattern for xattr keys.  [4mPATTERN[24m is a globbing pattern.[m
-[m
-   [1mDevice selection and switching[0m[m
-       [1m-f[22m, [1m--file[22m=[4mARCHIVE[0m[m
-              Use  archive  file  or  device [4mARCHIVE[24m.  If this option is not given, [1mtar [22mwill first examine the environment variable `TAPE'.  If it is set, its value will be used as the[m
-              archive name.  Otherwise, [1mtar [22mwill assume the compiled-in default.  The default value can be inspected either using the [1m--show-defaults [22moption, or at the end of  the  [1mtar[0m[m
-              [1m--help [22moutput.[m
-[m
-              An archive name that has a colon in it specifies a file or device on a remote machine.  The part before the colon is taken as the machine name or IP address, and the part[m
-              after it as the file or device pathname, e.g.:[m
-[m
-              --file=remotehost:/dev/sr0[m
-[m
-              An optional username can be prefixed to the hostname, placing a [1m@ [22msign between them.[m
-[m
-              By default, the remote host is accessed via the [1mrsh[22m(1) command.  Nowadays it is common to use [1mssh[22m(1) instead.  You can do so by giving the following command line option:[m
-[m
-              --rsh-command=/usr/bin/ssh[m
-[m
-              The  remote  machine  should  have  the  [1mrmt[22m(8)  command installed.  If its pathname does not match [1mtar[22m's default, you can inform [1mtar [22mabout the correct pathname using the[m
-              [1m--rmt-command [22moption.[m
-[m
-       [1m--force-local[0m[m
-              Archive file is local even if it has a colon.[m
-[m
-       [1m-F[22m, [1m--info-script[22m=[4mCOMMAND[24m, [1m--new-volume-script[22m=[4mCOMMAND[0m[m
-              Run [4mCOMMAND[24m at the end of each tape (implies [1m-M[22m).  The command can include arguments.  When started, it will inherit [1mtar[22m's environment plus the following variables:[m
-[m
-[7m Manual page tar(1) line 384 (press h for help or q to quit)[27m[K[K/[K[K[7mPattern not found  (press RETURN)[27m[79;1H[K[K[?1l>[?1049l[23;0;0t]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\df -h
-[?2004l]133;C\]666;vte.shell.preexec!\Filesystem                     Size  Used Avail Use% Mounted on
-/dev/mapper/rhel-root          200G  145G   56G  73% /
-devtmpfs                        45G     0   45G   0% /dev
-tmpfs                           45G   84K   45G   1% /dev/shm
-efivarfs                       248K   63K  181K  26% /sys/firmware/efi/efivars
-tmpfs                           18G  118M   18G   1% /run
-tmpfs                          1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
-/dev/nvme0n1p2                 893M  647M  246M  73% /boot
-/dev/mapper/rhel-home          688G  263G  426G  39% /home
-/dev/nvme0n1p1                 599M  9.1M  590M   2% /boot/efi
-tmpfs                          9.0G  2.7M  9.0G   1% /run/user/1000
-//192.168.1.38/Personal-Drive   33T  7.9T   25T  25% /home/ben/BenData
-/dev/sda1                      808M  808M     0 100% /run/media/ben/RHEL-10-0-BaseOS-x86_64
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\lsp[Kblk
-[?2004l]133;C\]666;vte.shell.preexec!\NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
-sda             8:0    1   7.4G  0 disk 
-├─sda1          8:1    1 807.8M  0 part /run/media/ben/RHEL-10-0-BaseOS-x86_64
-├─sda2          8:2    1   8.3M  0 part 
-└─sda3          8:3    1   300K  0 part 
-nvme0n1       259:0    0 953.9G  0 disk 
-├─nvme0n1p1   259:1    0   600M  0 part /boot/efi
-├─nvme0n1p2   259:2    0     1G  0 part /boot
-└─nvme0n1p3   259:3    0 952.3G  0 part 
-  ├─rhel-root 253:0    0   200G  0 lvm  /
-  ├─rhel-swap 253:1    0    64G  0 lvm  [SWAP]
-  └─rhel-home 253:2    0 688.3G  0 lvm  /home
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\[7msudo dd if=/path/to/image.iso of=/dev/sdX bs=4M status=progress conv=fdatasync[27m[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Csudo dd if=/path/to/image.iso of=/dev/sdX bs=4M status=progress conv=fdatasync[C[5P[C[3P[6P[4P[1@~[1@/[1@D[1@o[1@w[7@nloads/[1@c[1@s[1@b[25@-fedora-44-2026-08-21.iso[C[C[C[C[C[C[C[C[C[C[C[C[1P[1@a
-[?2004l]133;C\]666;vte.shell.preexec!\[sudo] password for ben: 
-^C^C^C^Z^C^C
-Killed
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;137\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\[K]133;D;137\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\ssh -Y ac[K[Kdarkstarwdarkstarodarkstarodarkstar[Cdarkstaradarkstarrdarkstar[Cdarkstar@darkstar
-[?2004l]133;C\]666;vte.shell.preexec!\
-3 devices have a firmware upgrade available.
-Run `fwupdmgr get-upgrades` for more information.
-
-===========================================================================
-=                      Red Hat CSB managed device                         =
-===========================================================================
-This system is not public and is restricted for use only by employees and
-other expressly authorized users. If you do not have authorization to use
-this system, discontinue use at once. Authorized users must also use the
-system appropriately and in compliance with Red Hat’s acceptable use (AUP)
-and information security policies.
-===========================================================================
-  host: woodard-thinkstationp620.rmtusca.csb
-distro: Fedora 44 
-device: ThinkStation P620 (30E1SG9J00)
-serial: MJ0K0HNR
-  cpus: 32 ram: 128.6GB
-        AMD Ryzen Threadripper PRO 5955WX 16-Cores
-===============================================================================
-CSB Configuration last run on 2026-09-02 09:48:17.489013.
-===============================================================================
-Last login: Tue Sep  1 20:04:28 2026 from 192.168.1.14
-/usr/bin/xauth:  file /home/woodard/.Xauthority does not exist
-]0;woodard@woodard-thinkstationp620:~]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ 6[Kactivate-global-python-argcomplete [Kactivate-global-python-argcomplete [Kgnome-ac[K[K[K-act[K[K[K[K[K[K[K[K[K[7mgnome-system-monitor &[27mgnome-system-monitor &
-[?2004l]3008;start=2eb19f36-1290-443e-976c-17f68ab5c1cd;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\[1] 254523
-]0;woodard@woodard-thinkstationp620:~]3008;end=2eb19f36-1290-443e-976c-17f68ab5c1cd;exit=success\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ fg
-[?2004l]3008;start=7d5f8ac4-a4cb-4771-937f-990514164915;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\gnome-system-monitor
-^C
-]0;woodard@woodard-thinkstationp620:~]3008;end=7d5f8ac4-a4cb-4771-937f-990514164915;exit=failure;status=130;signal=SIGINT\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ exp[K[K[Kecho $DISPLAY
-[?2004l]3008;start=9003f013-be68-4828-8845-09ed25da9787;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\localhost:10.0
-]0;woodard@woodard-thinkstationp620:~]3008;end=9003f013-be68-4828-8845-09ed25da9787;exit=success\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ emacs foo
-[?2004l]3008;start=20969db1-7fa5-47d2-9c9e-16263a109b62;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\[?1049h[22;0;0t[?12;25h[?1h=[H[2J[79d[K[?1l>[?12l[?25h[?1049l[23;0;0t[39;49m[?1049h[22;0;0t[?12;25h[?1h=[H[2J[78d[?25l[30m[47m-UUU:---  F1  [39;49m[1m[30m[47m*scratch*   [0m[39;49m[30m[47m   All   L1     (Fundamental) -----------------------------------------------------------------------------------------------------------------------------------------------[39;49m
-[A[2d[?12l[?25h[?12;25h[79d[?25lLoading /usr/share/emacs/site-lisp/site-start.d/00-dynamic-module-dir.el (source)...done[K[H
-[?12l[?25h[?12;25h[79;49H[?25l10-source-directory.el (source)...[K[H
-[?12l[?25h[?12;25h[79;83H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lclang-format.el (source)...[K[H
-[?12l[?25h[?12;25h[79;76H[?25ldone[H
-[?12l[?25h[?12;25h[79;55H[?25linclude-fixer.el (source)...[H
-[?12l[?25h[?12;25h[79d[?25l../../usr/share/emacs/site-lisp/site-start.d/clang-include-fixer.el: Warning: Unknown type: buffer-live[H
-[?12l[?25h[?12;25h[79d[?25lLoading /usr/share/emacs/site-lisp/site-start.d/clang-include-fixer.el (source)...done[K[H
-[?12l[?25h[?12;25h[79;50H[?25lmake-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;74H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25ldesktop-entry-mode-init.el (source)...[H
-[?12l[?25h[?12;25h[79;87H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lenvironment-modules-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;88H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lmercurial-site-start.el (source)...[K[H
-[?12l[?25h[?12;25h[79;84H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lsystemtap-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;78H[?25ldone[H
-[?12l[?25h[?12;25h[>0c]11;?\[>4;1m[?2004h[?1004h[79d[?25lFor information about GNU Emacs and the GNU system, type [38;5;18m[48;5;255mC-h C-a[39;49m.[K[H
-[?12l[?25h[?12;25h[79d[?25l(New file)[K[H
-[?12l[?25h[?12;25h[79d[?25l(New file)[K[H[7mFile Edit Options Buffers Tools Help                                                                                                                                                                   [0m[39;49m[27m
-[A
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[30m[48;5;250m-UUU:---  F1  [39;49m[1m[30m[48;5;250mfoo         [0m[39;49m[30m[48;5;250m   All   L1     (Fundamental) -----------------------------------------------------------------------------------------------------------------------------------------------[39;49m
-[A[2d[?12l[?25h[?12;25h[79d[K[2d[79d[K[?1004l[?2004l[>4m[?1l>[?12l[?25h[?1049l[23;0;0t[39;49m]0;woodard@woodard-thinkstationp620:~]3008;end=20969db1-7fa5-47d2-9c9e-16263a109b62;exit=success\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ sudo dnf xau[K[K[Klist xa[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[7msudo dnf install xorg-x11-xauth[27msudo dnf install xorg-x11-xauth
-[?2004l]3008;start=a4f3f3df-98a3-4345-8ecf-a32c1b0db06a;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\[sudo] password for woodard: 
-]3008;start=ba4a3ed8da2a4889b7835770b1346db9;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;machineid=8428a46f3b1e4c64a828441cf5a1f17a;bootid=35ce9833f9c24e51b58f553f910aa358;pid=255454;pidfdid=331933;comm=sudo;targetuser=root;type=session\Updating and loading repositories:
-Repositories loaded.
-Package "xorg-x11-xauth-1:1.1.5-1.fc44.x86_64" is already installed.
-
-Nothing to do.
-]3008;end=ba4a3ed8da2a4889b7835770b1346db9\]0;woodard@woodard-thinkstationp620:~]3008;end=a4f3f3df-98a3-4345-8ecf-a32c1b0db06a;exit=success\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ [7mtouch ~/.Xauthority[27m
-[7mchmod 600 ~/.Xauthority[27m[A[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ touch ~/.Xauthority
-chmod 600 ~/.Xauthority
-[?2004l]3008;start=d917713f-8e28-459a-b4b1-509c4cca2d66;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\]3008;start=d917713f-8e28-459a-b4b1-509c4cca2d66;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=command;cwd=/home/woodard\]0;woodard@woodard-thinkstationp620:~]3008;end=d917713f-8e28-459a-b4b1-509c4cca2d66;exit=success\]3008;start=6f79d3e1-0107-4557-86c9-73c40ca5b59f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000247443;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ chmod 600 ~/.Xauthority[4Ptouch[C[C[C[C[C[C[C[C[C[C[C[C[C[Csudo dnf install xorg-x11-xauth[K[?2004l
-logout
-Connection to darkstar closed.
-]0;ben@point:~/src/75fasmod]666;vte.shell.postexec=0\]666;vte.shell.precmd!\]7;file://point.bencoyote.net/home/ben/src/75fasmod\[?2004h]133;D;0\]133;A\[32mben@point[0m:[32m~/src/75fasmod[0m$[0m ]133;B\ssh -Y woodard@darkstar
-[?2004l]133;C\]666;vte.shell.preexec!\
-3 devices have a firmware upgrade available.
-Run `fwupdmgr get-upgrades` for more information.
-
-===========================================================================
-=                      Red Hat CSB managed device                         =
-===========================================================================
-This system is not public and is restricted for use only by employees and
-other expressly authorized users. If you do not have authorization to use
-this system, discontinue use at once. Authorized users must also use the
-system appropriately and in compliance with Red Hat’s acceptable use (AUP)
-and information security policies.
-===========================================================================
-  host: woodard-thinkstationp620.rmtusca.csb
-distro: Fedora 44 
-device: ThinkStation P620 (30E1SG9J00)
-serial: MJ0K0HNR
-  cpus: 32 ram: 128.6GB
-        AMD Ryzen Threadripper PRO 5955WX 16-Cores
-===============================================================================
-CSB Configuration last run on 2026-09-02 09:48:17.489013.
-===============================================================================
-Last login: Wed Sep  2 16:27:58 2026 from 192.168.1.14
-]0;woodard@woodard-thinkstationp620:~]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ [7mgnome-system-monitor[27mgnome-system-monitor
-[?2004l]3008;start=3f58efbe-a957-47fb-815d-83b4003c1c4a;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\^C
-]0;woodard@woodard-thinkstationp620:~]3008;end=3f58efbe-a957-47fb-815d-83b4003c1c4a;exit=failure;status=130;signal=SIGINT\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ emacs gnome-system-monitorchmod 600 ~/.Xauthority[4Ptouch[C[C[C[C[C[C[C[C[C[C[C[C[C[Csudo dnf install xorg-x11-xauthemacs foo[Kcho $DISPLAY[4Pmacs foo
-[?2004l]3008;start=e409b39e-4908-43e7-9ce9-e8a8f307889c;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\[?1049h[22;0;0t[?12;25h[?1h=[H[2J[79d[K[?1l>[?12l[?25h[?1049l[23;0;0t[39;49m[?1049h[22;0;0t[?12;25h[?1h=[H[2J[78d[?25l[30m[47m-UUU:---  F1  [39;49m[1m[30m[47m*scratch*   [0m[39;49m[30m[47m   All   L1     (Fundamental) -----------------------------------------------------------------------------------------------------------------------------------------------[39;49m
-[A[2d[?12l[?25h[?12;25h[79d[?25lLoading /usr/share/emacs/site-lisp/site-start.d/00-dynamic-module-dir.el (source)...done[K[H
-[?12l[?25h[?12;25h[79;49H[?25l10-source-directory.el (source)...[K[H
-[?12l[?25h[?12;25h[79;83H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lclang-format.el (source)...[K[H
-[?12l[?25h[?12;25h[79;76H[?25ldone[H
-[?12l[?25h[?12;25h[79;55H[?25linclude-fixer.el (source)...[H
-[?12l[?25h[?12;25h[79d[?25l../../usr/share/emacs/site-lisp/site-start.d/clang-include-fixer.el: Warning: Unknown type: buffer-live[H
-[?12l[?25h[?12;25h[79d[?25lLoading /usr/share/emacs/site-lisp/site-start.d/clang-include-fixer.el (source)...done[K[H
-[?12l[?25h[?12;25h[79;50H[?25lmake-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;74H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25ldesktop-entry-mode-init.el (source)...[H
-[?12l[?25h[?12;25h[79;87H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lenvironment-modules-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;88H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lmercurial-site-start.el (source)...[K[H
-[?12l[?25h[?12;25h[79;84H[?25ldone[H
-[?12l[?25h[?12;25h[79;49H[?25lsystemtap-init.el (source)...[K[H
-[?12l[?25h[?12;25h[79;78H[?25ldone[H
-[?12l[?25h[?12;25h[>0c]11;?\[>4;1m[?2004h[?1004h[79d[?25lFor information about GNU Emacs and the GNU system, type [38;5;18m[48;5;255mC-h C-a[39;49m.[K[H
-[?12l[?25h[?12;25h[79d[?25l(New file)[K[H
-[?12l[?25h[?12;25h[79d[?25l(New file)[K[H[7mFile Edit Options Buffers Tools Help                                                                                                                                                                   [0m[39;49m[27m
-[A
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[K
-[30m[48;5;250m-UUU:---  F1  [39;49m[1m[30m[48;5;250mfoo         [0m[39;49m[30m[48;5;250m   All   L1     (Fundamental) -----------------------------------------------------------------------------------------------------------------------------------------------[39;49m
-[A[2d[?12l[?25h[?12;25h[79d[K[2d[79d[K[?1004l[?2004l[>4m[?1l>[?12l[?25h[?1049l[23;0;0t[39;49m]0;woodard@woodard-thinkstationp620:~]3008;end=e409b39e-4908-43e7-9ce9-e8a8f307889c;exit=success\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ ls -l [Kd ~/
-[?2004l]3008;start=036a4a81-5770-4115-b412-faf04498fe62;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\drwx--x---. 1 woodard woodard 480 Sep  2 16:34 [0m[01;34m/home/woodard/[0m
-]0;woodard@woodard-thinkstationp620:~]3008;end=036a4a81-5770-4115-b412-faf04498fe62;exit=success\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-X11 connection rejected because of wrong authentication.
-
-[?2004l]0;woodard@woodard-thinkstationp620:~]3008;end=eaba9d5c-a590-483f-8dc7-8da841a3a9d0;exit=success\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ watch amdsmi[K[K[K[K[K[K-2 [K1[K[K1 amdsmi
-[?2004l]3008;start=01b21e21-6d02-4d05-a8ec-ef00295b6dad;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\watch: invalid option -- '1'
-
-Usage:
- watch [options] command
-
-Options:
-  -b, --beep             beep if command has a non-zero exit
-  -c, --color            interpret ANSI color and style sequences
-  -C, --no-color         do not interpret ANSI color and style sequences
-  -d, --differences[=<permanent>]
-                         highlight changes between updates
-  -e, --errexit          exit if command has a non-zero exit
-  -f, --follow           Follow the output and don't clear screen
-  -g, --chgexit          exit when output from command changes
-  -q, --equexit <cycles>
-                         exit when output from command does not change
-  -n, --interval <secs>  seconds to wait between updates
-  -p, --precise          -n includes command running time
-  -r, --no-rerun         do not rerun program on window resize
-  -s, --shotsdir         directory to store screenshots
-  -t, --no-title         turn off header
-  -w, --no-wrap          turn off line wrapping
-  -x, --exec             pass command to exec instead of "sh -c"
-
- -h, --help     display this help and exit
- -v, --version  output version information and exit
-
-For more details see watch(1).
-]0;woodard@woodard-thinkstationp620:~]3008;end=01b21e21-6d02-4d05-a8ec-ef00295b6dad;exit=failure;status=1\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ watch -1 amdsmi[1@n[C[C[C[C[C[1@-
-[?2004l]3008;start=2299f20c-9de2-4bca-8ade-4f32f02c85fa;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\[?1049h[22;0;0t[1;79r(B[m[4l[?7h[?25l[H[2JEvery 1.0s: amd-smi[1;131Hwoodard-thinkstationp620.rmtusca.csb: Thu 03 Sep 2026 02:45:31 PM EDT[2;187Hin 0.223s (0)[2;199H[3d+------------------------------------------------------------------------------+[4d| AMD-SMI 26.2.0+unknown[32Gamdgpu version: Linuxver ROCm version: 7.1.1    |[5d| VBIOS version: 00042143[5;80H|[6d| Platform: Linux Baremetal[6;80H|[7d|-------------------------------------+----------------------------------------|[8d| BDF[8;30HGPU-Name | Mem-Uti   Temp   UEC	   Power-Usage |[9d| GPU  HIP-ID  OAM-ID  Partition-Mode | GFX-Uti    Fan[9;70HMem-Usage |[10d|=====================================+========================================|[11d| 0000:43:00.0 AMD Radeon RX 7900 XTX | 0 %	 64 °C   0[11;71H27/291 W |[12d|   0[13G1     N/A[12;35HN/A | 1 %     70.98[12;65H20039/24560 MB |[13d|-------------------------------------+----------------------------------------|[14d| 0000:63:00.0     AMD Radeon Pro VII | N/A[14;52HN/A   0[14;70HN/A/190 W |[15d|   1[13G0     N/A[15;35HN/A | N/A     9.41 %[15;68H10/16368 MB |[16d+-------------------------------------+----------------------------------------+[17d+------------------------------------------------------------------------------+[18d| Processes:[18;80H|[19d|  GPU[19;15HPID  Process Name[19;42HGTT_MEM  VRAM_MEM  MEM_USAGE     CU % |[20d|==============================================================================|[21d|    0    2475805  N/A[21;44H0.0 B   19.0 GB    19.0 GB  N/A     |[22d|    1    2475805  N/A[22;44H0.0 B     0.0 B	0.0 B    0.0 % |[23d+------------------------------------------------------------------------------+[24dProcess Name may require elevated permissions.[25d[1;192H3[2d21s (0[11;41H30 %     92[11;70H269[12;41H87 %[25d[1;192H4[2d16s (0[11;42H6[11;51H4[11;71H88[12;41H91[12;68H40[25d[1;192H5[2d15s (0[11;42H4[11;72H9[12;41H86	71.76[12;69H1[25d[1;192H6[2d26s (0[11;42H7[11;71H91[12;41H91[25d[1;192H7[2d195s (0[11;41H16	 89[11;70H176[12;41H4[25d[1;192H9[2d208s (0[11;41H0 % 	 83[11;70H 63[12;41H2 % [25d[1;191H40[2d30s (0[11;41H26 %     92[11;70H266[12;41H82 %    70.98[12;69H2[25d[1;192H1[2d199s (0[11;41H3[11;51H4[11;71H89[12;42H9[25d[1;192H2[2d206s (0[11;42H7[12;41H90[12;69H3[25d[1;192H3[2d18s (0[11;71H91[12;42H1[25d[1;192H5[2;199H[11;42H6[11;72H0[12;41H89	71.76[25d[1;192H6[2d10s (0[11;41H2[11;51H2[11;71H35[12;41H65[25d[1;192H7[2d195s (0[11;41H0 %      84[11;70H 74[12;41H0 % [25d[1;192H8[2d218s (0[11;41H17 %	 87[11;70H188[12;41H55 %    70.98[12;69H4[25d[1;191H50[2;199H[11;41H35	 94[11;70H290[12;41H88[12;69H5[25d[1;192H1[2d16s (0[11;71H89[12;42H7[25d[1;192H2[2d38s (0[11;71H90[12;42H8[25d[1;192H3[2d12s (0[11;42H7[11;72H1[12;41H91	71.76[25d[1;192H4[2d08s (0[11;42H5[11;71H89[12;41H87	70.98[12;69H6[25d[1;192H6[2d09s (0[11;72H8[12;50H1.76[25d[1;192H7[2d14s (0[11;41H13	 88[11;70H164[12;41H41[12;69H7[25d[1;192H8[2d46s (0[11;41H35	 94[11;70H289[12;41H88[25d[1;192H9[2d15s (0[11;71H90[25d[1;189H6:01[2d00s (0[11;41H24[11;51H2[11;71H26[12;41H62	72.94[12;69H8[25d[1;192H2[2;199H[11;41H0 %      84[11;70H 72[12;41H0 %     71.76[25d[1;192H3[2d09s (0[11;41H24 %     91[11;70H239[12;41H74 %[12;69H9[25d[1;192H4[2d28s (0[11;41H35[11;51H4[11;71H91[12;41H89[25d[1;192H5[2d12s (0[11;42H6[11;72H0[12;41H90	70.98[12;68H50[25d[1;192H7[2d14s (0[12;42H1	71.76[25d[1;192H8[2d25s (0[11;42H7[11;71H89[12;42H2	73.73[25d[1;192H9[2d18s (0[11;71H91[12;42H1[25d[1;191H10[2d190s (0[11;41H7 %      87[11;70H114[12;41H18[25d[1;192H1[2d22[199G[11;41H5[11;51H5[11;72H7[12;41H27	72.94[12;69H1[25d[1;192H3[2d15s (0[11;41H37 %     93[11;70H293[12;41H91[25d[1;192H4[2d21s (0[11;42H6[11;51H4[11;72H0[12;42H0[12;69H2[25d[1;192H5[2d19s (0[11;42H5[11;71H89[12;41H87	71.76[25d[1;192H6[2d01s (0[11;41H13	 88[11;70H158[12;41H33[25d[1;192H8[2d05s (0[11;41H0 % 	 83[11;70H 57[12;41H2 % [25d[1;192H9[2d19s (0[11;41H29 %     91[11;70H270[12;41H85 %    70.98[12;69H3[25d[1;191H20[2d11s (0[11;41H37[11;51H3[11;71H91[12;41H92[25d[1;192H1[2d17s (0[11;42H6[11;71H89[12;41H89[12;69H4[25d[1;192H2[2d22s (0[11;42H5[11;51H4[12;42H8	71.76[25d[1;192H4[2d08s (0[11;42H6[11;71H90[12;42H9	72.94[25d[1;192H5[2d22s (0[11;42H5[11;71H89[12;42H7[12;69H5[25d[1;192H6[2d195s (0[11;42H %      85[11;70H 91[12;42H % [25d[1;192H7[2d220s (0[11;41H5[11;51H4[11;70H112[12;41H26 %    71.76[25d[1;192H8[2d12s (0[11;41H35 %     93[11;70H29[12;41H88[12;69H6[25d[1;191H30[2d0[199G[11;42H7[11;72H0[12;41H92[25d[1;192H1[2d16s (0[11;51H4[12;42H1	70.98[25d[1;192H2[2d03s (0[11;42H5[11;51H3[11;71H78[12;41H86	72.94[12;69H7[25d[1;192H3[2d197s (0[11;41H0 %      84[11;70H 79[12;41H0 % [25d[1;192H4[2d224s (0[11;41H5[11;51H5[11;70H120[12;41H32 %    71.76[12;69H8[25d[1;192H6[2d02s (0[11;41H37 %     93[11;70H293[12;41H9[25d[1;192H7[2d10s (0[11;72H0[25d[1;192H8[2;199H[11;72H1[25d[1;192H9[2d09s (0[11;72H0[25d[1;191H41[2d14s (0[11;51H4[12;42H0	72.94[12;69H9[25d[1;192H2[2d190s (0[11;41H19	 89[11;70H184[12;41H47	73.73[25d[1;192H3[2d209s (0[11;41H0 % 	 83[11;70H 62[12;41H3 %     72.94[25d[1;192H4[2d07s (0[11;41H30 %     92[11;70H277[12;41H87 %[12;68H60[25d[1;192H5[2d00s (0[11;42H7[11;51H3[11;71H90[12;41H91[25d[1;192H7[2d195s (0[11;41H28[11;51H2[11;71H45[12;41H7[12;50H1.76[25d[1;192H8[2d91s (0[11;41H0 %      84[11;70H 72[12;41H0 % [25d[1;192H9[2d207s (0[11;41H19 %	 89[11;70H214[12;41H64 %[12;69H2[25d[1;191H50[2d29s (0[11;41H35	 93[11;71H90[12;41H88	70.98[25d[1;192H1[2d05s (0[11;71H89[25d[1;192H3[2d03s (0[11;71H90[12;50H1.76[12;69H3[25d[1;192H4[2d11s (0[11;42H6[11;51H4[12;41H90[25d[1;192H5[2d15s (0[11;42H7[11;51H3[12;42H1	72.94[25d[1;192H6[2d13s (0[11;51H4[11;72H1[12;50H3.73[12;69H4[25d[1;192H7[2d191s (0[11;41H10	 87[11;70H136[12;41H25[25d[1;192H9[2d208s (0[11;41H3 % 	 85[11;71H0[12;42H2[25d[1;189H7:00[2d20s (0[11;42H2 %     92[11;70H271[12;41H8[12;50H2.94[12;69H5[25d[1;192H1[2d12s (0[11;42H6[11;51H4[11;71H90[12;41H90[25d[1;192H2[2d13s (0[11;42H7[11;51H3[12;42H1[12;69H6[25d[1;192H4[2d28s (0[11;51H4[12d1.76[25d[1;192H5[2d07s (0[11;42H5[11;71H88[12;41H87	72.94[25d[1;192H6[2d10s (0[11;41H12	 89[11;70H172[12;41H43[25d[1;192H7[2d19s (0[11;41H35	 93[11;70H287[12;41H87[12;69H7[25d[1;192H8[2d22s (0[11;42H7[11;51H4[11;71H90[12;41H91[12;69H8[25d[1;191H10[2d20s (0[11;42H6[25d[1;192H1[2d36s (0[11;42H5[11;72H1[12;41H89	73.73[25d[1;192H2[2d14s (0[11;71H89[12;42H8[25d[1;192H3[2d05s (0[11;42H6[11;71H91[12;41H90	74.9 %[12;69H9[25d[1;192H4[2d196s (0[11;41H9 %      87[11;70H125[12;41H22[25d[1;192H6[2d217s (0[11;41H8[11;51H6[11;71H38[12;41H34	73.73 [25d[1;192H7[2d14s (0[11;41H35 %     94[11;70H290[12;41H87[12;68H70[25d[1;192H8[2d17s (0[11;42H6[12d9[25d[1;192H9[2;199H[11;42H7[12;41H91	72.94[25d[1;191H21[2d12s (0[11;42H6[12;50H3.73[12;69H1[25d[1;192H2[2d0[199G[11;41H12	 88[11;70H148[12;41H29[25d[1;192H3[2d15s (0[11;41H5 % 	 85[11;71H07[12;42H3[25d[1;192H4[2d22s (0[11;41H37 %     93[11;70H293[12;41H92[25d[1;192H5[2d08s (0[11;42H6[11;51H4[11;72H0[12;42H0	72.94[12;69H2[25d[1;192H7[2d17s (0[11;42H5[11;71H89[12;41H88[12;69H3[25d[1;192H8[2d29s (0[12;50H3.73[25d[1;192H9[2d22s (0[11;41H1[11;50H89[11;70H183[12;41H49[25d[1;191H30[2d19s (0[11;41H34	 94[11;70H289[12;41H87[12;69H4[25d[1;192H1[2d25s (0[11;42H6[11;71H90[12;41H91[12;69H5[25d[1;192H3[2d16s (0[11;42H7[25d[1;192H4[2d28s (0[11;42H6[12d0	74.9 %[25d[1;192H5[2d0[199G[11;42H1[11;51H3[11;71H64[12;41H79[25d[1;192H6[2d194s (0[11;41H0 %      85[11;70H 75[12;41H0 %     73.73 [25d[1;192H8[2d216s (0[11;41H7[11;70H130[12;41H35 %[12;69H6[25d[1;192H9[2d24s (0[11;41H36 %     93[11;70H291[12;41H88[12;69H7[25d[1;191H40[2d42s (0[11;71H89[12;41H91	72.94[25d[1;192H1[2d14s (0[11;42H7[11;51H4[11;71H91[25d[1;192H2[2;199H[11;72H0[12;50H3.73[12;69H8[25d[1;192H4[2d20s (0[12;50H4.9 %[25d[1;192H5[2d27s (0[11;41H16	 89[11;70H179[12;41H48	73.73 [25d[1;192H6[2d32s (0[11;41H33	 93[11;70H280[12;41H86[12;69H9[25d[1;192H7[2d10s (0[11;42H6[11;51H4[11;71H9[12;41H91[25d[1;192H9[2d14s (0[11;42H5[11;71H89[12;41H88	74.9 %[12;68H80[25d[1;191H50[2d19s (0[12;69H1[25d[1;192H1[2d05s (0[11;42H6[11;51H5[12;41H90[25d[1;192H2[2d28s (0[11;41H18[11;51H0[11;70H196[12;41H55[25d[1;192H3[2d12s (0[11;41H34[11;51H3[11;70H278[12;41H87	73.73 [25d[1;192H5[2d24s (0[11;42H6[11;51H4[11;71H90[12;41H91[12;69H2[25d[1;192H6[2d13s (0[12;41H89	74.9 %[12;69H3[25d[1;192H7[2d15s (0[12;41H90[25d[1;192H8[2d196s (0[11;42H0[11;71H59[12;41H75[25d[1;189H8:00[2d202s (0[11;41H0 %      85[11;70H 76[12;41H0 % [25d[1;192H1[2d15s (0[11;41H13 %	 89[11;70H18[12;41H48 %[25d[1;192H2[2d18s (0[11;41H36	 94[11;70H291[12;41H91	73.73 [12;69H4[25d[1;192H3[2d12s (0[11;71H89[12;42H0[12;69H5[25d[1;192H4[2d09s (0[11;71H90[25d[1;192H6[2d16s (0[12;41H89	74.9 %[25d[1;192H7[2d195s (0[11;42H3[11;71H78[12;42H3[12;69H6[25d[1;192H8[2d92s (0[11;41H0 %      85[11;70H 80[12;41H0 % [25d[1;192H9[2d220s (0[11;41H12 %	 87[11;70H155[12;41H43 %[25d[1;191H10[2d11s (0[11;41H36	 94[11;70H290[12;41H90	73.73 [12;69H7[25d[1;192H2[2d14s (0[11;42H7[11;72H1[12;42H1[25d[1;192H3[2d18s (0[11;72H0[12;69H8[25d[1;192H4[2d11s (0[12;42H2	74.9 %[25d[1;192H5[2d0[199G[11;41H13	 88[11;70H153[12;41H3[12;50H3.73 [12;69H9[25d[1;192H6[2d1[199G[11;41H3 % 	 85[11;71H05[12;41H19[25d[1;192H8[2d3[199G[11;42H4 %     93[11;70H281[12;41H86[25d[1;192H9[2d08s (0[11;42H5[11;51H4[11;72H9[12;42H8	72.94[12;68H90[25d[1;191H20[2d10s (0[11;42H6[11;71H90[12;42H9[25d[1;192H1[2d11s (0[11;42H5[12d8	73.73[12;69H1[25d[1;192H3[2d22s (0[11;42H6[11;71H89[12;42H9	74.9 %[25d[1;192H4[2d194s (0[11;41H0 %      85[11;70H 80[12;41H0 % [25d[1;192H5[2d207s (0[11;41H4[11;70H116[12;41H26 %    73.73 [25d[1;192H6[2d14s (0[11;41H34 %     92[11;70H27[12;41H87[25d[1;192H7[2d05s (0[11;42H6[11;51H4[11;71H90[12;42H9	72.94[12;69H2[25d[1;192H9[2d21s (0[25d[1;191H30[2d28s (0[11;42H7[12;41H91	73.73[12;69H3[25d[1;192H1[2d16s (0[12;50H4.9 %[25d[1;192H2[2d19s (0[11;42H6[12d0[12;69H4[25d[1;192H3[2d196s (0[11;41H2 %      85[11;70H 97[12;41H6 %     73.73 [25d[1;192H5[2d217s (0[11;41H9[11;70H129[12;41H32 %[25d[1;192H6[2d19s (0[11;41H35 %     94[11;70H291[12;41H88[25d[1;192H7[2d11s (0[11;42H6[11;72H0[12;41H90	72.94[25d[1;192H8[2d13s (0[12;69H5[25d[1;191H40[2d04s (0[11;41H0 %      85[11;70H 75[12;41H1 % [25d[1;192H1[2d16s (0[11;41H13 %	 87[11;70H174[12;41H49 %    71.76[12;69H6[25d[1;192H2[2d13s (0[11;41H35	 94[11;70H291[12;41H87[25d[1;192H3[2d09s (0[11;42H7[11;51H3[11;72H0[12;41H91[25d[1;192H4[2d12s (0[11;42H6[11;51H4[11;71H89[12;41H88	72.94[12;69H7[25d[1;192H6[2d06s (0[11;42H7[11;71H90[12;41H90	73.73[25d[1;192H7[2d17s (0[11;42H6[11;71H89[12;41H88	74.9 %[12;69H8[25d[1;192H8[2d192s (0[11;41H11	 88[11;70H142[12;41H26[25d[1;192H9[2d206s (0[11;41H0 % 	 83[11;70H 59[12;41H1 %     73.73 [25d[1;191H50[2;199H[11;41H24 %     90[11;70H240[12;41H75 %[12;69H9[25d[1;192H2[2d28s (0[11;41H36[11;51H3[11;71H9[12;41H90	72.94[25d[1;192H3[2d11s (0[11;42H5[11;51H4[12;41H88[25d[1;192H4[2d12s (0[11;42H6[12d9[12;67H100[25d[1;192H5[2d13s (0[11;42H8[11;72H1[12;41H92	73.73[25d[1;192H6[2d17s (0[11;42H7[11;72H0[12;42H1	74.9 %[25d[1;192H8[2d02s (0[11;42H4[11;51H3[11;71H73[12;41H83[12;69H1[25d[1;192H9[2d00s (0[11;41H0 %      84[11;70H 69[12;41H0 %     73.73 [25d[1;189H9:00[2d04s (0[11;41H3[11;70H104[12;41H22 %[25d[1;192H1[2d00s (0[11;42H1 %     92[11;70H267[12;41H81	72.94[12;69H2[25d[1;192H3[2d08s (0[11;42H7[11;51H3[11;71H90[12;41H9[25d[1;192H4[2d24s (0[11;71H89[25d[1;192H5[2d16s (0[11;51H4[11;71H91[25d[1;192H6[2d17s (0[11;72H0[12;50H4.9 %[12;69H3[25d[1;192H7[2d21s (0[12;50H3.73 [12;69H4[25d[1;192H9[2d196s (0[11;41H28[11;51H2[11;71H37[12;41H68[25d[1;191H10[2d209s (0[11;41H0 %      84[11;70H 75[12;41H0 % [25d[1;192H1[2d25s (0[11;41H17 %	 88[11;70H197[12;41H59 %    72.94[25d[1;192H2[2d26s (0[11;41H35	 93[11;70H289[12;41H8[25d[1;192H3[2d17s (0[11;42H7[11;51H4[11;71H90[12;41H92[25d[1;192H5[2d18s (0[11;42H6[12d1[12;69H5[25d[1;192H6[2d32s (0[11;71H89[12;41H89	74.9 %[12;69H6[25d[1;192H7[2d25s (0[11;71H90[12;41H90[25d[1;192H8[2d00s (0[11;41H2[11;51H2[11;71H29[12;41H65[25d[1;191H20[2d194s (0[11;41H0 %      84[11;70H 70[12;41H0 %     73.73 [25d[1;192H1[2d212s (0[11;41H8[11;51H6[11;70H14[12;41H38 %[12;69H7[25d[1;192H2[2d27s (0[11;41H36 %     93[11;70H293[12;41H91[25d[1;192H3[2d11s (0[11;72H1[12;50H2.94[25d[1;192H4[2d17s (0[11;42H7[11;51H4[11;72H0[12;69H8[25d[1;192H6[2d10s (0[11;72H1[12;50H3.73[25d[1;192H7[2d192s (0[11;41H1[11;50H89[11;70H182[12;41H44[25d[1;192H8[2d224s (0[11;42H % 	 83[11;70H 7[12;41H5 % [25d[1;192H9[2d18s (0[11;41H22 %     90[11;70H24[12;41H71 %[12;69H9[25d[1;191H30[2d12s (0[11;41H37[11;51H3[11;71H93[12;41H9[12;50H2.94[12;68H10[25d[1;192H2[2d16s (0[11;51H4[11;72H0[25d[1;192H3[2d20s (0[11;72H1[25d[1;192H4[2d32s (0[11;42H6[11;72H0[12;41H89	73.73[25d[1;192H5[2d191s (0[11;41H10	 87[11;70H13[12;41H24	74.9 %[25d[1;192H7[2d206s (0[11;41H3 % 	 84[11;71H0[12;41H18	73.73 [25d[1;192H8[2d13s (0[11;42H0 %     92[11;70H272[12;41H82[12;69H1[25d[1;192H9[2d12s (0[11;42H7[11;51H3[11;71H90[12;41H91[12;69H2[25d[1;191H40[2d24s (0[11;42H6[11;71H88[12;41H89	72.94[25d[1;192H1[2d15s (0[11;42H7[11;51H4[11;71H90[12;41H91[25d[1;192H3[2d13s (0[12;50H3.73[25d[1;192H4[2d194s (0[11;41H16	 89[11;70H17[12;41H40[12;69H3[25d[1;192H5[2d97s (0[11;41H0 % 	 83[11;70H 64[12;41H1 % [25d[1;192H6[2d218s (0[11;41H19 %	 89[11;70H216[12;41H65 %    72.94[12;69H4[25d[1;192H7[2d04s (0[11;41H37	 93[11;71H90[12;41H91[25d[1;192H9[2d13s (0[12;42H2[25d[1;191H50[2;199H[12;42H1	71.76[12;69H5[25d[1;192H1[2d31s (0[11;51H4[12;42H0	73.73[25d[1;192H2[2d1[199G[11;42H6[11;71H89[12;50H4.9 %[12;69H6[21;55H1[21;66H1[25d[1;192H4[2d00s (0[11;41H22[11;51H0[11;71H05[12;41H55	73.73 [25d[1;192H5[2d17s (0[11;42H7[11;51H2[11;71H54[12;41H80[12;69H7[25d[1;192H6[2d15s (0[11;41H36[11;51H4[11;71H90[12;41H9[25d[1;192H7[2d13s (0[12;42H2	74.9 %[25d[1;192H8[2d10s (0[12;42H0[25d[1;188H50:00[2d19s (0[12;42H1[12;69H8[25d[1;192H1[2d11s (0[11;41H17	 89[11;70H196[12;41H53[12;69H9[25d[1;192H2[2d19s (0[11;41H3[11;50H94[11;70H290[12;41H91	73.73 [25d[1;192H3[2d17s (0[11;42H5[11;72H1[12;41H88[25d[1;192H4[2d15s (0[11;71H88[12;42H7	74.9 %[12;68H20[25d[1;192H6[2d07s (0[11;42H6[11;71H90[12;41H90[25d[1;192H7[2;199H[11;51H5[11;72H1[12;41H89[25d[1;192H8[2d190s (0[11;41H1[11;50H89[11;70H175[12;41H3[12;69H1[25d[1;192H9[2d237s (0[11;42H % 	 84[11;70H 84[12;41H11	73.73 [25d[1;191H11[2d16s (0[11;41H31 %     93[11;70H277[12;41H83[12;69H2[25d[1;192H2[2d25s (0[11;42H5[11;51H4[11;71H90[12;42H9[25d[1;192H3[2d12s (0[12;42H8[25d[1;192H4[2d28s (0[11;71H89[12;69H3[25d[1;192H5[2d17s (0[11;42H6[11;51H5[11;71H90[12;50H4.9 %[25d[1;192H7[2d198s (0[11;41H6 %      87[11;70H112[12;41H16[25d[1;192H8[2d224s (0[11;41H7[11;51H6[11;71H35[12;41H34[25d[1;192H9[2d12s (0[11;41H34 %     94[11;70H290[12;41H87	73.73 [12;69H4[25d[1;191H20[2d14s (0[11;42H7[12;41H92[25d[1;192H1[2d13s (0[11;42H6[12;41H89[12;69H5[25d[1;192H3[2d2[199G[11;42H5[12d8	74.9 %[25d[1;192H4[2d191s (0[11;41H11	 88[11;70H147[12;41H2[25d[1;192H5[2d202s (0[11;41H3 % 	 85[11;71H09[12;42H3	73.73 [25d[1;192H6[2d07s (0[11;42H2 %     92[11;70H273[12;41H82[12;69H6[25d[1;192H8[2d1[199G[11;42H6[11;51H4[11;71H90[12;41H90[25d[1;192H9[2d10s (0[11;71H89[12;50H2.94[12;69H7[25d[1;191H30[2d13s (0[11;71H91[12;42H2	73.73[25d[1;192H1[2d06s (0[11;41H19[11;51H0[11;70H189[12;41H51	74.9 %[25d[1;192H2[2d10s (0[11;41H30[11;51H3[11;70H275[12;41H84	73.73 [12;69H8[25d[1;192H4[2d12s (0[11;42H4[11;51H4[11;71H89[12;42H7[12;69H9[25d[1;192H5[2d14s (0[11;42H5[11;71H90[12;42H9	74.9 %[25d[1;192H6[2d18s (0[11;42H6[12;41H91[25d[1;192H7[2d13s (0[12;42H2[12;68H30[25d[1;192H8[2d195s (0[11;41H0 %      85[11;70H 81[12;41H1 % [25d[1;191H40[2d21[199G[11;41H13 %	 87[11;70H166[12;41H46 %    73.73 [25d[1;192H1[2d09s (0[11;41H35	 94[11;70H290[12;41H88[12;69H1[25d[1;192H2[2d11s (0[11;42H6[12;41H91[25d[1;192H3[2d13s (0[11;42H7[12d2[25d[1;192H4[2d00s (0[11;41H25[11;51H1[11;71H27[12;41H63	74.9 %[12;69H2[25d[1;192H6[2d08s (0[11;41H0 %      84[11;70H 74[12;41H1 %     73.73 [25d[1;192H7[2d13s (0[11;41H19 %     90[11;70H226[12;41H70 %[12;69H3[25d[1;192H8[2d12s (0[11;41H36[11;51H4[11;71H91[12;41H88	72.94[25d[1;192H9[2d06s (0[11;42H7[11;72H0[12;41H91[25d[1;191H51[2d28s (0[12;50H3.73[12;69H4[25d[1;192H2[2d22s (0[11;42H6[11;71H88[12;41H89	74.9 %[12;69H5[25d[1;192H3[2d19[199G[11;41H19[11;51H0[11;70H194[12;41H47[25d[1;192H4[2d94s (0[11;41H0 %      84[11;70H 72[12;41H0 %     73.73 [25d[1;192H5[2d211s (0[11;41H17 %	 88[11;70H197[12;41H59 %[25d[1;192H7[2;199H[11;41H3[11;50H93[11;70H291[12;41H92[25d[1;192H8[2d28s (0[11;42H5[11;51H4[11;71H89[12;41H87	72.94[12;69H6[25d[1;192H9[2d14s (0[11;72H8[12;69H7[25d[1;189H1:00[2d10s (0[11;42H7[11;71H90[12;41H91	73.73[25d[1;192H1[2d06s (0[11;42H4[11;71H84[12;41H84	74.9 %[25d[1;192H3[2d14s (0[11;41H16	 89[11;70H189[12;41H51	73.73 [12;69H8[25d[1;192H4[2d28s (0[11;41H34	 94[11;70H287[12;41H87[25d[1;192H5[2d21s (0[11;42H6[11;71H91[12;41H91	74.9 %[25d[1;192H6[2d16s (0[11;72H0[12;69H9[25d[1;192H8[2d0[199G[25d[1;192H9[2d19[199G[11;41H7 %      87[11;70H122[12;41H16	73.73 [25d[1;191H10[2d231s (0[11;41H14 %	 88[11;71H74[12;41H48[12;68H40[25d[1;192H1[2d17s (0[11;41H36	 94[11;70H290[12;41H90[12;69H1[25d[1;192H2[2d04s (0[12;42H1	72.94[25d[1;192H4[2d06s (0[11;42H7[12d2	73.73[25d[1;192H5[2d192s (0[11;41H21[11;51H0[11;71H01[12;41H5[12;50H4.9 %[25d[1;192H6[2d230s (0[11;41H0 %      84[11;70H 70[12;41H1 %     73.73 [25d[1;192H7[2d23s (0[11;41H27 %     91[11;70H256[12;41H82 %[12;69H2[25d[1;192H8[2d16s (0[11;41H3[11;51H4[11;71H90[12;41H9[12;69H3[25d[1;191H20[2d11s (0[11;42H5[12;41H87	72.94[25d[1;192H1[2d10s (0[11;42H6[12;41H90	73.73[25d[1;192H2[2d4[199G[11;42H5[12;41H88	74.9 %[25d[1;192H3[2d17s (0[11;42H7[11;72H1[12;41H91[12;69H4[25d[1;192H5[2d190s (0[11;41H29[11;51H2[11;71H45[12;41H72[25d[1;192H6[2d205s (0[11;42H2[11;51H1[11;71H27[12;41H69[12;69H5[25d[1;192H7[2d19s (0[11;41H36[11;51H4[11;71H90[12;41H91	73.73 [25d[1;192H8[2d16s (0[12;42H0	74.9 %[12;69H6[25d[1;192H9[2d11s (0[11;42H7[12d1[25d[1;191H31[2d197s (0[11;41H9 %      87[11;70H132[12;41H23[25d[1;192H2[2d206s (0[11;41H5[11;51H5[11;71H18[12;42H7	73.73 [12;69H7[25d[1;192H3[2d19s (0[11;41H36 %     94[11;70H292[12;41H91[25d[1;192H4[2d23s (0[11;72H0[12;42H0[12;69H8[25d[1;192H5[2d20s (0[11;42H7[12d1[25d[1;192H7[2d19s (0[12;50H4.9 %[25d[1;192H8[2d196s (0[11;41H29[11;51H2[11;71H44[12;41H7[25d[1;192H9[2d200s (0[11;41H0 %      84[11;70H 70[12;41H0 % [25d[1;191H40[2d17s (0[11;41H10 %	 86[11;70H152[12;41H43 %[12;69H9[25d[1;192H2[2;199H[11;41H35	 93[11;70H290[12;41H87	73.73 [12;68H50[25d[1;192H3[2d14s (0[11;42H6[11;51H4[11;72H1[12;41H90[12;69H1[25d[1;192H4[2d19s (0[11;42H7[11;72H0[12;42H2[25d[1;192H5[2d26s (0[12;50H4.9 %[25d[1;192H6[2d12s (0[12;42H0[25d[1;192H8[2d15s (0[11;42H6[11;71H81[12;41H88[25d[1;192H9[2d193s (0[11;41H0 %      85[11;70H 80[12;41H0 % [25d[1;191H50[2d20[199G[11;51H2[11;71H5[12;41H1[12;50H3.73 [25d[1;192H1[2d18s (0[11;41H23 %     91[11;70H244[12;41H75 %[12;69H2[25d[1;192H2[2d22s (0[11;41H35[11;51H3[11;71H88[12;41H87[12;69H3[25d[1;192H4[2d3[199G[11;42H6[11;51H4[11;71H90[12;42H9	72.94[25d[1;192H5[2d18s (0[25d[1;192H6[2d15s (0[12;50H4.9 %[12;69H4[25d[1;192H7[2d20s (0[11;42H7[11;72H1[12;41H92[25d[1;192H9[2d14s (0[11;72H0[12;42H0[25d[1;189H2:00[2d19[199G[11;41H4 %      86[11;70H 99[12;42H %     73.73 [25d[1;192H1[2d216s (0[11;41H10 %	 87[11;70H161[12;41H41 %[25d[1;192H2[2d17s (0[11;41H37	 93[11;70H29[12;41H92[12;69H5[25d[1;192H3[2d11s (0[11;51H4[12d2.94[25d[1;192H5[2;199H[11;42H5[11;71H89[12;41H88	73.73[12;69H6[25d[1;192H6[2d2[199G[11;42H6[11;71H90[12;41H90	74.9 %[25d[1;192H7[2d18s (0[11;42H7[12d2[25d[1;192H8[2d00s (0[11;41H23[11;51H1[11;71H09[12;41H57[25d[1;192H9[2d23s (0[11;42H7[11;51H2[11;71H54[12;41H76	73.73 [12;69H7[25dX11 connection rejected because of wrong authentication.
-[1;191H11[2d22s (0[11;41H36[11;51H4[11;71H90[12;41H89[12;69H8[25d[1;192H2[2d24s (0[11;42H7[11;71H89[12;41H91	74.9 %[25dX11 connection rejected because of wrong authentication.
-[1;192H3[2d21s (0[11;71H91[25d[1;192H4[2d193s (0[11;41H12	 88[11;70H144[12;41H29[12;69H9[25d[1;192H6[2d201s (0[11;41H0 % 	 83[11;70H 59[12;41H0 % [25d[1;192H7[2d19s (0[11;41H26 %     91[11;70H253[12;41H80 %    73.73 [12;68H60[25d[1;192H8[2d194s (0[11;41H1 %      85[11;70H 78[12;41H3 % [25d[1;192H9[2d92s (0[11;41H0[11;51H2[11;71H54[12;41H0[25d[1;191H20[2d91s (0[11;51H1[11;71H48[12;50H2.94[25d[1;192H2[2d94s (0[11;50H79[11;71H34[25d[1;192H3[2d93s (0[11;51H8[11;71H2[25d[1;192H4[2d92s (0[11;72H8[12;50H1.76[25d[1;192H5[2d94s (0[11;51H7[11;72H2[25d[1;192H6[2d99s (0[11;72H6[25d[1;192H8[2d203s (0[11;71H31[12;50H0.98[25d[1;192H9[2d195s (0[11;51H6[11;71H27[25d[1;191H30[2;199H[11;72H5[25d[1;192H1[2d90s (0[11;72H6[12;49H69.8 %[25d[1;192H2[2d211s (0[11;51H5[11;71H33[25d[1;192H4[2d190s (0[11;71H22[12;50H8.63 [25d[1;192H5[2d96s (0[11;71H31[25d[1;192H6[2d90s (0[11;51H4[11;71H22[25d[1;192H7[2d93s (0[11;72H1[12;50H7.84[25d[1;192H8[2d95s (0[11;72H9[25d[1;192H9[2d92s (0[11;51H3[25d[1;191H41[2d91s (0[11;72H6[12;50H6.67[25d[1;192H2[2d205s (0[11;72H5[25d[1;192H3[2d07s (0[11;51H2[25d[1;192H4[2d198s (0[11;72H3[12;50H5.88[25d[1;192H5[2d91s (0[11;72H9[25d[1;192H7[2;199H[11;72H5[25d[1;192H8[2d95s (0[11;51H1[11;72H8[12;50H4.71[25d[1;192H9[2d202s (0[11;72H2[25d[1;191H50[2d09s (0[11;72H1[25d[1;192H1[2d19[199G[11;72H6[12;50H3.92[25d[1;192H3[2d94s (0[11;51H0[11;72H4[25d[1;192H4[2d201s (0[11;72H2[25d[1;192H5[2d194s (0[11;72H8[12;50H2.75[25d[1;192H6[2d96s (0[11;72H4[25d[1;192H7[2d95s (0[11;50H69[11;72H1[25d[1;192H9[2d200s (0[11;72H8[12;50H1.96[25d[1;189H3:00[2d199s (0[11;72H5[25d[1;192H1[2d96s (0[11;51H8[11;72H8[25d[1;192H2[2d97s (0[11;72H3[12;50H0.78[25d[1;192H3[2d208s (0[11;72H7[25d[1;192H5[2d01s (0[25d[1;192H6[2;199H[11;72H2[12;52H0 %[25d[1;192H7[2d195s (0[11;51H7[11;72H6[25d[1;192H8[2d96s (0[11;72H4[25d[1;192H9[2;199H[11;72H0[12;49H58.82 [25d[1;191H11[2d99s (0[11;72H1[25d[1;192H2[2d95s (0[11;72H7[12;50H7.65[25d[1;192H3[2d20[199G[11;72H0[12;50H6.86[25d[1;192H4[2d01s (0[11;51H6[11;72H1[12;50H4.9 %[25d[1;192H5[2d03s (0[11;72H9[12;50H3.73 [25d[1;192H7[2d196s (0[11;72H7[12;50H2.94[25d[1;192H8[2d91s (0[11;72H0[12;50H0.98[25d[1;192H9[2d94s (0[11;72H2[12;49H49.8 %[25d[1;191H20[2d95s (0[11;72H4[12;50H8.63 [25d[1;192H1[2d91s (0[11;72H2[12;50H7.84[25d[1;192H3[2d93s (0[11;72H9[12;50H5.88[25d[1;192H4[2d201s (0[11;51H5[11;72H1[12;50H4.71[25d[1;192H5[2d192s (0[11;72H0[12;50H3.92[25d[1;192H6[2d91s (0[12;50H1.96[25d[1;192H7[2d94s (0[11;72H3[12;50H0.78[25d[1;192H9[2d96s (0[11;72H1[12;52H0 %[25d[1;191H30[2d95s (0[11;72H5[12;49H38.82 [25d[1;192H1[2d96s (0[11;72H4[12;50H6.86[25d[1;192H2[2d93s (0[11;72H7[12;50H5.69[25d[1;192H3[2d94s (0[11;72H0[12;50H4.9 %[25d[1;192H5[2d97s (0[11;72H3[12;50H2.94 [25d[1;192H6[2d98s (0[11;72H0[12;50H1.76[25d[1;192H7[2d201s (0[11;51H4[11;72H3[12;50H0.98[25d[1;192H8[2d195s (0[11;72H4[12;49H28.63[25d[1;192H9[2d203s (0[11;72H7[12;50H7.84[25d[1;191H41[2d192s (0[11;72H1[12;50H6.67[25d[1;192H2[2d98s (0[11;72H0[12;50H5.88[25d[1;192H3[2d91s (0[12;50H3.92[25d[1;192H4[2d94s (0[11;72H8[12;50H2.75[25d[1;192H5[2d92s (0[11;72H7[25d[1;192H7[2d94s (0[11;72H6[25d[1;192H8[2d206s (0[25d[1;192H9[2d194s (0[11;72H0[25d[1;191H50[2d95s (0[11;72H7[25d[1;192H1[2;199H[11;72H6[25d[1;192H3[2d202s (0[11;72H1[25d[1;192H4[2d195s (0[11;72H5[25d[1;192H5[2d89s (0[11;72H0[25d[1;192H6[2d96s (0[11;72H5[25d[1;192H7[2d20[199G[11;72H8[25d[1;192H9[2d194s (0[11;72H3[25d[1;189H4:00[2d92s (0[25d[1;192H1[2d91s (0[25d[1;192H2[2;199H[11;72H5[25d[1;192H3[2d92s (0[11;72H1[25d[1;192H5[2d96s (0[11;72H0[25d[1;192H6[2d95s (0[25d[1;192H7[2d93s (0[11;72H1[25d[1;192H8[2d95s (0[11;72H3[25d[1;192H9[2d93s (0[11;72H4[25d[1;191H11[2d99s (0[11;72H1[25d[1;192H2[2d96s (0[11;72H7[25d[1;192H3[2;199H[11;72H0[25d[1;192H4[2d97s (0[11;72H6[25d[1;192H5[2d92s (0[11;72H1[25d[1;192H7[2d93s (0[11;72H4[25d[1;192H8[2d200s (0[11;72H5[25d[1;192H9[2d198s (0[11;72H1[25d[1;191H20[2;199H[11;72H0[25d[1;192H1[2d97s (0[25d[1;192H3[2d99s (0[11;72H6[25d[1;192H4[2d98s (0[11;72H1[25d[1;192H5[2d96s (0[11;72H0[25d[1;192H6[2d92s (0[11;72H4[25d[1;192H7[2d91s (0[11;72H1[25d[1;192H8[2d95s (0[11;72H3[25d[1;191H30[2d94s (0[11;72H7[25d[1;192H1[2d200s (0[11;72H6[25d[1;192H2[2d191s (0[11;72H3[25d[1;192H3[2d98s (0[11;72H6[25d[1;192H4[2d93s (0[11;72H3[25d[1;192H6[2d96s (0[11;72H4[25d[1;192H7[2d92s (0[11;72H6[25d[1;192H8[2d94s (0[11;72H2[25d[1;192H9[2d90s (0[11;72H1[25d[1;191H40[2d95s (0[11;72H4[25d[1;192H2[2d93s (0[11;72H1[25d[1;192H3[2d95s (0[11;72H5[25d[1;192H4[2d200s (0[11;72H1[25d[1;192H5[2d197s (0[11;72H6[25d[1;192H6[2d93s (0[11;72H0[25d[1;192H8[2d206s (0[11;72H7[25d[1;192H9[2d190s (0[11;71H19[25d[1;191H50[2d91s (0[11;71H27[25d[1;192H1[2d95s (0[11;72H4[25d[1;192H2[2d94s (0[11;72H7[25d[1;192H4[2d92s (0[11;72H3[25d[1;192H5[2d93s (0[11;72H5[25d[1;192H6[2d99s (0[11;72H2[25d[1;192H7[2d93s (0[11;72H8[25d[1;192H8[2d98s (0[11;72H5[25d[1;189H5:00[2d95s (0[11;72H0[25d[1;192H1[2d99s (0[11;72H6[25d[1;192H2[2d93s (0[25d[1;192H3[2;199H[11;72H3[25d[1;192H4[2d90s (0[11;72H6[25d[1;192H6[2d95s (0[11;72H4[25d[1;192H7[2;199H[11;72H2[25d[1;192H8[2d94s (0[11;72H6[25d[1;192H9[2d91s (0[11;71H19[25d[1;191H10[2;199H[11;71H23[25d[1;192H2[2d96s (0[11;71H19[25d[1;192H3[2d97s (0[11;71H27[25d[1;192H4[2d91s (0[11;72H6[25d[1;192H5[2d90s (0[25d[1;192H6[2d206s (0[11;72H3[25d[1;192H8[2d193s (0[11;72H8[25d[1;192H9[2d95s (0[11;72H6[25d[1;191H20[2d20[199G[11;72H3[25d[1;192H1[2d191s (0[25d[1;192H2[2d94s (0[11;72H7[25d[1;192H4[2d96s (0[11;72H2[25d[1;192H5[2d91s (0[11;51H3[11;72H0[25d[1;192H6[2d206s (0[11;72H3[25d[1;192H7[2d197s (0[11;72H8[25d[1;192H8[2d91s (0[11;72H1[25d[1;192H9[2d92s (0[25d[1;191H31[2d95s (0[11;72H6[25d[1;192H2[2d92s (0[11;72H4[25d[1;192H3[2d93s (0[11;72H6[25d[1;192H4[2d91s (0[11;72H2[25d[1;192H5[2d98s (0[25d[1;192H7[2d204s (0[11;72H1[25d[1;192H8[2d196s (0[11;72H3[25d[1;192H9[2d95s (0[11;72H2[25d[1;191H40[2d99s (0[11;72H4[25d[1;192H1[2;199H[25d[1;192H3[2d97s (0[11;71H19[25d[1;192H4[2d94s (0[11;71H26[25d[1;192H5[2d93s (0[11;72H0[25d[1;192H6[2;199H[11;71H19[25d[1;192H7[2d94s (0[11;71H25[25d[1;192H9[2d96s (0[11;72H2[25d[1;191H50[2d98s (0[11;72H0[25d[1;192H1[2d96s (0[11;72H1[25d[1;192H2[2d93s (0[11;72H6[25d[1;192H3[2d94s (0[25d[1;192H5[2d98s (0[11;72H3[25d[1;192H6[2d95s (0[25d[1;192H7[2d201s (0[11;71H19[25d[1;192H8[2d199s (0[25d[1;192H9[2d95s (0[11;71H20[25d[1;189H6:01[2;199H[11;72H7[25d[1;192H2[2d96s (0[11;72H0[25d[1;192H3[2d98s (0[11;71H19[25d[1;192H4[2d99s (0[11;71H24[25d[1;192H5[2d97s (0[11;72H6[25d[1;192H7[2;199H[25d[1;192H8[2d96s (0[11;71H19[25d[1;192H9[2d97s (0[11;71H20[25d[1;191H10[2d96s (0[11;72H5[25d[1;192H1[2d205s (0[11;72H1[25d[1;192H3[2d03s (0[11;72H6[25d[1;192H4[2d197s (0[11;71H19[25d[1;192H5[2d96s (0[11;71H26[25d[1;192H6[2d202s (0[11;72H3[25d[1;192H7[2d197s (0[11;71H19[25d[1;192H9[2d96s (0[11;71H20[25d[1;191H20[2d203s (0[11;72H4[25d[1;192H1[2d196s (0[11;72H7[25d[1;192H2[2d95s (0[11;72H6[25d[1;192H3[2d92s (0[11;51H2[11;72H1[25d[1;192H5[2d97s (0[11;72H5[25d[1;192H6[2d94s (0[11;72H3[25d[1;192H7[2d93s (0[11;72H4[25d[1;192H8[2d98s (0[11;72H6[25d[1;192H9[2d200s (0[11;72H3[25d[1;191H31[2d195s (0[11;72H7[25d[1;192H2[2d99s (0[11;72H1[25d[1;192H3[2d93s (0[11;71H19[25d[1;192H4[2d209s (0[11;71H23[25d[1;192H5[2d193s (0[25d[1;192H7[2;199H[11;72H6[25d[1;192H8[2d97s (0[11;72H2[25d[1;192H9[2d98s (0[11;72H3[25d[1;191H40[2d97s (0[11;72H0[25d[1;192H1[2;199H[25d[1;192H3[2d90s (0[11;72H6[25d[1;192H4[2d95s (0[11;72H3[25d[1;192H5[2d92s (0[25d[1;192H6[2d99s (0[11;72H0[25d[1;192H7[2d200s (0[25d[1;192H9[2d01s (0[11;72H3[25d[1;191H50[2d190s (0[11;72H0[25d[1;192H1[2d97s (0[11;72H2[25d[1;192H2[2d20[199G[11;72H1[25d[1;192H3[2d193s (0[11;72H6[25d[1;192H5[2d92s (0[11;72H0[25d[1;192H6[2;199H[11;72H6[25d[1;192H7[2d93s (0[11;71H19[25d[1;192H8[2d220s (0[11;71H23[25d[1;192H9[2d199s (0[11;72H7[25d[1;189H7:01[2d203s (0[11;72H3[25d[1;192H2[2d195s (0[11;72H4[25d[1;192H3[2d96s (0[11;72H2[25d[1;192H4[2d97s (0[11;72H6[25d[1;192H5[2d91s (0[11;72H0[25d[1;192H7[2;199H[11;72H3[25d[1;192H8[2d93s (0[11;72H6[25d[1;192H9[2d94s (0[11;72H0[25d[1;191H10[2d208s (0[11;72H5[25d[1;192H1[2d195s (0[11;72H3[25d[1;192H3[2d92s (0[25d[1;192H4[2d94s (0[11;72H4[25d[1;192H5[2d97s (0[11;72H3[25d[1;192H6[2d216s (0[25d[1;192H7[2d01s (0[11;72H6[12;41H1[25d[1;192H9[2d198s (0[23d[J[11;41H2[11;51H3[11;71H55[12;41H20 %[12;65H  582[21;4HNo running processes found[21;44H[31X[22d+------------------------------------------------------------------------------+[23d[1;191H20[2d93s (0[11;41H0[11;51H2[11;71H23[12;41H0 % [23d[79;1H[?12l[?25h[?1049l[23;0;0t[?1l>]0;woodard@woodard-thinkstationp620:~]3008;end=2299f20c-9de2-4bca-8ade-4f32f02c85fa;exit=success\]3008;start=ef5a0317-52eb-4270-986b-61fbddf5a1a2;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=shell;cwd=/home/woodard\[?2004h[0m[32mwoodard@woodard-thinkstationp620[0m:[32m~[0m$ top
-[?2004l]3008;start=c9c0c49d-8783-4dad-8ee5-6025bc72a99f;machineid=8428a46f3b1e4c64a828441cf5a1f17a;user=woodard;hostname=woodard-thinkstationp620.rmtusca.csb;bootid=35ce9833-f9c2-4e51-b58f-553f910aa358;pid=00000000000000261035;type=command;cwd=/home/woodard\[?1h=[?25l[H(B[mtop - 14:57:24 up 1 day, 20:06,  3 users,  load average: 3.57, 4.57, 4.28(B[m[39;49m(B[m[39;49m[K
-(B[mTasks:(B[m[39;49m[1m 768 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m 1 (B[m[39;49m(B[mrunning,(B[m[39;49m[1m 767 (B[m[39;49m(B[msleep,(B[m[39;49m[1m 0 (B[m[39;49m(B[md-sleep,(B[m[39;49m[1m 0 (B[m[39;49m(B[mstopped,(B[m[39;49m[1m 0 (B[m[39;49m(B[mzombie(B[m[39;49m(B[m[39;49m[K
-(B[m%Cpu(s):(B[m[39;49m[1m  0.2 (B[m[39;49m(B[mus,(B[m[39;49m[1m  0.8 (B[m[39;49m(B[msy,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mni,(B[m[39;49m[1m 99.0 (B[m[39;49m(B[mid,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mwa,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mhi,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[msi,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mst(B[m[39;49m(B[m (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Mem :(B[m[39;49m[1m 128642.2 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m  10287.7 (B[m[39;49m(B[mfree,(B[m[39;49m[1m  12464.7 (B[m[39;49m(B[mused,(B[m[39;49m[1m 107253.2 (B[m[39;49m(B[mbuff/cache(B[m[39;49m(B[m (B[m[39;49m(B[m    (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Swap:(B[m[39;49m[1m 270335.0 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m 270159.6 (B[m[39;49m(B[mfree,(B[m[39;49m[1m    175.4 (B[m[39;49m(B[mused.(B[m[39;49m[1m 116177.5 (B[m[39;49m(B[mavail Mem (B[m[39;49m(B[m[39;49m[K
-[K
-[7m    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND                                                                                                                         (B[m[39;49m[K
-(B[m[1m2505627 woodard   20   0  245604   6804   4372 R  16.4   0.0   0:00.07 top                                                                                                                             (B[m[39;49m[K
-(B[m   1444 root      20   0   16184   8224   6708 S   4.1   0.0   0:02.16 systemd-homed                                                                                                                   (B[m[39;49m[K
-(B[m      1 root      20   0   44556  25704  12000 S   0.0   0.0   5:28.05 systemd                                                                                                                         (B[m[39;49m[K
-(B[m      2 root      20   0       0      0      0 S   0.0   0.0   0:00.41 kthreadd                                                                                                                        (B[m[39;49m[K
-(B[m      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 pool_workqueue_release                                                                                                          (B[m[39;49m[K
-(B[m      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-rcu_gp                                                                                                                (B[m[39;49m[K
-(B[m      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-sync_wq                                                                                                               (B[m[39;49m[K
-(B[m      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-kvfree_rcu_reclaim                                                                                                    (B[m[39;49m[K
-(B[m      7 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-slub_flushwq                                                                                                          (B[m[39;49m[K
-(B[m      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-netns                                                                                                                 (B[m[39;49m[K
-(B[m     10 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/0:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     13 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-mm_percpu_wq                                                                                                          (B[m[39;49m[K
-(B[m     15 root      20   0       0      0      0 S   0.0   0.0   0:01.05 ksoftirqd/0                                                                                                                     (B[m[39;49m[K
-(B[m     16 root      20   0       0      0      0 I   0.0   0.0   1:29.14 rcu_preempt                                                                                                                     (B[m[39;49m[K
-(B[m     17 root      20   0       0      0      0 S   0.0   0.0   0:00.87 rcu_exp_par_gp_kthread_worker/1                                                                                                 (B[m[39;49m[K
-(B[m     18 root      20   0       0      0      0 S   0.0   0.0   0:01.55 rcu_exp_gp_kthread_worker                                                                                                       (B[m[39;49m[K
-(B[m     19 root      rt   0       0      0      0 S   0.0   0.0   0:34.37 migration/0                                                                                                                     (B[m[39;49m[K
-(B[m     20 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kprobe-optimizer                                                                                                                (B[m[39;49m[K
-(B[m     21 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/0                                                                                                                   (B[m[39;49m[K
-(B[m     22 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/0                                                                                                                         (B[m[39;49m[K
-(B[m     23 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/1                                                                                                                         (B[m[39;49m[K
-(B[m     24 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/1                                                                                                                   (B[m[39;49m[K
-(B[m     25 root      rt   0       0      0      0 S   0.0   0.0   0:27.61 migration/1                                                                                                                     (B[m[39;49m[K
-(B[m     26 root      20   0       0      0      0 S   0.0   0.0   0:00.37 ksoftirqd/1                                                                                                                     (B[m[39;49m[K
-(B[m     28 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/1:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     29 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/2                                                                                                                         (B[m[39;49m[K
-(B[m     30 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/2                                                                                                                   (B[m[39;49m[K
-(B[m     31 root      rt   0       0      0      0 S   0.0   0.0   0:23.66 migration/2                                                                                                                     (B[m[39;49m[K
-(B[m     32 root      20   0       0      0      0 S   0.0   0.0   0:00.14 ksoftirqd/2                                                                                                                     (B[m[39;49m[K
-(B[m     34 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/2:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     35 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/3                                                                                                                         (B[m[39;49m[K
-(B[m     36 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/3                                                                                                                   (B[m[39;49m[K
-(B[m     37 root      rt   0       0      0      0 S   0.0   0.0   0:22.92 migration/3                                                                                                                     (B[m[39;49m[K
-(B[m     38 root      20   0       0      0      0 S   0.0   0.0   0:00.11 ksoftirqd/3                                                                                                                     (B[m[39;49m[K
-(B[m     40 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/3:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     41 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/4                                                                                                                         (B[m[39;49m[K
-(B[m     42 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/4                                                                                                                   (B[m[39;49m[K
-(B[m     43 root      rt   0       0      0      0 S   0.0   0.0   0:19.54 migration/4                                                                                                                     (B[m[39;49m[K
-(B[m     44 root      20   0       0      0      0 S   0.0   0.0   0:00.08 ksoftirqd/4                                                                                                                     (B[m[39;49m[K
-(B[m     46 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/4:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     47 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/5                                                                                                                         (B[m[39;49m[K
-(B[m     48 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/5                                                                                                                   (B[m[39;49m[K
-(B[m     49 root      rt   0       0      0      0 S   0.0   0.0   0:19.23 migration/5                                                                                                                     (B[m[39;49m[K
-(B[m     50 root      20   0       0      0      0 S   0.0   0.0   0:00.04 ksoftirqd/5                                                                                                                     (B[m[39;49m[K
-(B[m     52 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/5:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     53 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/6                                                                                                                         (B[m[39;49m[K
-(B[m     54 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/6                                                                                                                   (B[m[39;49m[K
-(B[m     55 root      rt   0       0      0      0 S   0.0   0.0   0:26.64 migration/6                                                                                                                     (B[m[39;49m[K
-(B[m     56 root      20   0       0      0      0 S   0.0   0.0   0:00.03 ksoftirqd/6                                                                                                                     (B[m[39;49m[K
-(B[m     58 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/6:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     59 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/7                                                                                                                         (B[m[39;49m[K
-(B[m     60 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/7                                                                                                                   (B[m[39;49m[K
-(B[m     61 root      rt   0       0      0      0 S   0.0   0.0   0:18.48 migration/7                                                                                                                     (B[m[39;49m[K
-(B[m     62 root      20   0       0      0      0 S   0.0   0.0   0:00.05 ksoftirqd/7                                                                                                                     (B[m[39;49m[K
-(B[m     64 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/7:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     65 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/8                                                                                                                         (B[m[39;49m[K
-(B[m     66 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/8                                                                                                                   (B[m[39;49m[K
-(B[m     67 root      rt   0       0      0      0 S   0.0   0.0   0:36.41 migration/8                                                                                                                     (B[m[39;49m[K
-(B[m     68 root      20   0       0      0      0 S   0.0   0.0   0:00.45 ksoftirqd/8                                                                                                                     (B[m[39;49m[K
-(B[m     70 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/8:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     71 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/9                                                                                                                         (B[m[39;49m[K
-(B[m     72 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/9                                                                                                                   (B[m[39;49m[K
-(B[m     73 root      rt   0       0      0      0 S   0.0   0.0   0:27.65 migration/9                                                                                                                     (B[m[39;49m[K
-(B[m     74 root      20   0       0      0      0 S   0.0   0.0   0:01.35 ksoftirqd/9                                                                                                                     (B[m[39;49m[K
-(B[m     76 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/9:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     77 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/10                                                                                                                        (B[m[39;49m[K
-(B[m     78 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/10                                                                                                                  (B[m[39;49m[K
-(B[m     79 root      rt   0       0      0      0 S   0.0   0.0   0:32.60 migration/10                                                                                                                    (B[m[39;49m[K
-(B[m     80 root      20   0       0      0      0 S   0.0   0.0   0:00.18 ksoftirqd/10                                                                                                                    (B[m[39;49m[K
-(B[m     82 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/10:0H-kblockd                                                                                                           (B[m[39;49m[K
-(B[m     83 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/11                                                                                                                        (B[m[39;49m[K
-(B[m     84 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/11                                                                                                                  (B[m[39;49m[K[H(B[mtop - 14:57:27 up 1 day, 20:06,  3 users,  load average: 3.57, 4.57, 4.28(B[m[39;49m(B[m[39;49m[K
-
-(B[m%Cpu(s):(B[m[39;49m[1m  0.2 (B[m[39;49m(B[mus,(B[m[39;49m[1m  0.2 (B[m[39;49m(B[msy,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mni,(B[m[39;49m[1m 99.3 (B[m[39;49m(B[mid,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[mwa,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[mhi,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[msi,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mst(B[m[39;49m(B[m (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Mem :(B[m[39;49m[1m 128642.2 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m  10317.1 (B[m[39;49m(B[mfree,(B[m[39;49m[1m  12435.3 (B[m[39;49m(B[mused,(B[m[39;49m[1m 107253.2 (B[m[39;49m(B[mbuff/cache(B[m[39;49m(B[m (B[m[39;49m(B[m    (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Swap:(B[m[39;49m[1m 270335.0 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m 270159.6 (B[m[39;49m(B[mfree,(B[m[39;49m[1m    175.4 (B[m[39;49m(B[mused.(B[m[39;49m[1m 116206.9 (B[m[39;49m(B[mavail Mem (B[m[39;49m(B[m[39;49m[K
-[K
-
-(B[m  66037 root      20   0 5891132   1.7g   1.5g S   2.6   1.4  74:03.54 falcon-sensor-b                                                                                                                 (B[m[39;49m[K
-(B[m  49404 geoclue   20   0 2308512  44336  17280 S   1.0   0.0   1:43.54 geoclue                                                                                                                         (B[m[39;49m[K
-(B[m 664942 woodard   20   0 6556980 300732  78528 S   1.0   0.2   7:45.29 beam.smp                                                                                                                        (B[m[39;49m[K
-(B[m[1m2505627 woodard   20   0  245604   7120   4676 R   1.0   0.0   0:00.10 top                                                                                                                             (B[m[39;49m[K
-(B[m 681509 166534    20   0  282576  18804  15124 S   0.7   0.0   2:12.97 postgres                                                                                                                        (B[m[39;49m[K
-(B[m2500522 woodard   20   0  267984  33936  14336 S   0.7   0.0   0:00.64 python3                                                                                                                         (B[m[39;49m[K
-(B[m   1077 root      20   0  400296 226452 223720 S   0.3   0.2   1:12.15 systemd-journal                                                                                                                 (B[m[39;49m[K
-(B[m   1268 systemd+  20   0   16024   7328   6192 S   0.3   0.0   3:45.93 systemd-oomd                                                                                                                    (B[m[39;49m[K
-(B[m   1664 root      20   0   17608  11836   9620 S   0.3   0.0   0:16.56 wpa_supplicant                                                                                                                  (B[m[39;49m[K
-(B[m   8427 root      20   0  855720  21540  16836 S   0.3   0.0   0:38.59 NetworkManager                                                                                                                  (B[m[39;49m[K
-(B[m  26856 root      30  10 1765792 169268  13216 S   0.3   0.1  34:41.59 osqueryd                                                                                                                        (B[m[39;49m[K
-(B[m  48924 woodard   20   0   19.1g 324604 124068 S   0.3   0.2   3:53.34 gnome-shell                                                                                                                     (B[m[39;49m[K
-(B[m  65706 splunk    20   0  430784 146100  71940 S   0.3   0.1   4:21.40 splunkd                                                                                                                         (B[m[39;49m[K
-(B[m 152714 woodard   20   0  476780  13228  11228 S   0.3   0.0   0:02.17 gsd-xsettings                                                                                                                   (B[m[39;49m[K
-(B[m 265049 woodard   20   0   15.6g   1.2g 326044 S   0.3   0.9   6:29.73 python3                                                                                                                         (B[m[39;49m[K
-(B[m 681262 woodard   20   0   23.6g 401836  58556 S   0.3   0.3   2:06.32 node                                                                                                                            (B[m[39;49m[K
-(B[m 681301 woodard   20   0 1339680  86296  49804 S   0.3   0.1   2:43.60 node                                                                                                                            (B[m[39;49m[K
-(B[m1610383 root      20   0       0      0      0 I   0.3   0.0   0:00.09 kworker/7:0-memcg                                                                                                               (B[m[39;49m[K
-(B[m2472006 root      20   0       0      0      0 I   0.3   0.0   0:00.27 kworker/9:2-memcg                                                                                                               (B[m[39;49m[K
-(B[m2480407 root      20   0       0      0      0 I   0.3   0.0   0:00.12 kworker/u129:10-events_unbound                                                                                                  (B[m[39;49m[K
-(B[m2492445 root      20   0       0      0      0 I   0.3   0.0   0:00.03 kworker/14:2-memcg                                                                                                              (B[m[39;49m[K
-(B[m      1 root      20   0   44556  25704  12000 S   0.0   0.0   5:28.05 systemd                                                                                                                         (B[m[39;49m[K
-(B[m      2 root      20   0       0      0      0 S   0.0   0.0   0:00.41 kthreadd                                                                                                                        (B[m[39;49m[K
-(B[m      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 pool_workqueue_release                                                                                                          (B[m[39;49m[K
-(B[m      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-rcu_gp                                                                                                                (B[m[39;49m[K
-(B[m      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-sync_wq                                                                                                               (B[m[39;49m[K
-(B[m      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-kvfree_rcu_reclaim                                                                                                    (B[m[39;49m[K
-(B[m      7 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-slub_flushwq                                                                                                          (B[m[39;49m[K
-(B[m      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-netns                                                                                                                 (B[m[39;49m[K
-(B[m     10 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/0:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     13 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-mm_percpu_wq                                                                                                          (B[m[39;49m[K
-(B[m     15 root      20   0       0      0      0 S   0.0   0.0   0:01.05 ksoftirqd/0                                                                                                                     (B[m[39;49m[K
-(B[m     16 root      20   0       0      0      0 I   0.0   0.0   1:29.14 rcu_preempt                                                                                                                     (B[m[39;49m[K
-(B[m     17 root      20   0       0      0      0 S   0.0   0.0   0:00.87 rcu_exp_par_gp_kthread_worker/1                                                                                                 (B[m[39;49m[K
-(B[m     18 root      20   0       0      0      0 S   0.0   0.0   0:01.55 rcu_exp_gp_kthread_worker                                                                                                       (B[m[39;49m[K
-(B[m     19 root      rt   0       0      0      0 S   0.0   0.0   0:34.37 migration/0                                                                                                                     (B[m[39;49m[K
-(B[m     20 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kprobe-optimizer                                                                                                                (B[m[39;49m[K
-(B[m     21 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/0                                                                                                                   (B[m[39;49m[K
-(B[m     22 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/0                                                                                                                         (B[m[39;49m[K
-(B[m     23 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/1                                                                                                                         (B[m[39;49m[K
-(B[m     24 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/1                                                                                                                   (B[m[39;49m[K
-(B[m     25 root      rt   0       0      0      0 S   0.0   0.0   0:27.61 migration/1                                                                                                                     (B[m[39;49m[K
-(B[m     26 root      20   0       0      0      0 S   0.0   0.0   0:00.37 ksoftirqd/1                                                                                                                     (B[m[39;49m[K
-(B[m     28 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/1:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     29 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/2                                                                                                                         (B[m[39;49m[K
-(B[m     30 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/2                                                                                                                   (B[m[39;49m[K
-(B[m     31 root      rt   0       0      0      0 S   0.0   0.0   0:23.66 migration/2                                                                                                                     (B[m[39;49m[K
-(B[m     32 root      20   0       0      0      0 S   0.0   0.0   0:00.14 ksoftirqd/2                                                                                                                     (B[m[39;49m[K
-(B[m     34 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/2:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     35 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/3                                                                                                                         (B[m[39;49m[K
-(B[m     36 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/3                                                                                                                   (B[m[39;49m[K
-(B[m     37 root      rt   0       0      0      0 S   0.0   0.0   0:22.92 migration/3                                                                                                                     (B[m[39;49m[K
-(B[m     38 root      20   0       0      0      0 S   0.0   0.0   0:00.11 ksoftirqd/3                                                                                                                     (B[m[39;49m[K
-(B[m     40 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/3:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     41 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/4                                                                                                                         (B[m[39;49m[K
-(B[m     42 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/4                                                                                                                   (B[m[39;49m[K
-(B[m     43 root      rt   0       0      0      0 S   0.0   0.0   0:19.54 migration/4                                                                                                                     (B[m[39;49m[K
-(B[m     44 root      20   0       0      0      0 S   0.0   0.0   0:00.08 ksoftirqd/4                                                                                                                     (B[m[39;49m[K
-(B[m     46 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/4:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     47 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/5                                                                                                                         (B[m[39;49m[K
-(B[m     48 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/5                                                                                                                   (B[m[39;49m[K
-(B[m     49 root      rt   0       0      0      0 S   0.0   0.0   0:19.23 migration/5                                                                                                                     (B[m[39;49m[K
-(B[m     50 root      20   0       0      0      0 S   0.0   0.0   0:00.04 ksoftirqd/5                                                                                                                     (B[m[39;49m[K
-(B[m     52 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/5:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     53 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/6                                                                                                                         (B[m[39;49m[K
-(B[m     54 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/6                                                                                                                   (B[m[39;49m[K
-(B[m     55 root      rt   0       0      0      0 S   0.0   0.0   0:26.64 migration/6                                                                                                                     (B[m[39;49m[K
-(B[m     56 root      20   0       0      0      0 S   0.0   0.0   0:00.03 ksoftirqd/6                                                                                                                     (B[m[39;49m[K
-(B[m     58 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/6:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     59 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/7                                                                                                                         (B[m[39;49m[K
-(B[m     60 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/7                                                                                                                   (B[m[39;49m[K
-(B[m     61 root      rt   0       0      0      0 S   0.0   0.0   0:18.48 migration/7                                                                                                                     (B[m[39;49m[K[H(B[mtop - 14:57:30 up 1 day, 20:06,  3 users,  load average: 5.84, 5.02, 4.42(B[m[39;49m(B[m[39;49m[K
-(B[mTasks:(B[m[39;49m[1m 761 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m 1 (B[m[39;49m(B[mrunning,(B[m[39;49m[1m 760 (B[m[39;49m(B[msleep,(B[m[39;49m[1m 0 (B[m[39;49m(B[md-sleep,(B[m[39;49m[1m 0 (B[m[39;49m(B[mstopped,(B[m[39;49m[1m 0 (B[m[39;49m(B[mzombie(B[m[39;49m(B[m[39;49m[K
-(B[m%Cpu(s):(B[m[39;49m[1m  3.3 (B[m[39;49m(B[mus,(B[m[39;49m[1m  1.3 (B[m[39;49m(B[msy,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mni,(B[m[39;49m[1m 95.1 (B[m[39;49m(B[mid,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[mwa,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[mhi,(B[m[39;49m[1m  0.1 (B[m[39;49m(B[msi,(B[m[39;49m[1m  0.0 (B[m[39;49m(B[mst(B[m[39;49m(B[m (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Mem :(B[m[39;49m[1m 128642.2 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m  10333.1 (B[m[39;49m(B[mfree,(B[m[39;49m[1m  12419.3 (B[m[39;49m(B[mused,(B[m[39;49m[1m 107253.2 (B[m[39;49m(B[mbuff/cache(B[m[39;49m(B[m (B[m[39;49m(B[m    (B[m[39;49m(B[m[39;49m[K
-(B[mMiB Swap:(B[m[39;49m[1m 270335.0 (B[m[39;49m(B[mtotal,(B[m[39;49m[1m 270159.6 (B[m[39;49m(B[mfree,(B[m[39;49m[1m    175.4 (B[m[39;49m(B[mused.(B[m[39;49m[1m 116223.0 (B[m[39;49m(B[mavail Mem (B[m[39;49m(B[m[39;49m[K
-[K
-
-(B[m  66037 root      20   0 5891132   1.7g   1.5g S   2.3   1.4  74:03.61 falcon-sensor-b                                                                                                                 (B[m[39;49m[K
-(B[m 664942 woodard   20   0 6559548 300740  78528 S   1.0   0.2   7:45.32 beam.smp                                                                                                                        (B[m[39;49m[K
-(B[m  26856 root      30  10 1765792 169268  13216 S   0.7   0.1  34:41.61 osqueryd                                                                                                                        (B[m[39;49m[K
-(B[m 664928 166534    20   0   75176  24136  18380 S   0.7   0.0   2:30.47 redis-server                                                                                                                    (B[m[39;49m[K
-(B[m2500522 woodard   20   0  267984  33936  14336 S   0.7   0.0   0:00.66 python3                                                                                                                         (B[m[39;49m[K
-(B[m[1m2505627 woodard   20   0  245604   7120   4676 R   0.7   0.0   0:00.12 top                                                                                                                             (B[m[39;49m[K
-(B[m     43 root      rt   0       0      0      0 S   0.3   0.0   0:19.55 migration/4                                                                                                                     (B[m[39;49m[K
-(B[m     61 root      rt   0       0      0      0 S   0.3   0.0   0:18.49 migration/7                                                                                                                     (B[m[39;49m[K
-(B[m    115 root      rt   0       0      0      0 S   0.3   0.0   0:26.34 migration/16                                                                                                                    (B[m[39;49m[K
-(B[m    128 root      rt   0       0      0      0 S   0.3   0.0   0:22.81 migration/18                                                                                                                    (B[m[39;49m[K
-(B[m    140 root      rt   0       0      0      0 S   0.3   0.0   0:15.16 migration/20                                                                                                                    (B[m[39;49m[K
-(B[m    164 root      rt   0       0      0      0 S   0.3   0.0   0:17.97 migration/24                                                                                                                    (B[m[39;49m[K
-(B[m   1594 root      20   0  420556  54408  52316 S   0.3   0.0   0:07.62 abrt-dump-journ                                                                                                                 (B[m[39;49m[K
-(B[m  26853 root      30  10  173744   9132   8880 S   0.3   0.0   0:55.75 osqueryd                                                                                                                        (B[m[39;49m[K
-(B[m  48454 woodard   20   0  254904  17712  12064 S   0.3   0.0   2:10.12 systemd                                                                                                                         (B[m[39;49m[K
-(B[m  65706 splunk    20   0  430784 146100  71940 S   0.3   0.1   4:21.41 splunkd                                                                                                                         (B[m[39;49m[K
-(B[m 265049 woodard   20   0   15.6g   1.2g 326420 S   0.3   0.9   6:29.74 python3                                                                                                                         (B[m[39;49m[K
-(B[m 681271 woodard   20   0   23.6g 385008  58520 S   0.3   0.3   0:27.90 node                                                                                                                            (B[m[39;49m[K
-(B[m 681301 woodard   20   0 1339680  86296  49804 S   0.3   0.1   2:43.61 node                                                                                                                            (B[m[39;49m[K
-(B[m 681509 166534    20   0  282576  18804  15124 S   0.3   0.0   2:12.98 postgres                                                                                                                        (B[m[39;49m[K
-(B[m 681510 166534    20   0  282580  18796  15104 S   0.3   0.0   2:12.21 postgres                                                                                                                        (B[m[39;49m[K
-(B[m2423440 root      20   0       0      0      0 I   0.3   0.0   0:00.59 kworker/u130:13-events_unbound                                                                                                  (B[m[39;49m[K
-(B[m2477818 root      20   0       0      0      0 I   0.3   0.0   0:00.10 kworker/u129:7-btrfs-endio-meta                                                                                                 (B[m[39;49m[K
-(B[m      1 root      20   0   44556  25704  12000 S   0.0   0.0   5:28.05 systemd                                                                                                                         (B[m[39;49m[K
-(B[m      2 root      20   0       0      0      0 S   0.0   0.0   0:00.41 kthreadd                                                                                                                        (B[m[39;49m[K
-(B[m      3 root      20   0       0      0      0 S   0.0   0.0   0:00.00 pool_workqueue_release                                                                                                          (B[m[39;49m[K
-(B[m      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-rcu_gp                                                                                                                (B[m[39;49m[K
-(B[m      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-sync_wq                                                                                                               (B[m[39;49m[K
-(B[m      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-kvfree_rcu_reclaim                                                                                                    (B[m[39;49m[K
-(B[m      7 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-slub_flushwq                                                                                                          (B[m[39;49m[K
-(B[m      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-netns                                                                                                                 (B[m[39;49m[K
-(B[m     10 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/0:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     13 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/R-mm_percpu_wq                                                                                                          (B[m[39;49m[K
-(B[m     15 root      20   0       0      0      0 S   0.0   0.0   0:01.05 ksoftirqd/0                                                                                                                     (B[m[39;49m[K
-(B[m     16 root      20   0       0      0      0 I   0.0   0.0   1:29.14 rcu_preempt                                                                                                                     (B[m[39;49m[K
-(B[m     17 root      20   0       0      0      0 S   0.0   0.0   0:00.87 rcu_exp_par_gp_kthread_worker/1                                                                                                 (B[m[39;49m[K
-(B[m     18 root      20   0       0      0      0 S   0.0   0.0   0:01.55 rcu_exp_gp_kthread_worker                                                                                                       (B[m[39;49m[K
-(B[m     19 root      rt   0       0      0      0 S   0.0   0.0   0:34.37 migration/0                                                                                                                     (B[m[39;49m[K
-(B[m     20 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kprobe-optimizer                                                                                                                (B[m[39;49m[K
-(B[m     21 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/0                                                                                                                   (B[m[39;49m[K
-(B[m     22 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/0                                                                                                                         (B[m[39;49m[K
-(B[m     23 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/1                                                                                                                         (B[m[39;49m[K
-(B[m     24 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/1                                                                                                                   (B[m[39;49m[K
-(B[m     25 root      rt   0       0      0      0 S   0.0   0.0   0:27.61 migration/1                                                                                                                     (B[m[39;49m[K
-(B[m     26 root      20   0       0      0      0 S   0.0   0.0   0:00.37 ksoftirqd/1                                                                                                                     (B[m[39;49m[K
-(B[m     28 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/1:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     29 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/2                                                                                                                         (B[m[39;49m[K
-(B[m     30 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/2                                                                                                                   (B[m[39;49m[K
-(B[m     31 root      rt   0       0      0      0 S   0.0   0.0   0:23.66 migration/2                                                                                                                     (B[m[39;49m[K
-(B[m     32 root      20   0       0      0      0 S   0.0   0.0   0:00.14 ksoftirqd/2                                                                                                                     (B[m[39;49m[K
-(B[m     34 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/2:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     35 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/3                                                                                                                         (B[m[39;49m[K
-(B[m     36 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/3                                                                                                                   (B[m[39;49m[K
-(B[m     37 root      rt   0       0      0      0 S   0.0   0.0   0:22.92 migration/3                                                                                                                     (B[m[39;49m[K
-(B[m     38 root      20   0       0      0      0 S   0.0   0.0   0:00.11 ksoftirqd/3                                                                                                                     (B[m[39;49m[K
-(B[m     40 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker/3:0H-kblockd                                                                                                            (B[m[39;49m[K
-(B[m     41 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/4                                                                                                                         (B[m[39;49m[K
-(B[m     42 root     -51   0       0      0      0 S   0.0   0.0   0:00.00 idle_inject/4                                                                                                                   (B[m[39;49m[K
-(B[m     44 root      20   0       0      0      0 S   0.0   0.0   0:00.08 ksoftirqd/4                                                                                                                     (B[m[39;49m[K
-(B[m     46 roo
