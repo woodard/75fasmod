@@ -10,22 +10,9 @@ THD75::THD75(std::string port, rig_model_t model, bool hamlib_debug)
 
 THD75::~THD75() {
   if (rig_ != nullptr) {
-    std::cerr << "[RIG] Quieting TH-D75 and draining serial buffers..." << std::endl;
-    
-    // 1. Send \r and AI 0 to terminate any ongoing commands and stop 
-    //    Kenwood's Auto-Information telemetry.
-    const char* stop_cmd = "\rAI 0\r";
-    std::array<char, 256> dummy_buf{};
-    unsigned char term = '\r';
-    rig_send_raw(rig_, reinterpret_cast<const unsigned char *>(stop_cmd),
-                 strlen(stop_cmd), reinterpret_cast<unsigned char *>(dummy_buf.data()),
-                 dummy_buf.size() - 1, &term);
-
-    // 2. Wait for the radio to finish sending any trailing responses.
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-    
-    // 3. Consume and discard everything that accumulated
-    flush_serial();
+    std::cerr << "[RIG] Cleaning up TH-D75 instance..." << std::endl;
+    // Let base RadioController destructor handle clean rig_close() 
+    // without issuing trailing commands over the wire.
   }
 }
 

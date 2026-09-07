@@ -75,24 +75,10 @@ RadioController::RadioController(rig_model_t model, std::string port,
       orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
       orig_power_saved_(false) {
   
-  // Enable Hamlib internal verbose trace logging only if requested
   if (hamlib_debug) {
     rig_set_debug_level(RIG_DEBUG_TRACE);
     rig_set_debug_file(stderr);
   }
-
-  // --- Force drain OS serial buffers before Hamlib connects ---
-  // This clears any 73-byte FO command echoes left on the wire from 
-  // previous aborted test runs, ensuring a clean slate.
-  int fd = open(port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-  if (fd >= 0) {
-    tcflush(fd, TCIOFLUSH);
-    char junk[256];
-    while (read(fd, junk, sizeof(junk)) > 0) {} // Drain completely
-    close(fd);
-  }
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  // ------------------------------------------------------------
 
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
@@ -103,6 +89,7 @@ RadioController::RadioController(rig_model_t model, std::string port,
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
+  // Single open call handled by Hamlib (thd75_open will handle the 200ms DTR flush)
   int status = rig_open(rig_);
   if (status != RIG_OK) {
     std::cerr << "[RIG] Error: rig_open() failed on " << port_
@@ -113,14 +100,10 @@ RadioController::RadioController(rig_model_t model, std::string port,
     return;
   }
 
-  // MUST be called AFTER rig_open(). 
-  // rig_open() spawns the background caching thread; this command kills it
-  // to ensure strict single-threaded access to the serial port.
+  // Disable Hamlib background cache polling thread globally
   rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
   
-  // Wait for the background thread to safely exit
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
   flush_serial();
 }
 
