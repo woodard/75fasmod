@@ -1,4 +1,4 @@
- /**
+/**
  * @file THD75.hpp
  * @brief Kenwood TH-D75 specific radio controller implementation
  *
@@ -20,7 +20,7 @@ public:
 
   explicit THD75(std::string port, rig_model_t model, bool hamlib_debug);
   ~THD75() override;
-  
+
   auto initialize() -> bool override;
   void shutdown() override;
 

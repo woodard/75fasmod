@@ -17,9 +17,6 @@
 #include <termios.h>
 #include <thread>
 #include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
 
 namespace {
 constexpr double FREQUENCY_MHZ_TO_HZ = 1000000.0;
@@ -51,16 +48,16 @@ auto RadioController::read_sysfs_attr(const fs::path &filepath) -> std::string {
 void RadioController::flush_serial() {
   if (rig_ != nullptr) {
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    rig_flush(static_cast<hamlib_port_t *>(
-        rig_data_pointer(rig_, RIG_PTRX_RIGPORT)));
+    rig_flush(
+        static_cast<hamlib_port_t *>(rig_data_pointer(rig_, RIG_PTRX_RIGPORT)));
   }
 }
 
 /**
  * @brief Construct a new Radio Controller object
  *
- * Initializes the Hamlib rig instance, forcibly drains lingering OS serial 
- * buffers to prevent protocol desynchronization, and safely kills Hamlib's 
+ * Initializes the Hamlib rig instance, forcibly drains lingering OS serial
+ * buffers to prevent protocol desynchronization, and safely kills Hamlib's
  * internal background cache polling thread to avoid collisions.
  *
  * @param model Hamlib rig model number
@@ -74,7 +71,7 @@ RadioController::RadioController(rig_model_t model, std::string port,
       orig_mode_saved_(false), orig_frequency_(0), orig_frequency_saved_(false),
       orig_width_(0), orig_power_(PowerLevel::UNKNOWN),
       orig_power_saved_(false) {
-  
+
   if (hamlib_debug) {
     rig_set_debug_level(RIG_DEBUG_TRACE);
     rig_set_debug_file(stderr);
@@ -83,13 +80,15 @@ RadioController::RadioController(rig_model_t model, std::string port,
   std::cerr << "[RIG] Initializing Hamlib model ID " << model_ << "...\n";
   rig_ = rig_init(model_);
   if (rig_ == nullptr) {
-    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_ << "\n";
+    std::cerr << "[RIG] Error: rig_init() failed for model ID " << model_
+              << "\n";
     return;
   }
 
   rig_set_conf(rig_, rig_token_lookup(rig_, "rig_pathname"), port_.c_str());
 
-  // Single open call handled by Hamlib (thd75_open will handle the 200ms DTR flush)
+  // Single open call handled by Hamlib (thd75_open will handle the 200ms DTR
+  // flush)
   int status = rig_open(rig_);
   if (status != RIG_OK) {
     std::cerr << "[RIG] Error: rig_open() failed on " << port_
@@ -102,7 +101,7 @@ RadioController::RadioController(rig_model_t model, std::string port,
 
   // Disable Hamlib background cache polling thread globally
   rig_set_cache_timeout_ms(rig_, static_cast<hamlib_cache_t>(0), 0);
-  
+
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
   flush_serial();
 }
@@ -135,7 +134,8 @@ auto RadioController::initialize() -> bool {
 
   std::cerr << "[RIG] Saving original radio state..." << std::endl;
 
-  // Save original frequency using virtual override (invokes THD75 CAT fallback if applicable)
+  // Save original frequency using virtual override (invokes THD75 CAT fallback
+  // if applicable)
   double freq_mhz = 0.0;
   if (this->get_frequency(freq_mhz)) {
     orig_frequency_ = static_cast<freq_t>(freq_mhz * FREQUENCY_MHZ_TO_HZ);
@@ -166,7 +166,8 @@ void RadioController::shutdown() {
 
   // Restore original frequency using virtual override
   if (orig_frequency_saved_) {
-    double freq_mhz = static_cast<double>(orig_frequency_) / FREQUENCY_MHZ_TO_HZ;
+    double freq_mhz =
+        static_cast<double>(orig_frequency_) / FREQUENCY_MHZ_TO_HZ;
     this->set_frequency(freq_mhz);
   }
 
@@ -294,7 +295,9 @@ auto RadioController::get_dcd(bool &is_squelch_open) -> bool {
 /**
  * @brief Set the TX power level (Base class placeholder)
  */
-auto RadioController::set_power_level(const std::string &) -> bool { return false; }
+auto RadioController::set_power_level(const std::string &) -> bool {
+  return false;
+}
 
 /**
  * @brief Get the current TX power level (Base class placeholder)
@@ -353,7 +356,8 @@ auto RadioController::find_tty_sysfs(unsigned int target_vid,
 /**
  * @brief Find ALSA device mapped to the serial port's parent USB hub
  *
- * Searches for an ALSA sound device associated with the radio's USB serial port.
+ * Searches for an ALSA sound device associated with the radio's USB serial
+ * port.
  *
  * @param serial_port Serial port path
  * @return ALSA device name
