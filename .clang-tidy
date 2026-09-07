@@ -1,5 +1,5 @@
 ---
-Checks: '-llvm-*,bugprone-*,modernize-*,performance-*,readability-*'
+Checks: '-llvm-*,bugprone-*,modernize-*,performance-*,readability-*,-llvm-header-guard,-cppcoreguidelines-header-guard'
 WarningsAsErrors: ''
 HeaderFilterRegex: '^((?!.*\.local).)*$'
 ExcludeHeaderFilterRegex: '.*(\.local|/usr/).*'

@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // NOLINT(llvm-header-guard,cppcoreguidelines-header-guard)
 #include "Frame.hpp"
 #include <cstddef>
 #include <cstdint>

@@ -1,7 +1,4 @@
-#ifndef DATASOCKET_HPP
-#define DATASOCKET_HPP
-
-#pragma once
+#pragma once // NOLINT(llvm-header-guard,cppcoreguidelines-header-guard)
 
 // Necessary includes for std:: types used in this header
 #include <chrono>
@@ -58,5 +55,3 @@ private:
   std::chrono::steady_clock::time_point tx_resume_time_; // MAC Cooldown
   int frames_sent_in_burst_ = 0;
 };
-
-#endif

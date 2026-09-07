@@ -1,7 +1,4 @@
-#ifndef MODEMDSP_HPP
-#define MODEMDSP_HPP
-
-#pragma once
+#pragma once // NOLINT(llvm-header-guard,cppcoreguidelines-header-guard)
 #include <gnuradio/top_block.h>
 
 class ModemDSP {
@@ -25,5 +22,3 @@ private:
   gr::top_block_sptr rx_tb_; ///< GNU Radio receiver top block
   gr::top_block_sptr tx_tb_; ///< GNU Radio transmitter top block
 };
-
-#endif

@@ -1,7 +1,4 @@
-#ifndef TCMCONFIG_HPP
-#define TCMCONFIG_HPP
-
-#pragma once
+#pragma once // NOLINT(llvm-header-guard,cppcoreguidelines-header-guard)
 #include <gnuradio/digital/constellation.h>
 #include <gnuradio/trellis/fsm.h>
 
@@ -20,5 +17,3 @@ public:
   static auto get_constellation(ModulationScheme scheme)
       -> gr::digital::constellation_sptr;
 };
-
-#endif
