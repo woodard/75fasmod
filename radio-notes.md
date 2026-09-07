@@ -524,3 +524,18 @@ int rig_send_raw(RIG *rig, const unsigned char *in_buf, int in_len,
 | **Response Terminator** | Looks for explicit terminator string (e.g., `"\r"` or `";"`) | Reads fixed number of bytes or until timeout |
 | **Typical Target Radios** | Kenwood (`BC;`), Elecraft (`FA;`) | Icom CI-V hex frames (`0xFE 0xFE...`), Yaesu binary |
 | **Best Choice For TH-D75** | **Yes** (For standard text commands) | Only if interfacing with custom binary streams |
+
+AI stands for Auto Information.
+
+In the Kenwood CAT (Computer Aided Transceiver) protocol, the AI command controls whether the radio spontaneously reports its status changes to the computer.
+
+Here is how the modes work:
+
+    AI 0 (Auto Information OFF): The radio speaks only when spoken to. It will only send data over the serial port if you explicitly ask for it (e.g., if you send FQ, it replies with FQ).
+
+    AI 1 or AI 2 (Auto Information ON): The radio becomes chatty. If you twist the tuning knob, press the PTT button, or if a signal opens the squelch, the radio automatically blasts that new state out over the serial port without waiting for a query.
+
+Why we are using AI 0 in the destructor:
+If a previous application (like an APRS client or another Hamlib script) crashed or exited while Auto Information was turned on, the radio will continue spewing spontaneous updates onto the serial line. When your test script opens the port, those unprompted updates collide with the responses Hamlib actually expects, causing the offset-by-one -RIG_EPROTO errors we were fighting.
+
+Sending AI 0 immediately silences the radio, ensuring the serial line is perfectly predictable and strictly call-and-response.

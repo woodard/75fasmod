@@ -17,6 +17,9 @@
 #include <termios.h>
 #include <thread>
 #include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 
 namespace {
 constexpr double FREQUENCY_MHZ_TO_HZ = 1000000.0;
