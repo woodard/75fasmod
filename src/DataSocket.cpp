@@ -1,4 +1,61 @@
 #include "DataSocket.hpp"
+
+/**
+ * @file DataSocket.hpp
+ * @brief IPC socket server for 75fasmod modem data transfer
+ *
+ * This module provides a socket-based IPC (Inter-Process Communication)
+ * server that allows external processes to connect to the 75fasmod modem
+ * and exchange data with it. The server manages burst transmission
+ * limits and handles multiple client connections.
+ */
+
+/**
+ * @brief Socket server for modem data transfer
+ *
+ * This class implements a Unix domain socket server that listens for
+ * connections from client processes. It manages data transfer between
+ * the modem and connected clients, handling burst transmission limits
+ * and PTT (Push-To-Talk) control.
+ *
+ * Key features:
+ * - Background thread for accepting connections
+ * - Burst transmission limiting to prevent radio overload
+ * - Automatic PTT control during transmission
+ * - Thread-safe queue management
+ */
+
+/**
+ * @brief Constructs a new DataSocket object
+ *
+ * @param socket_path Path for the Unix domain socket
+ * @param radio Reference to RadioController for PTT control
+ * @param dsp Reference to ModemDSP for signal processing
+ * @param burst_limit Maximum frames to transmit in a single burst
+ * @param flush_timeout_ms Timeout in milliseconds to flush the transmit queue
+ */
+
+/**
+ * @brief Destructor
+ *
+ * Stops the server thread and cleans up resources.
+ */
+
+/**
+ * @brief Starts the background server thread
+ *
+ * Starts a background thread to listen for IPC connections.
+ *
+ * @return true if thread started successfully, false otherwise
+ */
+
+/**
+ * @brief Stops the server thread and cleans up
+ *
+ * Signals the server thread to stop and waits for it to complete.
+ * Removes the socket file.
+ */
+
 #include "Frame.hpp"
 #include "ModemDSP.hpp"
 #include "RadioController.hpp"

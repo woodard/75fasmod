@@ -1,4 +1,75 @@
 #include "ModemDSP.hpp"
+
+/**
+ * @file ModemDSP.hpp
+ * @brief Digital Signal Processing for 75fasmod modem
+ *
+ * This module provides the ModemDSP class that interfaces with GNU Radio
+ * for digital signal processing in the 75fasmod modem. It manages the
+ * GNU Radio top-block configuration for both receiver and transmitter
+ * chains, connecting to ALSA audio devices for hardware interfacing.
+ *
+ * The modem uses advanced modulation techniques (Adaptive QAM and TCM)
+ * to achieve high data rates on FM radio links.
+ */
+
+/**
+ * @brief Digital Signal Processing manager for 75fasmod
+ *
+ * This class manages the GNU Radio signal processing chains for the modem.
+ * It handles receiver and transmitter setup, connecting to ALSA audio
+ * devices for hardware I/O.
+ *
+ * Key responsibilities:
+ * - Configure GNU Radio flowgraphs for RX and TX
+ * - Manage ALSA audio device connections
+ * - Provide simple start/stop interfaces for DSP streams
+ */
+
+/**
+ * @brief Constructs a new ModemDSP object
+ *
+ * @param alsa_tx_device ALSA device path for transmission (e.g.,
+ * "plughw:0,0")
+ * @param alsa_rx_device ALSA device path for reception (e.g., "plughw:0,0")
+ */
+
+/**
+ * @brief Destructor
+ *
+ * Cleans up GNU Radio resources and closes ALSA connections.
+ */
+
+/**
+ * @brief Starts receiver processing
+ *
+ * Initializes and starts the GNU Radio receiver flowgraph.
+ *
+ * @param output_fd File descriptor to write decoded data to
+ * @return true if started successfully, false otherwise
+ */
+
+/**
+ * @brief Stops receiver processing
+ *
+ * Stops the receiver flowgraph and releases resources.
+ */
+
+/**
+ * @brief Starts transmitter processing
+ *
+ * Initializes and starts the GNU Radio transmitter flowgraph.
+ *
+ * @param input_fd File descriptor to read data from
+ * @return true if started successfully, false otherwise
+ */
+
+/**
+ * @brief Stops transmitter processing
+ *
+ * Stops the transmitter flowgraph and releases resources.
+ */
+
 #include "TcmConfig.hpp"
 #include <gnuradio/audio/sink.h>
 #include <gnuradio/audio/source.h>

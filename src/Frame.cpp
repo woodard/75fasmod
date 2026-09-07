@@ -1,5 +1,64 @@
 #include "Frame.hpp"
 
+/**
+ * @file Frame.hpp
+ * @brief Frame structure for 75fasmod data transmission
+ *
+ * This module defines the Frame class and related structures used for
+ * data transmission in the 75fasmod modem. Frames are the basic
+ * communication units that are encoded with COBS and transmitted over
+ * the radio link.
+ *
+ * Frame structure:
+ * - ModemHeader (frame_type, sequence_number, payload_length)
+ * - Payload (variable length data)
+ * - CRC32 (error detection checksum)
+ */
+
+/**
+ * @brief Enumeration of frame types
+ *
+ * Defines the type of data contained in a frame.
+ */
+
+/**
+ * @brief Modem header structure
+ *
+ * Contains metadata for frame identification and processing.
+ */
+
+/**
+ * @brief Constructs a ModemHeader
+ * @param frame_type Type of frame (DATA or ACK)
+ * @param seq_num Sequence number (0-255, rolling)
+ * @param payload_len Length of the payload in bytes
+ */
+
+/**
+ * @brief Data frame structure
+ *
+ * Represents a complete data frame with header, payload, and CRC checksum.
+ * Inherits from ModemHeader to include the header fields.
+ */
+
+/**
+ * @brief Constructs a Frame
+ * @param frame_type Type of frame (DATA or ACK)
+ * @param seq_num Sequence number (0-255, rolling)
+ * @param payload_len Length of the payload in bytes
+ * @param payload Data payload vector
+ */
+
+/**
+ * @brief Calculates CRC32 checksum
+ * @return CRC32 value for the frame
+ */
+
+/**
+ * @brief Encodes the frame using COBS
+ * @return COBS-encoded byte vector
+ */
+
 namespace {
 constexpr uint32_t CRC_INITIAL_VALUE = 0xFFFFFFFF;
 constexpr uint32_t CRC_POLY = 0xEDB88320;

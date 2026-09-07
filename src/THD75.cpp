@@ -1,4 +1,14 @@
 #include "THD75.hpp"
+
+/**
+ * @file THD75.hpp
+ * @brief Kenwood TH-D75 specific radio controller implementation
+ *
+ * This class implements the TH-D75 specific functionality for the
+ * RadioController base class. It provides implementations using
+ * Hamlib's Kenwood TH-D75 backend where needed.
+ */
+
 #include "hamlib/rig.h"
 #include <cctype>
 #include <cmath>

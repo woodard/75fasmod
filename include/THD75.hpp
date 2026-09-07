@@ -1,12 +1,3 @@
-/**
- * @file THD75.hpp
- * @brief Kenwood TH-D75 specific radio controller implementation
- *
- * This class implements the TH-D75 specific functionality for the
- * RadioController base class. It provides implementations using
- * Hamlib's Kenwood TH-D75 backend where needed.
- */
-
 #ifndef THD75_HPP
 #define THD75_HPP
 

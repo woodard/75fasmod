@@ -8,6 +8,202 @@
  */
 
 #include "RadioController.hpp"
+
+/**
+ * @file RadioController.hpp
+ * @brief Radio controller for Kenwood TH-D75 using Hamlib
+ *
+ * This module provides a high-level interface to control the Kenwood TH-D75
+ * radio transceiver using the Hamlib library. It handles frequency setting
+ * and querying, power level management, PTT control, and USB interface
+ * configuration for digital modem operation.
+ *
+ * @author 75fasmod developers
+ * @version 0.1.0
+ * @date 2024
+ */
+
+/**
+ * @brief Radio controller class for Kenwood TH-D75
+ *
+ * This class provides methods to control a Kenwood TH-D75 radio transceiver
+ * through Hamlib. It handles initialization, frequency control, power level
+ * management, PTT control, and USB interface configuration for digital
+ * modem operation.
+ *
+ * @note Requires Hamlib library with Kenwood TH-D75 backend support
+ * @note Currently supports Kenwood TH-D75 (rig_model_t:
+ * RIG_MODEL_KENWOOD_TH_D75)
+ */
+
+/**
+ * @brief Power level enumeration for TX power control
+ *
+ * Maps to Kenwood CAT power level values for the TH-D75 radio.
+ */
+
+/**
+ * @brief USB Out Select enumeration for Menu Item 102
+ *
+ * Controls which signal path is routed to the USB/serial data port.
+ * This is essential for digital modem operation.
+ */
+
+/**
+ * @brief Radio mode enumeration
+ *
+ * Radio modes mapped to Hamlib RIG_MODE_* constants.
+ * Note: These are Hamlib mode flags (bit flags), not simple enums.
+ */
+
+/**
+ * @brief Construct a new Radio Controller object
+ *
+ * @param model Hamlib rig model number (e.g., RIG_MODEL_KENWOOD_TH_D75)
+ * @param port Serial port device path (e.g., "/dev/ttyUSB0")
+ * @param hamlib_debug Enable Hamlib debug output (default: false)
+ */
+
+/**
+ * @brief Shutdown the radio controller
+ *
+ * Closes the radio connection and performs cleanup.
+ * Derived classes should override to add specific cleanup logic.
+ */
+
+/**
+ * @brief Destroy the Radio Controller object
+ *
+ * Closes the Hamlib rig connection if open.
+ */
+
+/**
+ * @brief Initialize the radio controller
+ *
+ * Base initialization. Derived classes should override to add
+ * THD75-specific initialization logic.
+ *
+ * @return true if initialization successful, false otherwise
+ */
+
+/**
+ * @brief Set the radio frequency
+ *
+ * Sets the VFO frequency in megahertz.
+ *
+ * @param freq_mhz Frequency in megahertz
+ * @return true if set successfully, false otherwise
+ */
+
+/**
+ * @brief Get the current VFO frequency
+ *
+ * Queries the radio for the current VFO frequency in megahertz.
+ *
+ * @param freq_mhz Reference to store the frequency in megahertz
+ * @return true if query successful, false on error
+ */
+
+/**
+ * @brief Get the current radio mode
+ *
+ * Queries the radio for the current operating mode for the current VFO.
+ *
+ * @param mode Reference to store the current mode
+ * @return true if query successful, false on error
+ */
+
+/**
+ * @brief Set the radio mode
+ *
+ * Sets the operating mode for the current VFO.
+ *
+ * @param mode The mode to set
+ * @return true if set successfully, false otherwise
+ */
+
+/**
+ * @brief Set the TX power level
+ *
+ * Sets the transmission power level. Valid levels: "EL", "L", "M", "H".
+ *
+ * @param level Power level string ("EL", "L", "M", or "H")
+ * @return true if set successfully, false otherwise
+ */
+
+/**
+ * @brief Get the current TX power level
+ *
+ * Queries the radio for the current TX power level.
+ *
+ * @param level Reference to store the power level string ("EL", "L", "M",
+ * "H")
+ * @return true if query successful, false on error
+ */
+
+/**
+ * @brief Set PTT (Push-to-Talk) state
+ *
+ * Controls the transmit/receive state of the radio.
+ *
+ * @param transmit true for transmit, false for receive
+ * @return true if command successful, false otherwise
+ */
+
+/**
+ * @brief Get the DCD (Digital Carrier Detect) status
+ *
+ * Queries whether carrier is detected on the receive path.
+ *
+ * @param is_squelch_open Reference to store the DCD status
+ * @return true if query successful, false on error
+ */
+
+/**
+ * @brief Flush the serial port buffer
+ *
+ * Clears any pending data from the serial port. Useful for ensuring
+ * a clean communication channel before sending new commands.
+ */
+
+/**
+ * @brief Find available serial tty devices in sysfs
+ *
+ * Searches /sys/class/tty for serial devices matching the TH-D75 USB PID/VID.
+ *
+ * @return Vector of device paths matching the TH-D75
+ */
+
+/**
+ * @brief Find tty sysfs devices for a specific USB device
+ *
+ * Searches for serial devices matching the given USB Vendor ID and Product
+ * ID.
+ *
+ * @param target_vid USB Vendor ID
+ * @param target_pid USB Product ID
+ * @return Vector of device paths
+ */
+
+/**
+ * @brief Find ALSA device for the radio
+ *
+ * Searches for an ALSA sound device associated with the radio's USB serial
+ * port.
+ *
+ * @param port Serial port path
+ * @return ALSA device name
+ */
+
+/**
+ * @brief Helper function to read sysfs attributes
+ *
+ * Reads a string value from a sysfs file.
+ *
+ * @param filepath Path to the sysfs file
+ * @return String value read from file, or empty string on error
+ */
+
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
